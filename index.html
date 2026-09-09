@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>rpg0504 · 作品集</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0d16; --panel:#141b2c; --panel2:#0d121f; --line:#2a3550;
+    --ink:#e8edf5; --dim:#8b99b5; --olive:#b9c94e; --teal:#7fd4c1; --amber:#e8a05c;
+  }
+  body{min-height:100vh;background:
+      radial-gradient(1000px 600px at 15% -10%,rgba(185,201,78,.10),transparent 60%),
+      radial-gradient(900px 600px at 100% 0%,rgba(127,212,193,.08),transparent 55%),
+      var(--bg);
+    color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.7}
+  .wrap{max-width:900px;margin:0 auto;padding:72px 24px 80px}
+  header{margin-bottom:44px}
+  h1{font-size:clamp(30px,6vw,46px);letter-spacing:2px;font-weight:800;
+    background:linear-gradient(90deg,var(--olive),var(--teal),var(--amber));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--dim);margin-top:10px;font-size:15px}
+  .eyebrow{display:inline-block;font-size:12px;letter-spacing:3px;color:var(--dim);
+    border:1px solid var(--line);border-radius:20px;padding:3px 12px;margin-bottom:16px}
+  .cards{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  a.card{display:block;padding:26px;border-radius:16px;text-decoration:none;color:inherit;
+    background:linear-gradient(160deg,var(--panel),var(--panel2));border:1px solid var(--line);
+    transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+  a.card:hover{transform:translateY(-4px);border-color:#3f5480;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+  .icon{font-size:30px;line-height:1;margin-bottom:14px}
+  .card h2{font-size:21px;letter-spacing:1px;margin-bottom:8px}
+  .card p{color:var(--dim);font-size:14px}
+  .tags{margin-top:16px;display:flex;flex-wrap:wrap;gap:7px}
+  .tag{font-size:11px;letter-spacing:1px;color:#9fb0d0;background:#1d2740;
+    border:1px solid #2f3d5e;border-radius:20px;padding:2px 10px}
+  .feat{border-color:#3d4a2e;background:linear-gradient(160deg,#1b2418,#101709)}
+  .feat .tag{background:#26301a;border-color:#3f4d2a;color:#c7d68a}
+  footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);
+    color:#5f6d89;font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  footer a{color:#7d8cab;text-decoration:none}
+  footer a:hover{color:var(--teal)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">RPG0504 · GITHUB PAGES</span>
+    <h1>作品集</h1>
+    <p class="sub">放在這裡的東西，開了就能直接玩、直接用。</p>
+  </header>
+
+  <div class="cards">
+    <a class="card feat" href="axe-dog/index.html">
+      <div class="icon">🐕‍🦺🪓</div>
+      <h2>斧犬夜班：繃帶醫院</h2>
+      <p>以真實院區平面圖建置關卡的俯視角動作遊戲。操控警衛犬「阿斧」，
+         擊倒藥劑部、MRI、牙科部三名頭目取得門禁卡，從大門殺出去。</p>
+      <div class="tags">
+        <span class="tag">HTML5 Canvas</span><span class="tag">36 間房</span>
+        <span class="tag">BFS 流場尋路</span><span class="tag">單檔 · 免安裝</span>
+      </div>
+    </a>
+
+    <a class="card" href="calculator.html">
+      <div class="icon">🧮</div>
+      <h2>簡易計算機</h2>
+      <p>四則運算的小工具，介面乾淨、鍵盤可用。</p>
+      <div class="tags"><span class="tag">HTML</span><span class="tag">工具</span></div>
+    </a>
+  </div>
+
+  <footer>
+    <span>© rpg0504</span>
+    <span><a href="https://github.com/rpg0504-rgb/rpg0504.github.io">GitHub 原始碼</a></span>
+  </footer>
+</div>
+</body>
+</html>
