@@ -9,7 +9,8 @@
   html,body{height:100%;overflow:hidden;background:#0a0d16;
     font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
     color:#e8edf5;-webkit-font-smoothing:antialiased;user-select:none}
-  #game{display:block;width:100%;height:100%;cursor:none;image-rendering:auto}
+  #game{display:block;width:100%;height:100%;cursor:none;image-rendering:auto;
+    touch-action:none;outline:none;-webkit-tap-highlight-color:transparent}
   #wrap{position:relative;width:100%;height:100%}
 
   .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
@@ -41,14 +42,17 @@
     font-weight:700;color:#e8edf5;text-shadow:0 3px 18px rgba(0,0,0,.9);opacity:0;transition:opacity .4s}
   #objective{position:absolute;left:50%;top:calc(9% + 40px);transform:translateX(-50%);font-size:13px;
     letter-spacing:2px;color:#b9c94e;opacity:0;transition:opacity .4s}
+  #hint{position:absolute;left:50%;bottom:14%;transform:translateX(-50%);padding:10px 18px;
+    background:rgba(10,14,26,.88);border:1px solid #3b4a6e;border-radius:10px;
+    font-size:14px;letter-spacing:1px;color:#cbd5e6;display:none;text-align:center}
   #pause{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
     background:rgba(6,8,16,.82);font-size:30px;letter-spacing:10px}
 </style>
 </head>
 <body>
 <div id="wrap">
-  <canvas id="game"></canvas>
-  <div id="hud"><div id="toast"></div><div id="objective"></div><div id="pause">暫 停</div></div>
+  <canvas id="game" tabindex="0"></canvas>
+  <div id="hud"><div id="toast"></div><div id="objective"></div><div id="pause">暫 停</div><div id="hint"></div></div>
 
   <div class="overlay" id="title">
     <div class="card">
@@ -66,6 +70,7 @@
           <div class="row"><kbd>左鍵</kbd>／<kbd>空白</kbd> 揮斧</div>
           <div class="row"><kbd>Shift</kbd> 翻滾（無敵幀）</div>
           <div class="row"><kbd>P</kbd> 暫停　<kbd>R</kbd> 重來</div>
+          <div class="row" style="color:#7fd4c1;margin-top:6px">手機：左半邊拖曳移動，右下兩顆按鈕揮斧／翻滾</div>
         </div>
         <div>
           <h2>敵人</h2>
@@ -450,6 +455,10 @@ function populate(){
    ========================================================================= */
 const cvs = document.getElementById('game'), ctx = cvs.getContext('2d');
 const keys = {}, mouse = {x:0, y:0, down:false};
+const STICK_R = 52;
+const stick = {id:null, atkId:null, dashId:null, ox:0, oy:0, dx:0, dy:0};
+let usingTouch = matchMedia('(pointer: coarse)').matches;
+let anyInput = false;
 let VW = 0, VH = 0, DPR = 1;
 function resize(){
   DPR = Math.min(2, window.devicePixelRatio || 1);
@@ -460,20 +469,93 @@ function resize(){
 }
 window.addEventListener('resize', resize); resize();
 
+// 用實體按鍵位置（e.code）判定，中文輸入法開著也不會失效；
+// 舊瀏覽器沒有 e.code 時退回 e.key。
+const KEY_BY_CODE = {
+  KeyW:'up', KeyA:'left', KeyS:'down', KeyD:'right',
+  ArrowUp:'up', ArrowLeft:'left', ArrowDown:'down', ArrowRight:'right',
+  Space:'attack', ShiftLeft:'dash', ShiftRight:'dash',
+  KeyP:'pause', Escape:'pause', KeyR:'restart',
+};
+const KEY_BY_NAME = {
+  w:'up', a:'left', s:'down', d:'right',
+  arrowup:'up', arrowleft:'left', arrowdown:'down', arrowright:'right',
+  ' ':'attack', spacebar:'attack', shift:'dash', p:'pause', escape:'pause', r:'restart',
+};
+function actionOf(e){
+  return KEY_BY_CODE[e.code] || KEY_BY_NAME[(e.key || '').toLowerCase()] || null;
+}
 addEventListener('keydown', e => {
-  const k = e.key.toLowerCase();
-  keys[k] = true;
-  if ([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k)) e.preventDefault();
-  if (k === 'p' && G.state === 'play') togglePause();
-  if (k === 'escape' && G.state === 'play') togglePause();
-  if (k === 'r' && (G.state === 'play' || G.state === 'pause' || G.state === 'end')) startGame();
-  if (k === ' ' && G.state === 'play') doSwing();
+  const a = actionOf(e);
+  if (!a) return;
+  anyInput = true;
+  if (a !== 'pause' && a !== 'restart') e.preventDefault();
+  if (a === 'pause'){ if (G.state === 'play' || G.state === 'pause') togglePause(); return; }
+  if (a === 'restart'){ if (G.state !== 'title') startGame(); return; }
+  if (keys[a]) return;                       // 忽略長按的自動重複
+  keys[a] = true;
+  if (a === 'attack' && G.state === 'play') doSwing();
 });
-addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
-cvs.addEventListener('mousemove', e => { const b = cvs.getBoundingClientRect(); mouse.x = e.clientX - b.left; mouse.y = e.clientY - b.top; });
-cvs.addEventListener('mousedown', e => { if (e.button === 0){ mouse.down = true; if (G.state === 'play') doSwing(); } });
+addEventListener('keyup', e => { const a = actionOf(e); if (a) keys[a] = false; });
+addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
+
+cvs.addEventListener('mousemove', e => {
+  const b = cvs.getBoundingClientRect();
+  mouse.x = e.clientX - b.left; mouse.y = e.clientY - b.top;
+  usingTouch = false; anyInput = true;
+});
+cvs.addEventListener('mousedown', e => {
+  if (e.button === 0){ mouse.down = true; anyInput = true; focusGame(); if (G.state === 'play') doSwing(); }
+});
 addEventListener('mouseup', () => { mouse.down = false; });
 cvs.addEventListener('contextmenu', e => e.preventDefault());
+
+/* ── 觸控：左半邊虛擬搖桿，右下揮斧／翻滾 ── */
+function touchButtons(){
+  const s = Math.min(1, VW / 480);
+  return {
+    atk:  {x: VW - 74 * s,  y: VH - 108 * s, r: 42 * s},
+    dash: {x: VW - 162 * s, y: VH - 62 * s,  r: 30 * s},
+  };
+}
+function localPt(t){ const b = cvs.getBoundingClientRect(); return {x: t.clientX - b.left, y: t.clientY - b.top}; }
+function hitBtn(p, b){ return Math.hypot(p.x - b.x, p.y - b.y) < b.r + 12; }
+
+cvs.addEventListener('touchstart', e => {
+  usingTouch = true; anyInput = true; focusGame();
+  const B = touchButtons();
+  for (const t of e.changedTouches){
+    const p = localPt(t);
+    if (hitBtn(p, B.atk)){ stick.atkId = t.identifier; if (G.state === 'play') doSwing(); continue; }
+    if (hitBtn(p, B.dash)){ stick.dashId = t.identifier; keys.dash = true; continue; }
+    if (stick.id === null){ stick.id = t.identifier; stick.ox = p.x; stick.oy = p.y; stick.dx = 0; stick.dy = 0; }
+  }
+  e.preventDefault();
+}, {passive:false});
+
+cvs.addEventListener('touchmove', e => {
+  for (const t of e.changedTouches){
+    if (t.identifier !== stick.id) continue;
+    const p = localPt(t);
+    let dx = p.x - stick.ox, dy = p.y - stick.oy;
+    const m = Math.hypot(dx, dy);
+    if (m > STICK_R){ dx = dx / m * STICK_R; dy = dy / m * STICK_R; }
+    stick.dx = dx; stick.dy = dy;
+  }
+  e.preventDefault();
+}, {passive:false});
+
+function endTouch(e){
+  for (const t of e.changedTouches){
+    if (t.identifier === stick.id){ stick.id = null; stick.dx = 0; stick.dy = 0; }
+    if (t.identifier === stick.atkId) stick.atkId = null;
+    if (t.identifier === stick.dashId){ stick.dashId = null; keys.dash = false; }
+  }
+  e.preventDefault();
+}
+cvs.addEventListener('touchend', endTouch, {passive:false});
+cvs.addEventListener('touchcancel', endTouch, {passive:false});
+function focusGame(){ try{ cvs.focus({preventScroll:true}); window.focus(); }catch(err){} }
 
 function togglePause(){
   G.state = G.state === 'play' ? 'pause' : 'play';
@@ -516,13 +598,25 @@ function killEnemy(e){
 }
 
 function updatePlayer(dt){
-  let mx = (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
-  let my = (keys.s || keys.arrowdown ? 1 : 0) - (keys.w || keys.arrowup ? 1 : 0);
-  const m = Math.hypot(mx, my); if (m > 0){ mx /= m; my /= m; }
+  let mx = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
+  let my = (keys.down ? 1 : 0) - (keys.up ? 1 : 0);
+  if (stick.id !== null && (stick.dx || stick.dy)){
+    const dead = 8, m0 = Math.hypot(stick.dx, stick.dy);
+    if (m0 > dead){ mx = stick.dx / STICK_R; my = stick.dy / STICK_R; }
+  }
+  const m = Math.hypot(mx, my); if (m > 1){ mx /= m; my /= m; }
 
-  P.aim = Math.atan2(mouse.y - VH / 2, mouse.x - VW / 2);
+  if (usingTouch){
+    // 觸控沒有滑鼠可瞄準：自動朝最近的敵人，沒有敵人就面向移動方向
+    let best = null, bd = 240 * 240;
+    for (const e of G.enemies){ const d = dist2(e, P); if (d < bd){ bd = d; best = e; } }
+    if (best) P.aim = Math.atan2(best.y - P.y, best.x - P.x);
+    else if (mx || my) P.aim = Math.atan2(my, mx);
+  } else {
+    P.aim = Math.atan2(mouse.y - VH / 2, mouse.x - VW / 2);
+  }
 
-  if ((keys.shift) && P.dashCd <= 0 && P.dash <= 0 && (mx || my)){
+  if (keys.dash && P.dashCd <= 0 && P.dash <= 0 && (mx || my)){
     P.dash = .17; P.dashCd = .75; P.dvx = mx; P.dvy = my; SFX.dash();
     burst(P.x, P.y, '#9fd8ff', 8, 90);
   }
@@ -1033,8 +1127,8 @@ function render(){
 }
 
 function drawHUD(c){
-  // 血條
-  const bw = 260, bx = 24, by = VH - 58;
+  // 血條（觸控時移到左上，避免和操作鈕重疊）
+  const bw = Math.min(260, VW - 60), bx = 24, by = usingTouch ? 122 : VH - 58;
   c.fillStyle = 'rgba(10,14,26,.8)'; roundRect(c, bx - 6, by - 24, bw + 12, 52, 10); c.fill();
   c.fillStyle = '#242c42'; roundRect(c, bx, by, bw, 16, 8); c.fill();
   const hp = clamp(P.hp / P.max, 0, 1);
@@ -1049,7 +1143,7 @@ function drawHUD(c){
   if (P.power > 0){ c.fillStyle = '#ffd166'; c.fillText('磨刀石 ' + P.power.toFixed(1) + 's', sx, sy); sx += 96; }
   if (P.haste > 0){ c.fillStyle = '#e8a05c'; c.fillText('咖啡因 ' + P.haste.toFixed(1) + 's', sx, sy); sx += 96; }
   if (P.dashCd > 0){ c.fillStyle = '#6f7c99'; c.fillText('翻滾冷卻', sx, sy); }
-  else { c.fillStyle = '#9fd8ff'; c.fillText('翻滾就緒 (Shift)', sx, sy); }
+  else { c.fillStyle = '#9fd8ff'; c.fillText(usingTouch ? '翻滾就緒' : '翻滾就緒 (Shift)', sx, sy); }
 
   // 門禁卡
   c.textAlign = 'left';
@@ -1078,36 +1172,39 @@ function drawHUD(c){
   }
 
   // 小地圖
-  const mw = miniCvs.width, mh = miniCvs.height, mx = VW - mw - 20, my = 20;
+  const mw = Math.min(miniCvs.width, VW * 0.32), mh = mw * H / W, ms = mw / W;
+  const mx = VW - mw - 16, my = 16;
   c.globalAlpha = .92;
   c.fillStyle = 'rgba(8,11,20,.85)'; roundRect(c, mx - 6, my - 6, mw + 12, mh + 12, 8); c.fill();
-  c.drawImage(miniCvs, mx, my);
+  c.drawImage(miniCvs, mx, my, mw, mh);
   c.globalAlpha = 1;
   c.strokeStyle = 'rgba(120,140,180,.5)'; c.lineWidth = 1; c.strokeRect(mx, my, mw, mh);
   ROOMS.forEach(r => {
     if (!r.boss) return;
     const alive = G.enemies.some(e => e.boss === r.boss);
     c.fillStyle = alive ? '#ff6b8a' : '#5a6a86';
-    c.beginPath(); c.arc(mx + (r.x + r.w / 2) * MINI_S, my + (r.y + r.h / 2) * MINI_S, 4.5, 0, 6.3); c.fill();
+    c.beginPath(); c.arc(mx + (r.x + r.w / 2) * ms, my + (r.y + r.h / 2) * ms, 4, 0, 6.3); c.fill();
   });
   G.enemies.forEach(e => {
     if (!e.awake || e.boss) return;
     c.fillStyle = 'rgba(255,120,120,.75)';
-    c.fillRect(mx + e.x * MINI_S - 1, my + e.y * MINI_S - 1, 2.4, 2.4);
+    c.fillRect(mx + e.x * ms - 1, my + e.y * ms - 1, 2.2, 2.2);
   });
   G.drops.forEach(d => {
     c.fillStyle = '#ffd166';
-    c.fillRect(mx + d.x * MINI_S - 1, my + d.y * MINI_S - 1, 2.2, 2.2);
+    c.fillRect(mx + d.x * ms - 1, my + d.y * ms - 1, 2.2, 2.2);
   });
   // 出口
   const ex = EXITS[0];
   c.fillStyle = G.unlocked ? '#7fd4c1' : '#3f5a55';
-  c.fillRect(mx + ex.x * MINI_S, my + ex.y * MINI_S, 5, 5);
+  c.fillRect(mx + ex.x * ms, my + ex.y * ms, 5, 5);
   // 玩家
-  c.fillStyle = '#fff'; c.beginPath(); c.arc(mx + P.x * MINI_S, my + P.y * MINI_S, 3.6, 0, 6.3); c.fill();
+  c.fillStyle = '#fff'; c.beginPath(); c.arc(mx + P.x * ms, my + P.y * ms, 3.4, 0, 6.3); c.fill();
   c.strokeStyle = '#e0a760'; c.lineWidth = 2;
-  c.beginPath(); c.moveTo(mx + P.x * MINI_S, my + P.y * MINI_S);
-  c.lineTo(mx + P.x * MINI_S + Math.cos(P.aim) * 9, my + P.y * MINI_S + Math.sin(P.aim) * 9); c.stroke();
+  c.beginPath(); c.moveTo(mx + P.x * ms, my + P.y * ms);
+  c.lineTo(mx + P.x * ms + Math.cos(P.aim) * 9, my + P.y * ms + Math.sin(P.aim) * 9); c.stroke();
+
+  if (usingTouch){ drawTouchUI(c); return; }
 
   // 準心
   c.strokeStyle = 'rgba(255,255,255,.75)'; c.lineWidth = 2;
@@ -1116,6 +1213,32 @@ function drawHUD(c){
   c.moveTo(mouse.x + 4, mouse.y); c.lineTo(mouse.x + 14, mouse.y);
   c.moveTo(mouse.x, mouse.y - 14); c.lineTo(mouse.x, mouse.y - 4);
   c.moveTo(mouse.x, mouse.y + 4); c.lineTo(mouse.x, mouse.y + 14); c.stroke();
+}
+
+function drawTouchUI(c){
+  const B = touchButtons();
+  // 搖桿：按住才顯示
+  if (stick.id !== null){
+    c.strokeStyle = 'rgba(255,255,255,.28)'; c.lineWidth = 3;
+    c.beginPath(); c.arc(stick.ox, stick.oy, STICK_R, 0, 6.3); c.stroke();
+    c.fillStyle = 'rgba(224,167,96,.75)';
+    c.beginPath(); c.arc(stick.ox + stick.dx, stick.oy + stick.dy, 24, 0, 6.3); c.fill();
+  } else {
+    c.fillStyle = 'rgba(255,255,255,.35)';
+    c.font = '600 13px "Noto Sans TC",sans-serif'; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+    c.fillText('← 這半邊拖曳移動', 26, VH - 96);
+  }
+  // 按鈕
+  const btn = (b, label, fill, ring, sz) => {
+    c.fillStyle = fill; c.beginPath(); c.arc(b.x, b.y, b.r, 0, 6.3); c.fill();
+    c.strokeStyle = ring; c.lineWidth = 2.5; c.stroke();
+    c.fillStyle = '#0f1220'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.font = '800 ' + sz + 'px "Noto Sans TC",sans-serif';
+    c.fillText(label, b.x, b.y + 1);
+  };
+  btn(B.atk, '斧', P.swingCd > 0 ? 'rgba(185,201,78,.45)' : 'rgba(185,201,78,.92)', 'rgba(255,255,255,.5)', B.atk.r * .8);
+  btn(B.dash, '滾', P.dashCd > 0 ? 'rgba(127,212,193,.35)' : 'rgba(127,212,193,.9)', 'rgba(255,255,255,.45)', B.dash.r * .78);
+  c.textBaseline = 'alphabetic';
 }
 
 /* =========================================================================
@@ -1139,6 +1262,9 @@ function startGame(){
   document.getElementById('title').classList.add('hidden');
   document.getElementById('endscreen').classList.add('hidden');
   document.getElementById('pause').style.display = 'none';
+  anyInput = false;
+  document.getElementById('hint').style.display = 'none';
+  focusGame();
   showToast('大門', '夜班開始 — 找出三張門禁卡');
   try{ ac().resume(); }catch(e){}
   SFX.bark();
@@ -1172,6 +1298,11 @@ function loop(now){
     updatePlayer(dt); updateEnemies(dt); updateShots(dt); updateFX(dt);
     if (mouse.down) doSwing();
     if (toastT > 0){ toastT -= dt; if (toastT <= 0){ elToast.style.opacity = 0; elObj.style.opacity = 0; } }
+    const eh = document.getElementById('hint');
+    if (!anyInput && G.time > 3.5){
+      eh.textContent = usingTouch ? '左半邊拖曳可以移動' : '先點一下畫面，再用 WASD 或方向鍵移動';
+      eh.style.display = 'block';
+    } else if (eh.style.display === 'block') eh.style.display = 'none';
   }
   if (G.state !== 'title') render();
   requestAnimationFrame(loop);
