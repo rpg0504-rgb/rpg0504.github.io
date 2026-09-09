@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>斧犬夜班：繃帶醫院</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:#0a0d16;
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",sans-serif;
+    color:#e8edf5;-webkit-font-smoothing:antialiased;user-select:none}
+  #game{display:block;width:100%;height:100%;cursor:none;image-rendering:auto}
+  #wrap{position:relative;width:100%;height:100%}
+
+  .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 50% 40%,rgba(24,32,52,.94),rgba(6,8,16,.98));z-index:20}
+  .overlay.hidden{display:none}
+  .card{width:min(760px,92vw);max-height:92vh;overflow:auto;padding:28px 32px;
+    background:linear-gradient(160deg,#141b2c,#0d121f);border:1px solid #2a3550;border-radius:16px;
+    box-shadow:0 24px 60px rgba(0,0,0,.6)}
+  .card h1{font-size:34px;letter-spacing:2px;margin-bottom:4px;
+    background:linear-gradient(90deg,#b9c94e,#7fd4c1,#e8a05c);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .card h2{font-size:20px;margin:18px 0 8px;color:#b9c94e;letter-spacing:1px}
+  .sub{color:#8b99b5;font-size:14px;margin-bottom:14px;line-height:1.7}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px}
+  .row{display:flex;align-items:center;gap:10px;font-size:14px;color:#c9d4e8;padding:3px 0}
+  kbd{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:26px;padding:0 8px;
+    background:#222c44;border:1px solid #3b4a6e;border-bottom-width:3px;border-radius:6px;
+    font-size:12px;font-family:inherit;color:#e8edf5;flex:none}
+  .enemy-line{display:flex;gap:9px;align-items:center;font-size:13px;color:#a9b6cf;padding:2px 0}
+  .dot{width:11px;height:11px;border-radius:50%;flex:none;box-shadow:0 0 8px currentColor}
+  button.start{margin-top:22px;width:100%;padding:14px;font-size:17px;font-weight:700;letter-spacing:3px;
+    font-family:inherit;color:#0a0d16;background:linear-gradient(90deg,#b9c94e,#d7e06a);
+    border:none;border-radius:10px;cursor:pointer;transition:transform .12s,filter .12s}
+  button.start:hover{transform:translateY(-2px);filter:brightness(1.1)}
+  .tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;letter-spacing:1px;
+    background:#26314c;color:#8fa3c8;margin-left:8px;vertical-align:middle}
+
+  #hud{position:absolute;inset:0;pointer-events:none;z-index:10}
+  #toast{position:absolute;left:50%;top:9%;transform:translateX(-50%);font-size:26px;letter-spacing:8px;
+    font-weight:700;color:#e8edf5;text-shadow:0 3px 18px rgba(0,0,0,.9);opacity:0;transition:opacity .4s}
+  #objective{position:absolute;left:50%;top:calc(9% + 40px);transform:translateX(-50%);font-size:13px;
+    letter-spacing:2px;color:#b9c94e;opacity:0;transition:opacity .4s}
+  #pause{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+    background:rgba(6,8,16,.82);font-size:30px;letter-spacing:10px}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game"></canvas>
+  <div id="hud"><div id="toast"></div><div id="objective"></div><div id="pause">暫 停</div></div>
+
+  <div class="overlay" id="title">
+    <div class="card">
+      <h1>斧犬夜班<span class="tag">AXE DOG · NIGHT SHIFT</span></h1>
+      <div class="sub">
+        凌晨三點，整棟醫院被「痛覺病毒」吞沒，病患化成一團團會走路的繃帶惡夢。<br>
+        你是院區警衛犬 <b style="color:#e8c88a">阿斧</b>——四條腿、一把消防斧，還有一份沒人想接的夜班。<br>
+        搶回三張門禁卡，從<b style="color:#b9c94e">大門</b>殺出去。
+      </div>
+      <div class="grid2">
+        <div>
+          <h2>操作</h2>
+          <div class="row"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> 移動</div>
+          <div class="row"><kbd>滑鼠</kbd> 瞄準方向</div>
+          <div class="row"><kbd>左鍵</kbd>／<kbd>空白</kbd> 揮斧</div>
+          <div class="row"><kbd>Shift</kbd> 翻滾（無敵幀）</div>
+          <div class="row"><kbd>P</kbd> 暫停　<kbd>R</kbd> 重來</div>
+        </div>
+        <div>
+          <h2>敵人</h2>
+          <div class="enemy-line"><i class="dot" style="background:#e8e2d4;color:#e8e2d4"></i>繃帶患者 — 慢，會抓人</div>
+          <div class="enemy-line"><i class="dot" style="background:#c78a4e;color:#c78a4e"></i>拐杖跳跳 — 突進三連跳</div>
+          <div class="enemy-line"><i class="dot" style="background:#6fa8dc;color:#6fa8dc"></i>輪椅衝鋒 — 直線高速撞擊</div>
+          <div class="enemy-line"><i class="dot" style="background:#9fd8c4;color:#9fd8c4"></i>點滴架 — 遠距噴藥丸</div>
+          <div class="enemy-line"><i class="dot" style="background:#d8d2c0;color:#d8d2c0"></i>石膏重甲 — 硬，痛，但很慢</div>
+          <div class="enemy-line"><i class="dot" style="background:#ff6b8a;color:#ff6b8a"></i>三隻頭目 — 藥劑部 / MRI / 牙科部</div>
+        </div>
+      </div>
+      <h2>地圖</h2>
+      <div class="sub" style="margin:0">
+        1:1 還原院區平面圖：急診、放射科 A/B 區、藥劑部、牙科部、外科診間群、批價掛號⋯⋯<br>
+        右上角小地圖會標出<b style="color:#ff6b8a">頭目房</b>與<b style="color:#7fd4c1">出口</b>。
+      </div>
+      <button class="start" id="btnStart">按此開始夜班</button>
+    </div>
+  </div>
+
+  <div class="overlay hidden" id="endscreen">
+    <div class="card" style="text-align:center">
+      <h1 id="endTitle">夜班結束</h1>
+      <div class="sub" id="endText"></div>
+      <div id="endStats" class="sub" style="color:#c9d4e8"></div>
+      <button class="start" id="btnRetry">再來一次</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =========================================================================
+   1. 空間資料 — 依院區平面圖建置
+   世界座標 1400 x 1970，格子 10px
+   ========================================================================= */
+const W = 1400, H = 1970, CELL = 10;
+const GW = W / CELL, GH = H / CELL;
+
+// 走廊（可行走）
+const CORRIDORS = [
+  {x:60,  y:60,   w:120, h:1910, id:'CV0'},   // 西側主動線
+  {x:400, y:60,   w:60,  h:1910, id:'CV2'},
+  {x:800, y:60,   w:60,  h:1910, id:'CV4'},
+  {x:1240,y:60,   w:100, h:1910, id:'CV6'},   // 東側主動線
+  {x:60,  y:60,   w:1280,h:120,  id:'CH0'},
+  {x:60,  y:400,  w:1280,h:60,   id:'CH2', label:'等候區', lx:600, ly:430},
+  {x:60,  y:720,  w:1280,h:60,   id:'CH4'},
+  {x:0,   y:1100, w:1400,h:70,   id:'CH6', label:'主通道', lx:760, ly:1135},  // 大門↔南側門
+  {x:60,  y:1470, w:1280,h:60,   id:'CH8'},
+  {x:60,  y:1850, w:1280,h:80,   id:'CH10'},
+  {x:60,  y:1190, w:400, h:260,  id:'LOBBY', label:'大廳', lx:420, ly:1210},
+  {x:590, y:1530, w:80,  h:320,  id:'CLINIC-V'},            // 外科診間中央走道
+  {x:1100,y:1530, w:140, h:320,  id:'SE'},
+  {x:1220,y:1930, w:120, h:40,   id:'WGATE'},               // 西側門
+];
+
+// 門：{side, off, len} — off 為沿該邊的位移
+const D = (side, off, len) => ({side, off, len});
+
+// 房間
+const ROOMS = [
+  // ── 急診區 ────────────────────────────────────────────
+  {id:'fever', name:'發燒篩檢站',  x:620, y:200, w:160, h:180, c:'clinic', doors:[D('s',50,70)]},
+  {id:'ambu',  name:'救護車出入口',x:480, y:200, w:120, h:180, c:'util',   doors:[D('s',30,60)]},
+  {id:'linen', name:'被服室',      x:200, y:200, w:180, h:180, c:'util',   doors:[D('e',60,70)]},
+  {id:'rest',  name:'醫護休息室',  x:200, y:480, w:180, h:220, c:'util',   doors:[D('e',80,70)]},
+  {id:'iso',   name:'負壓隔離室',  x:880, y:200, w:180, h:180, c:'clinic', doors:[D('s',60,70)]},
+  {id:'equip', name:'器材室',      x:1080,y:200, w:140, h:180, c:'util',   doors:[D('s',40,60)]},
+  {id:'er1',   name:'急救室',      x:480, y:480, w:140, h:220, c:'clinic', doors:[D('n',40,60)]},
+  {id:'er2',   name:'急診室',      x:640, y:480, w:140, h:220, c:'clinic', doors:[D('n',40,60),D('e',70,70)]},
+  {id:'ns',    name:'急診護理站',  x:880, y:480, w:120, h:100, c:'desk',   doors:[D('w',25,55)]},
+  {id:'cast1', name:'石膏室／縫合室',x:880,y:600, w:120, h:100, c:'clinic', doors:[D('w',25,55)]},
+  {id:'obs',   name:'急診觀察室',  x:1020,y:480, w:200, h:220, c:'clinic', doors:[D('n',60,80),D('e',80,70)]},
+  // ── 藥劑／放射 ────────────────────────────────────────
+  {id:'store', name:'藥庫',        x:200, y:800, w:80,  h:70,  c:'util',   doors:[D('n',20,45)]},
+  {id:'inj',   name:'注射室',      x:300, y:800, w:80,  h:70,  c:'clinic', doors:[D('n',20,45)]},
+  {id:'pharm', name:'藥劑部',      x:200, y:890, w:180, h:190, c:'clinic', boss:'pill',
+               doors:[D('w',60,80),D('s',50,80)]},
+  {id:'radA',  name:'放射科A區',   x:480, y:800, w:300, h:280, c:'clinic',
+               doors:[D('n',100,80),D('e',100,80),D('s',110,80)]},
+  {id:'elevM', name:'醫療電梯',    x:880, y:800, w:110, h:130, c:'lift',   doors:[D('w',40,55)]},
+  {id:'elevV', name:'訪客電梯',    x:880, y:950, w:110, h:130, c:'lift',   doors:[D('w',40,55)]},
+  {id:'radB',  name:'放射科B區',   x:1010,y:800, w:210, h:170, c:'clinic', doors:[D('n',80,80),D('e',50,70)]},
+  {id:'mri',   name:'MRI',         x:1010,y:1000,w:210, h:80,  c:'clinic', boss:'magnet',
+               doors:[D('s',80,80),D('e',20,45)]},
+  // ── 一樓中段 ──────────────────────────────────────────
+  {id:'mart',  name:'維康便利',    x:480, y:1190,w:140, h:80,  c:'shop',   doors:[D('n',40,60)]},
+  {id:'desk1', name:'櫃台',        x:640, y:1190,w:140, h:80,  c:'desk',   doors:[D('n',40,60)]},
+  {id:'admit', name:'申辦櫃檯\n住出院中心',x:880,y:1190,w:180,h:80,c:'admin',doors:[D('n',60,70),D('w',20,45)]},
+  {id:'lab',   name:'檢驗科\n抽血室',x:880,y:1290,w:70, h:160, c:'clinic', doors:[D('w',55,60)]},
+  {id:'beauty',name:'醫學美容中心',x:970, y:1290,w:90,  h:160, c:'clinic', doors:[D('s',20,50)]},
+  {id:'dental',name:'牙科部',      x:1080,y:1190,w:140, h:260, c:'clinic', boss:'drill',
+               doors:[D('n',40,60),D('e',100,80)]},
+  // ── 門診／批價 ────────────────────────────────────────
+  {id:'cashier',name:'批價掛號',   x:200, y:1550,w:110, h:90,  c:'pay',    doors:[D('w',25,45),D('n',30,50)]},
+  {id:'refer', name:'轉診中心',    x:330, y:1550,w:50,  h:90,  c:'pay',    doors:[D('n',10,30)]},
+  {id:'uro',   name:'泌尿科',      x:200, y:1670,w:180, h:150, c:'clinic', doors:[D('w',50,60),D('e',50,60)]},
+  {id:'colo',  name:'直腸外科',    x:480, y:1550,w:90,  h:55,  c:'clinic', doors:[D('e',12,32)]},
+  {id:'chest', name:'胸腔外科',    x:480, y:1625,w:90,  h:55,  c:'clinic', doors:[D('e',12,32)]},
+  {id:'ortho', name:'骨科',        x:480, y:1700,w:90,  h:55,  c:'clinic', doors:[D('e',12,32)]},
+  {id:'breast',name:'乳房外科',    x:480, y:1775,w:90,  h:55,  c:'clinic', doors:[D('e',12,32)]},
+  {id:'neuro', name:'115\n神經外科',x:690,y:1550,w:90,  h:55,  c:'clinic', doors:[D('w',12,32)]},
+  {id:'plast', name:'114\n整形外科',x:690,y:1625,w:90,  h:55,  c:'clinic', doors:[D('w',12,32)]},
+  {id:'cast2', name:'石膏室',      x:690, y:1700,w:90,  h:55,  c:'clinic', doors:[D('w',12,32)]},
+  {id:'r112',  name:'112',         x:690, y:1775,w:90,  h:55,  c:'clinic', doors:[D('w',12,32),D('e',12,32)]},
+];
+
+// 實心裝飾物（採光井、手扶梯等，不可通行）
+const PROPS = [
+  {name:'手扶梯',   x:240, y:1240,w:140,h:160,kind:'escalator'},
+  {name:'採光井',   x:480, y:1310,w:300,h:140,kind:'void'},
+  {name:'採光井',   x:880, y:1550,w:220,h:280,kind:'void'},
+  {name:'樓梯',     x:1250,y:200, w:80, h:120,kind:'stair'},
+];
+
+// 出入口
+const EXITS = [
+  {id:'main', name:'大門',   x:0,   y:1100,w:60, h:70, dir:'w', goal:true},
+  {id:'south',name:'南側門', x:1340,y:1100,w:60, h:70, dir:'e'},
+  {id:'west', name:'西側門', x:1220,y:1930,w:120,h:40, dir:'s'},
+];
+
+const ROOM_COLORS = {
+  clinic:'#b9c94e', util:'#cdd6a8', desk:'#c3cf7a', lift:'#6f6f76',
+  admin:'#e8a05c', shop:'#a9c07a', pay:'#c9a0dc',
+};
+
+/* =========================================================================
+   2. 網格 / 碰撞 / 流場尋路
+   ========================================================================= */
+const solid = new Uint8Array(GW * GH);      // 1 = 不可通行
+const roomOf = new Int16Array(GW * GH).fill(-1);
+const idx = (cx, cy) => cy * GW + cx;
+
+function rectCells(r, fn){
+  const x0 = Math.max(0, Math.floor(r.x / CELL)), x1 = Math.min(GW - 1, Math.ceil((r.x + r.w) / CELL) - 1);
+  const y0 = Math.max(0, Math.floor(r.y / CELL)), y1 = Math.min(GH - 1, Math.ceil((r.y + r.h) / CELL) - 1);
+  for (let cy = y0; cy <= y1; cy++) for (let cx = x0; cx <= x1; cx++) fn(cx, cy);
+}
+function doorRect(r, d){
+  const T = 26;
+  if (d.side === 'n') return {x:r.x + d.off, y:r.y - T, w:d.len, h:T + 8};
+  if (d.side === 's') return {x:r.x + d.off, y:r.y + r.h - 8, w:d.len, h:T + 8};
+  if (d.side === 'w') return {x:r.x - T, y:r.y + d.off, w:T + 8, h:d.len};
+  return {x:r.x + r.w - 8, y:r.y + d.off, w:T + 8, h:d.len};
+}
+
+function buildGrid(){
+  solid.fill(1);
+  const open = r => rectCells(r, (cx, cy) => { solid[idx(cx, cy)] = 0; });
+  CORRIDORS.forEach(open);
+  EXITS.forEach(open);
+  ROOMS.forEach((rm, i) => {
+    open(rm);
+    rectCells(rm, (cx, cy) => { roomOf[idx(cx, cy)] = i; });
+    (rm.doors || []).forEach(d => open(doorRect(rm, d)));
+  });
+  PROPS.forEach(p => { if (p.w > 0 && p.h > 0) rectCells(p, (cx, cy) => { solid[idx(cx, cy)] = 1; }); });
+}
+buildGrid();
+
+function isSolidAt(x, y){
+  const cx = x / CELL | 0, cy = y / CELL | 0;
+  if (cx < 0 || cy < 0 || cx >= GW || cy >= GH) return true;
+  return solid[idx(cx, cy)] === 1;
+}
+// 圓 vs 格子：分軸解算
+function moveEntity(e, dx, dy){
+  const step = (ax, ay) => {
+    let nx = e.x + ax, ny = e.y + ay;
+    const r = e.r;
+    const x0 = (nx - r) / CELL | 0, x1 = (nx + r) / CELL | 0;
+    const y0 = (ny - r) / CELL | 0, y1 = (ny + r) / CELL | 0;
+    let hit = false;
+    for (let cy = y0; cy <= y1 && !hit; cy++) for (let cx = x0; cx <= x1; cx++){
+      if (cx < 0 || cy < 0 || cx >= GW || cy >= GH || solid[idx(cx, cy)]){
+        const bx = cx * CELL, by = cy * CELL;
+        const px = Math.max(bx, Math.min(nx, bx + CELL));
+        const py = Math.max(by, Math.min(ny, by + CELL));
+        if ((nx - px) ** 2 + (ny - py) ** 2 < r * r){ hit = true; break; }
+      }
+    }
+    if (!hit){ e.x = nx; e.y = ny; return true; }
+    return false;
+  };
+  const ok1 = step(dx, 0);
+  const ok2 = step(0, dy);
+  return ok1 || ok2;
+}
+function lineClear(x0, y0, x1, y1){
+  const d = Math.hypot(x1 - x0, y1 - y0), n = Math.ceil(d / 8);
+  for (let i = 1; i < n; i++){
+    if (isSolidAt(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n)) return false;
+  }
+  return true;
+}
+
+// ── 流場（BFS）：敵人共用一張到玩家的距離場 ────────────────
+const flow = new Int32Array(GW * GH);
+const bfsQ = new Int32Array(GW * GH);
+let flowCell = -1, flowTimer = 0;
+const N8 = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+function buildFlow(px, py){
+  const sx = px / CELL | 0, sy = py / CELL | 0;
+  flow.fill(-1);
+  if (sx < 0 || sy < 0 || sx >= GW || sy >= GH || solid[idx(sx, sy)]) return;
+  let head = 0, tail = 0;
+  const s = idx(sx, sy); flow[s] = 0; bfsQ[tail++] = s;
+  while (head < tail){
+    const c = bfsQ[head++], cx = c % GW, cy = (c / GW) | 0, d = flow[c];
+    for (let i = 0; i < 4; i++){
+      const nx = cx + N8[i][0], ny = cy + N8[i][1];
+      if (nx < 0 || ny < 0 || nx >= GW || ny >= GH) continue;
+      const n = idx(nx, ny);
+      if (solid[n] || flow[n] !== -1) continue;
+      flow[n] = d + 1; bfsQ[tail++] = n;
+    }
+  }
+}
+function flowDir(x, y){
+  const cx = x / CELL | 0, cy = y / CELL | 0;
+  if (cx < 1 || cy < 1 || cx >= GW - 1 || cy >= GH - 1) return null;
+  let best = flow[idx(cx, cy)], bx = 0, by = 0;
+  if (best < 0) return null;
+  for (const [ox, oy] of N8){
+    const n = idx(cx + ox, cy + oy);
+    if (solid[n]) continue;
+    if (Math.abs(ox) + Math.abs(oy) === 2 && (solid[idx(cx + ox, cy)] || solid[idx(cx, cy + oy)])) continue;
+    const v = flow[n];
+    if (v >= 0 && v < best){ best = v; bx = ox; by = oy; }
+  }
+  if (!bx && !by) return null;
+  const m = Math.hypot(bx, by);
+  return {x: bx / m, y: by / m};
+}
+
+/* ── 小工具 ─────────────────────────────────────────────── */
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = a => a[Math.random() * a.length | 0];
+const dist2 = (a, b) => (a.x - b.x) ** 2 + (a.y - b.y) ** 2;
+function angDiff(a, b){ let d = (a - b) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return d; }
+function roomCenter(r){ return {x: r.x + r.w / 2, y: r.y + r.h / 2}; }
+function freeSpotIn(r, pad = 26){
+  for (let i = 0; i < 60; i++){
+    const x = rand(r.x + pad, r.x + r.w - pad), y = rand(r.y + pad, r.y + r.h - pad);
+    if (!isSolidAt(x, y) && !isSolidAt(x - 14, y) && !isSolidAt(x + 14, y) &&
+        !isSolidAt(x, y - 14) && !isSolidAt(x, y + 14)) return {x, y};
+  }
+  const c = roomCenter(r);
+  return isSolidAt(c.x, c.y) ? null : c;
+}
+
+/* =========================================================================
+   3. 音效
+   ========================================================================= */
+let AC = null;
+function ac(){ if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); return AC; }
+function blip(freq, dur, type = 'square', vol = .12, slide = 0){
+  try{
+    const a = ac(), o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, a.currentTime);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, freq + slide), a.currentTime + dur);
+    g.gain.setValueAtTime(vol, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001, a.currentTime + dur);
+    o.connect(g); g.connect(a.destination); o.start(); o.stop(a.currentTime + dur);
+  }catch(e){}
+}
+function noise(dur = .12, vol = .16){
+  try{
+    const a = ac(), n = a.sampleRate * dur | 0, buf = a.createBuffer(1, n, a.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const s = a.createBufferSource(), g = a.createGain(), f = a.createBiquadFilter();
+    f.type = 'lowpass'; f.frequency.value = 1400;
+    s.buffer = buf; g.gain.value = vol; s.connect(f); f.connect(g); g.connect(a.destination); s.start();
+  }catch(e){}
+}
+const SFX = {
+  swing:  () => blip(320, .09, 'sawtooth', .07, -180),
+  hit:    () => { noise(.09, .2); blip(180, .07, 'square', .1, -90); },
+  kill:   () => blip(140, .22, 'triangle', .12, -90),
+  hurt:   () => blip(220, .2, 'sawtooth', .14, -160),
+  dash:   () => blip(600, .1, 'sine', .07, 400),
+  pickup: () => { blip(660, .07, 'sine', .1); setTimeout(() => blip(990, .1, 'sine', .1), 70); },
+  card:   () => { [523,659,784,1047].forEach((f,i)=>setTimeout(()=>blip(f,.14,'triangle',.11), i*90)); },
+  boss:   () => blip(70, .8, 'sawtooth', .16, 30),
+  bark:   () => { blip(420, .07, 'square', .12, -200); setTimeout(()=>blip(300,.09,'square',.1,-150), 80); },
+};
+
+/* =========================================================================
+   4. 敵人 / 頭目定義
+   ========================================================================= */
+const ETYPES = {
+  bandage:{name:'繃帶患者', hp:30, sp:52, r:14, dmg:8,  col:'#e8e2d4', ink:'#8d8779', xp:1},
+  crutch: {name:'拐杖跳跳', hp:26, sp:34, r:13, dmg:11, col:'#d3a05e', ink:'#7c5a2b', xp:1, hop:true},
+  wheel:  {name:'輪椅衝鋒', hp:50, sp:26, r:17, dmg:16, col:'#7fb0dc', ink:'#3d5f7d', xp:2, charge:true},
+  iv:     {name:'點滴架',   hp:26, sp:44, r:13, dmg:9,  col:'#9fd8c4', ink:'#4f8375', xp:2, ranged:true},
+  cast:   {name:'石膏重甲', hp:100,sp:30, r:21, dmg:19, col:'#ddd7c4', ink:'#8b8574', xp:3},
+};
+const BOSSES = {
+  pill:  {name:'藥罐巨人', title:'藥劑部',  hp:430, sp:46, r:34, dmg:22, col:'#f0a8bd', ink:'#8c3f56'},
+  magnet:{name:'磁力核心', title:'MRI',     hp:480, sp:36, r:36, dmg:20, col:'#8fbaff', ink:'#33518c'},
+  drill: {name:'鑽頭王',   title:'牙科部',  hp:540, sp:54, r:32, dmg:25, col:'#ff9a68', ink:'#94421c'},
+};
+
+/* =========================================================================
+   5. 遊戲狀態
+   ========================================================================= */
+const G = {
+  state:'title', t:0, kills:0, cards:0, cardSet:{}, time:0,
+  enemies:[], shots:[], parts:[], drops:[], texts:[],
+  shake:0, curRoom:-1, bossAlert:null, escaped:false, unlocked:false,
+};
+const P = {
+  x:110, y:1135, r:14, hp:100, max:100, sp:200, aim:0,
+  swing:0, swingCd:0, hitSet:null, dash:0, dashCd:0, dvx:0, dvy:0,
+  inv:0, power:0, haste:0, step:0, flash:0, combo:0, comboT:0,
+};
+const cam = {x:0, y:0};
+
+function spawnEnemy(type, x, y, boss){
+  const d = boss ? BOSSES[boss] : ETYPES[type];
+  G.enemies.push({
+    type: boss ? 'boss' : type, boss: boss || null, def: d,
+    x, y, r: d.r, hp: d.hp, max: d.hp, sp: d.sp,
+    vx:0, vy:0, kx:0, ky:0, cd: rand(0, 1), tcd: 0, st: 0, ph: rand(0, 6.3),
+    awake: false, flash: 0, ang: rand(0, 6.3), fire: rand(1, 3),
+  });
+}
+function spawnDrop(kind, x, y){ G.drops.push({kind, x, y, t:0}); }
+function burst(x, y, col, n = 10, spd = 150){
+  for (let i = 0; i < n; i++){
+    const a = rand(0, 6.3), s = rand(spd * .3, spd);
+    G.parts.push({x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rand(.3, .8), t: 0,
+      col, sz: rand(2, 5), spin: rand(-9, 9), rot: a});
+  }
+}
+function floatText(x, y, s, col){ G.texts.push({x, y, s, col, t:0}); }
+
+/* ── 佈署敵人 ───────────────────────────────────────────── */
+function populate(){
+  G.enemies.length = 0; G.drops.length = 0; G.shots.length = 0;
+  const tables = {
+    fever:['bandage','bandage','iv'], ambu:['bandage'],
+    linen:['bandage','crutch'], rest:['bandage','iv','crutch'],
+    iso:['cast','bandage','bandage'], equip:['crutch','iv'],
+    er1:['cast','bandage','bandage'], er2:['bandage','crutch','iv','bandage'],
+    ns:['iv'], cast1:['cast','bandage'], obs:['wheel','bandage','crutch','bandage','iv'],
+    store:['bandage'], inj:['iv','bandage'],
+    pharm:['bandage','iv','crutch'],
+    radA:['wheel','cast','bandage','crutch','iv'],
+    elevM:['bandage'], elevV:['bandage','crutch'],
+    radB:['cast','wheel','iv','bandage'], mri:['wheel','cast'],
+    mart:['bandage'], desk1:['crutch'],
+    admit:['bandage','crutch'], lab:['iv','bandage'], beauty:['bandage','bandage','crutch'],
+    dental:['cast','iv','wheel','bandage'],
+    cashier:['bandage','crutch'], refer:['bandage'], uro:['wheel','bandage','iv','crutch'],
+    colo:['crutch'], chest:['iv'], ortho:['cast'], breast:['bandage'],
+    neuro:['crutch'], plast:['bandage'], cast2:['cast'], r112:['iv'],
+  };
+  ROOMS.forEach(rm => {
+    const list = tables[rm.id] || ['bandage'];
+    list.forEach(t => { const s = freeSpotIn(rm); if (s) spawnEnemy(t, s.x, s.y); });
+    if (rm.boss){ const c = roomCenter(rm); if (!isSolidAt(c.x, c.y)) spawnEnemy(null, c.x, c.y, rm.boss); }
+  });
+  // 走廊遊蕩者
+  [[300,740],[700,745],[1150,745],[250,1135],[620,1135],[1000,1135],[1290,900],
+   [430,1500],[900,1500],[1180,1700],[430,1000],[830,1300],[300,1890],[900,1890],[620,1700]]
+   .forEach(([x,y]) => { if (!isSolidAt(x,y)) spawnEnemy(pick(['bandage','crutch','bandage','iv']), x, y); });
+  // 補給
+  [['bone','er1'],['bone','uro'],['bone','radB'],['bone','beauty'],['bone','obs'],['bone','cashier'],
+   ['coffee','mart'],['coffee','desk1'],['whet','inj'],['whet','cast2'],['whet','radA'],['bone','r112'],['bone','rest'],['whet','iso']]
+   .forEach(([k, id]) => {
+     const rm = ROOMS.find(r => r.id === id), s = rm && freeSpotIn(rm, 34);
+     if (s) spawnDrop(k, s.x, s.y);
+   });
+}
+
+/* =========================================================================
+   6. 輸入
+   ========================================================================= */
+const cvs = document.getElementById('game'), ctx = cvs.getContext('2d');
+const keys = {}, mouse = {x:0, y:0, down:false};
+let VW = 0, VH = 0, DPR = 1;
+function resize(){
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  VW = window.innerWidth; VH = window.innerHeight;
+  cvs.width = VW * DPR; cvs.height = VH * DPR;
+  cvs.style.width = VW + 'px'; cvs.style.height = VH + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+window.addEventListener('resize', resize); resize();
+
+addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  keys[k] = true;
+  if ([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k)) e.preventDefault();
+  if (k === 'p' && G.state === 'play') togglePause();
+  if (k === 'escape' && G.state === 'play') togglePause();
+  if (k === 'r' && (G.state === 'play' || G.state === 'pause' || G.state === 'end')) startGame();
+  if (k === ' ' && G.state === 'play') doSwing();
+});
+addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+cvs.addEventListener('mousemove', e => { const b = cvs.getBoundingClientRect(); mouse.x = e.clientX - b.left; mouse.y = e.clientY - b.top; });
+cvs.addEventListener('mousedown', e => { if (e.button === 0){ mouse.down = true; if (G.state === 'play') doSwing(); } });
+addEventListener('mouseup', () => { mouse.down = false; });
+cvs.addEventListener('contextmenu', e => e.preventDefault());
+
+function togglePause(){
+  G.state = G.state === 'play' ? 'pause' : 'play';
+  document.getElementById('pause').style.display = G.state === 'pause' ? 'flex' : 'none';
+}
+
+/* =========================================================================
+   7. 玩家行為
+   ========================================================================= */
+function doSwing(){
+  if (P.swingCd > 0 || P.dash > 0) return;
+  P.swing = .26; P.swingCd = .38; P.hitSet = new Set();
+  SFX.swing();
+}
+function damagePlayer(n){
+  if (P.inv > 0 || P.dash > 0) return;
+  P.hp -= n; P.inv = .55; P.flash = .3; G.shake = Math.min(16, G.shake + 6);
+  P.combo = 0; SFX.hurt();
+  if (P.hp <= 0){ P.hp = 0; endGame(false); }
+}
+function hitEnemy(e, dmg, kx, ky){
+  e.hp -= dmg; e.flash = .18; e.awake = true;
+  e.kx += kx; e.ky += ky;
+  burst(e.x, e.y, e.def.col, 6, 140);
+  floatText(e.x, e.y - e.r - 6, Math.round(dmg), dmg > 26 ? '#ffd166' : '#fff');
+  SFX.hit();
+  if (e.hp <= 0) killEnemy(e);
+}
+function killEnemy(e){
+  e.dead = true; G.kills++;
+  P.combo++; P.comboT = 2.2;
+  burst(e.x, e.y, e.def.col, e.boss ? 60 : 16, e.boss ? 320 : 200);
+  burst(e.x, e.y, '#ffffff', 6, 120);
+  SFX.kill();
+  if (e.boss){
+    G.shake = 22; SFX.card();
+    spawnDrop('card:' + e.boss, e.x, e.y);
+    floatText(e.x, e.y - 40, e.def.name + ' 倒下！', '#ffd166');
+  } else if (Math.random() < .12) spawnDrop('bone', e.x, e.y);
+}
+
+function updatePlayer(dt){
+  let mx = (keys.d || keys.arrowright ? 1 : 0) - (keys.a || keys.arrowleft ? 1 : 0);
+  let my = (keys.s || keys.arrowdown ? 1 : 0) - (keys.w || keys.arrowup ? 1 : 0);
+  const m = Math.hypot(mx, my); if (m > 0){ mx /= m; my /= m; }
+
+  P.aim = Math.atan2(mouse.y - VH / 2, mouse.x - VW / 2);
+
+  if ((keys.shift) && P.dashCd <= 0 && P.dash <= 0 && (mx || my)){
+    P.dash = .17; P.dashCd = .75; P.dvx = mx; P.dvy = my; SFX.dash();
+    burst(P.x, P.y, '#9fd8ff', 8, 90);
+  }
+  P.dashCd -= dt; P.swingCd -= dt; P.inv -= dt; P.flash -= dt;
+  P.power -= dt; P.haste -= dt; P.comboT -= dt;
+  if (P.comboT <= 0) P.combo = 0;
+  if (P.swing > 0) P.swing -= dt;
+
+  let sp = P.sp * (P.haste > 0 ? 1.35 : 1) * (P.swing > 0 ? .55 : 1);
+  if (P.dash > 0){ P.dash -= dt; mx = P.dvx; my = P.dvy; sp = 560; }
+  if (mx || my){ moveEntity(P, mx * sp * dt, my * sp * dt); P.step += sp * dt; }
+
+  // 揮斧判定
+  if (P.swing > .08 && P.hitSet){
+    const range = 66, dmg = (22 + P.combo * 1.2) * (P.power > 0 ? 1.6 : 1);
+    const prog = 1 - P.swing / .26, sweep = P.aim - .9 + prog * 1.8;
+    for (const e of G.enemies){
+      if (e.dead || P.hitSet.has(e)) continue;
+      const d = Math.hypot(e.x - P.x, e.y - P.y);
+      if (d > range + e.r) continue;
+      const a = Math.atan2(e.y - P.y, e.x - P.x);
+      if (Math.abs(angDiff(a, sweep)) < .85){
+        P.hitSet.add(e);
+        const k = e.boss ? 90 : 320;
+        hitEnemy(e, dmg, Math.cos(a) * k, Math.sin(a) * k);
+        G.shake = Math.min(10, G.shake + 3);
+      }
+    }
+  }
+
+  // 房間提示
+  const rid = roomOf[idx(clamp(P.x / CELL | 0, 0, GW - 1), clamp(P.y / CELL | 0, 0, GH - 1))];
+  if (rid !== G.curRoom){ G.curRoom = rid; if (rid >= 0) showToast(ROOMS[rid].name.replace('\n', ' ')); }
+
+  // 撿補給
+  for (const d of G.drops){
+    if (d.got) continue;
+    if (dist2(d, P) < 30 * 30){
+      d.got = true;
+      if (d.kind === 'bone'){ P.hp = Math.min(P.max, P.hp + 22); floatText(P.x, P.y - 30, '+22 HP', '#7fd4c1'); SFX.pickup(); }
+      else if (d.kind === 'coffee'){ P.haste = 16; floatText(P.x, P.y - 30, '咖啡因！移速↑', '#e8a05c'); SFX.pickup(); }
+      else if (d.kind === 'whet'){ P.power = 20; floatText(P.x, P.y - 30, '磨刀石！傷害↑', '#ffd166'); SFX.pickup(); }
+      else if (d.kind.startsWith('card:')){
+        const b = d.kind.slice(5);
+        if (!G.cardSet[b]){ G.cardSet[b] = true; G.cards++; SFX.card(); }
+        floatText(P.x, P.y - 34, '取得門禁卡 ' + G.cards + '/3', '#ffd166');
+        if (G.cards >= 3){ G.unlocked = true; showToast('大門解鎖', '往西邊主通道盡頭撤離！'); }
+      }
+    }
+  }
+  G.drops = G.drops.filter(d => !d.got);
+
+  // 撤離
+  if (G.unlocked && P.x < 62 && P.y > 1090 && P.y < 1180) endGame(true);
+}
+
+/* =========================================================================
+   8. 敵人 AI
+   ========================================================================= */
+function updateEnemies(dt){
+  const px = P.x, py = P.y;
+  for (const e of G.enemies){
+    if (e.dead) continue;
+    e.flash -= dt; e.cd -= dt; e.tcd -= dt; e.ph += dt;
+    const dx = px - e.x, dy = py - e.y, d = Math.hypot(dx, dy) || 1;
+
+    if (!e.awake && d < (e.boss ? 460 : 380) && lineClear(e.x, e.y, px, py)){
+      e.awake = true;
+      if (e.boss && !G.bossAlert){ G.bossAlert = e; SFX.boss(); showToast(e.def.name, '頭目 — ' + e.def.title); }
+    }
+    // 擊退
+    e.x += e.kx * dt; e.y += e.ky * dt;
+    if (isSolidAt(e.x, e.y)){ e.x -= e.kx * dt; e.y -= e.ky * dt; e.kx *= -.3; e.ky *= -.3; }
+    e.kx *= Math.pow(.0015, dt); e.ky *= Math.pow(.0015, dt);
+
+    if (!e.awake){
+      if (e.cd <= 0){ e.cd = rand(1.4, 3.2); e.ang = rand(0, 6.3); }
+      moveEntity(e, Math.cos(e.ang) * 18 * dt, Math.sin(e.ang) * 18 * dt);
+      continue;
+    }
+
+    let sp = e.sp, tx = dx / d, ty = dy / d;
+    const near = d < 260 && lineClear(e.x, e.y, px, py);
+    if (!near){ const f = flowDir(e.x, e.y); if (f){ tx = f.x; ty = f.y; } }
+
+    // 型別行為
+    if (e.def.hop){                         // 拐杖跳跳
+      e.st -= dt;
+      if (e.st <= 0){ e.st = rand(.55, 1.1); e.hopT = .3; }
+      if (e.hopT > 0){ e.hopT -= dt; sp = 190; } else sp = 22;
+    } else if (e.def.charge){               // 輪椅衝鋒
+      if (e.st > 0){ e.st -= dt; sp = 300; tx = Math.cos(e.ang); ty = Math.sin(e.ang);
+        if (!moveEntity(e, tx * sp * dt, ty * sp * dt)){ e.st = 0; e.cd = 1.4; G.shake = Math.max(G.shake, 5); burst(e.x, e.y, e.def.col, 8, 120); }
+        if (Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r + 3 && e.tcd <= 0){ damagePlayer(e.def.dmg); e.tcd = .8; }
+        continue;
+      } else if (e.cd <= 0 && near && d < 380 && d > 60){
+        e.st = .75; e.cd = 2.6; e.ang = Math.atan2(dy, dx); blip(200, .12, 'sawtooth', .06, 200); continue;
+      } else sp = e.sp;
+    } else if (e.def.ranged){               // 點滴架
+      if (near && d < 330){
+        sp = d < 170 ? -e.sp * .7 : e.sp * .3;
+        if (e.cd <= 0){ e.cd = 1.9; fireShot(e.x, e.y, Math.atan2(dy, dx), 210, e.def.dmg, '#9fd8c4'); blip(500,.08,'sine',.06,-200); }
+      }
+    } else if (e.boss){ bossAI(e, dt, d, dx, dy); continue; }
+
+    moveEntity(e, tx * sp * dt, ty * sp * dt);
+
+    // 接觸傷害
+    if (d < e.r + P.r + 2 && e.tcd <= 0){
+      damagePlayer(e.def.dmg); e.tcd = .9;
+      const a = Math.atan2(dy, dx);
+      P.x += Math.cos(a) * 6; P.y += Math.sin(a) * 6;
+    }
+  }
+  G.enemies = G.enemies.filter(e => !e.dead);
+  if (G.bossAlert && G.bossAlert.dead) G.bossAlert = null;
+}
+
+function fireShot(x, y, a, sp, dmg, col){
+  G.shots.push({x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, dmg, col, life: 3, r: 6});
+}
+function bossAI(e, dt, d, dx, dy){
+  const b = e.boss;
+  e.st -= dt;
+  let tx = dx / d, ty = dy / d, sp = e.sp;
+  if (!lineClear(e.x, e.y, P.x, P.y)){ const f = flowDir(e.x, e.y); if (f){ tx = f.x; ty = f.y; } }
+
+  if (b === 'pill'){                       // 藥罐巨人：範圍震盪 + 召喚
+    if (e.cd <= 0 && d < 340){
+      e.cd = 3.4;
+      for (let i = 0; i < 10; i++) fireShot(e.x, e.y, i / 10 * 6.283 + e.ph, 165, 12, '#f0a8bd');
+      burst(e.x, e.y, '#f0a8bd', 24, 220); G.shake = 10; blip(120, .3, 'square', .1, -60);
+    }
+    if (e.st <= 0){
+      e.st = 7;
+      for (let i = 0; i < 2; i++){
+        const a = rand(0, 6.3), nx = e.x + Math.cos(a) * 60, ny = e.y + Math.sin(a) * 60;
+        if (!isSolidAt(nx, ny)){ spawnEnemy('bandage', nx, ny); G.enemies[G.enemies.length-1].awake = true; }
+      }
+    }
+  } else if (b === 'magnet'){               // 磁力核心：吸引 + 三向脈衝
+    if (d < 420){
+      const pull = 62 * dt / Math.max(.4, d / 300);
+      moveEntity(P, -dx / d * pull, -dy / d * pull);
+    }
+    if (e.cd <= 0 && d < 420){
+      e.cd = 2.3;
+      const a0 = Math.atan2(dy, dx);
+      [-.32, 0, .32].forEach(o => fireShot(e.x, e.y, a0 + o, 260, 14, '#8fbaff'));
+      blip(300, .2, 'sine', .08, -180);
+    }
+    sp = e.sp * .8;
+  } else if (b === 'drill'){                // 鑽頭王：連續衝刺
+    if (e.dash > 0){
+      e.dash -= dt;
+      if (!moveEntity(e, Math.cos(e.ang) * 430 * dt, Math.sin(e.ang) * 430 * dt)){ e.dash = 0; G.shake = 12; burst(e.x, e.y, '#ff9a68', 14, 200); }
+      if (Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r + 4 && e.tcd <= 0){ damagePlayer(e.def.dmg); e.tcd = .7; }
+      return;
+    }
+    if (e.cd <= 0 && d < 460){ e.cd = 1.9; e.dash = .42; e.ang = Math.atan2(dy, dx); blip(700,.14,'sawtooth',.08,-500); return; }
+  }
+  moveEntity(e, tx * sp * dt, ty * sp * dt);
+  if (d < e.r + P.r + 6 && e.tcd <= 0){ damagePlayer(e.def.dmg); e.tcd = 1; }
+}
+
+function updateShots(dt){
+  for (const s of G.shots){
+    s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt;
+    if (isSolidAt(s.x, s.y)){ s.life = 0; burst(s.x, s.y, s.col, 5, 90); }
+    else if (dist2(s, P) < (P.r + s.r) ** 2){ s.life = 0; damagePlayer(s.dmg); burst(s.x, s.y, s.col, 8, 120); }
+  }
+  G.shots = G.shots.filter(s => s.life > 0);
+}
+function updateFX(dt){
+  for (const p of G.parts){ p.t += dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= .94; p.vy *= .94; p.rot += p.spin * dt; }
+  G.parts = G.parts.filter(p => p.t < p.life);
+  for (const t of G.texts){ t.t += dt; t.y -= 26 * dt; }
+  G.texts = G.texts.filter(t => t.t < .9);
+  G.shake *= Math.pow(.02, dt);
+}
+
+/* =========================================================================
+   9. 靜態地圖圖層（一次繪製，之後只做貼圖）
+   ========================================================================= */
+const mapCvs = document.createElement('canvas');
+mapCvs.width = W; mapCvs.height = H;
+const mctx = mapCvs.getContext('2d');
+const miniCvs = document.createElement('canvas');
+const MINI_S = 190 / W;
+miniCvs.width = W * MINI_S; miniCvs.height = H * MINI_S;
+
+function roundRect(c, x, y, w, h, r){
+  c.beginPath();
+  c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+}
+function drawMap(){
+  const c = mctx;
+  c.fillStyle = '#0f1220'; c.fillRect(0, 0, W, H);
+
+  // 地板（依格子，走廊淺灰、房間依機能色）
+  for (let cy = 0; cy < GH; cy++) for (let cx = 0; cx < GW; cx++){
+    const i = idx(cx, cy);
+    if (solid[i]) continue;
+    const ri = roomOf[i];
+    c.fillStyle = ri >= 0 ? ROOM_COLORS[ROOMS[ri].c] : '#e9ecef';
+    c.fillRect(cx * CELL, cy * CELL, CELL, CELL);
+  }
+  // 走廊地磚紋理
+  c.strokeStyle = 'rgba(90,105,130,.14)'; c.lineWidth = 1;
+  for (let x = 0; x < W; x += 40){ c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke(); }
+  for (let y = 0; y < H; y += 40){ c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
+
+  // 牆體：把緊鄰地板的實心格畫成牆
+  for (let cy = 0; cy < GH; cy++) for (let cx = 0; cx < GW; cx++){
+    const i = idx(cx, cy);
+    if (!solid[i]) continue;
+    let edge = false;
+    for (const [ox, oy] of N8){
+      const nx = cx + ox, ny = cy + oy;
+      if (nx < 0 || ny < 0 || nx >= GW || ny >= GH) continue;
+      if (!solid[idx(nx, ny)]){ edge = true; break; }
+    }
+    if (!edge) continue;
+    c.fillStyle = '#39415c'; c.fillRect(cx * CELL, cy * CELL, CELL, CELL);
+  }
+  // 牆頂亮邊
+  for (let cy = 1; cy < GH; cy++) for (let cx = 0; cx < GW; cx++){
+    if (solid[idx(cx, cy)] && !solid[idx(cx, cy - 1)]){
+      c.fillStyle = '#6b7699'; c.fillRect(cx * CELL, cy * CELL, CELL, 3);
+    }
+  }
+
+  // 房間外框 + 名稱
+  ROOMS.forEach(rm => {
+    c.strokeStyle = 'rgba(30,38,58,.55)'; c.lineWidth = 2;
+    c.strokeRect(rm.x + 1, rm.y + 1, rm.w - 2, rm.h - 2);
+    const cx0 = rm.x + rm.w / 2, cy0 = rm.y + rm.h / 2;
+    const lines = rm.name.split('\n');
+    const fs = rm.w < 100 || rm.h < 70 ? 13 : (rm.w > 180 ? 20 : 16);
+    c.font = '700 ' + fs + 'px "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    lines.forEach((ln, i) => {
+      const y = cy0 + (i - (lines.length - 1) / 2) * (fs + 3);
+      c.fillStyle = 'rgba(255,255,255,.65)'; c.fillText(ln, cx0 + 1, y + 1);
+      c.fillStyle = '#2e3446'; c.fillText(ln, cx0, y);
+    });
+    if (rm.boss){
+      c.strokeStyle = 'rgba(255,107,138,.85)'; c.lineWidth = 4;
+      c.setLineDash([14, 10]); c.strokeRect(rm.x + 4, rm.y + 4, rm.w - 8, rm.h - 8); c.setLineDash([]);
+    }
+  });
+
+  // 走廊標籤
+  CORRIDORS.forEach(cr => {
+    if (!cr.label) return;
+    c.font = '600 17px "Noto Sans TC",sans-serif'; c.fillStyle = 'rgba(60,70,92,.55)';
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(cr.label, cr.lx, cr.ly);
+  });
+
+  // 裝飾物
+  PROPS.forEach(p => {
+    if (p.w <= 0) return;
+    if (p.kind === 'void'){
+      c.fillStyle = '#f4f5f7'; c.fillRect(p.x, p.y, p.w, p.h);
+      c.strokeStyle = '#9aa3b5'; c.lineWidth = 2; c.strokeRect(p.x, p.y, p.w, p.h);
+      c.beginPath(); c.moveTo(p.x, p.y); c.lineTo(p.x + p.w, p.y + p.h);
+      c.moveTo(p.x + p.w, p.y); c.lineTo(p.x, p.y + p.h); c.stroke();
+    } else if (p.kind === 'escalator'){
+      c.fillStyle = '#4f5a72'; c.fillRect(p.x, p.y, p.w, p.h);
+      c.strokeStyle = '#8b97b3'; c.lineWidth = 2;
+      for (let y = p.y + 10; y < p.y + p.h; y += 16){ c.beginPath(); c.moveTo(p.x + 6, y); c.lineTo(p.x + p.w - 6, y); c.stroke(); }
+    } else {
+      c.fillStyle = '#2f8f5b'; roundRect(c, p.x, p.y, p.w, p.h, 10); c.fill();
+      c.fillStyle = '#eafaf0'; c.font = '700 15px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText('樓梯', p.x + p.w / 2, p.y + p.h / 2);
+    }
+    if (p.kind === 'void'){
+      c.fillStyle = 'rgba(90,100,120,.7)'; c.font = '600 14px "Noto Sans TC",sans-serif';
+      c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(p.name, p.x + p.w / 2, p.y + p.h / 2);
+    }
+  });
+
+  // 出入口
+  EXITS.forEach(x => {
+    c.fillStyle = x.goal ? '#7fd4c1' : '#4a5a7a';
+    c.fillRect(x.x, x.y, x.w, x.h);
+    c.save(); c.translate(x.x + x.w / 2, x.y + x.h / 2);
+    if (x.dir === 'w' || x.dir === 'e') c.rotate(-Math.PI / 2);
+    c.fillStyle = x.goal ? '#0d2a24' : '#cfd8ea';
+    c.font = '700 18px "Noto Sans TC",sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(x.name, 0, 0); c.restore();
+  });
+
+  // 動線箭頭（呼應原始平面圖）
+  const arrows = [[300,750,0],[560,750,0],[1000,750,0],[250,1135,0],[560,1135,0],[1050,1135,0],
+                  [430,600,-1.5708],[830,900,1.5708],[1290,1300,1.5708],[430,1750,-1.5708]];
+  arrows.forEach(([ax, ay, r]) => {
+    c.save(); c.translate(ax, ay); c.rotate(r);
+    c.fillStyle = 'rgba(214,48,49,.75)';
+    c.beginPath(); c.moveTo(16, 0); c.lineTo(-8, -9); c.lineTo(-8, 9); c.closePath(); c.fill();
+    c.restore();
+  });
+
+  const mc = miniCvs.getContext('2d');
+  mc.imageSmoothingEnabled = true;
+  mc.drawImage(mapCvs, 0, 0, miniCvs.width, miniCvs.height);
+}
+drawMap();
+
+/* =========================================================================
+   10. 角色繪製
+   ========================================================================= */
+function drawDog(c){
+  const a = P.aim, walk = Math.sin(P.step / 14);
+  c.save(); c.translate(P.x, P.y);
+  c.fillStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.ellipse(0, 10, 17, 7, 0, 0, 6.3); c.fill();
+  c.rotate(a);
+  const hurt = P.flash > 0 && (G.t * 30 | 0) % 2 === 0;
+  const fur = hurt ? '#ffffff' : '#e0a760', fur2 = hurt ? '#ffdddd' : '#c98b46';
+  // 尾巴
+  c.strokeStyle = fur2; c.lineWidth = 6; c.lineCap = 'round';
+  c.beginPath(); c.moveTo(-13, 0); c.quadraticCurveTo(-24, walk * 9, -30, walk * 15 - 4); c.stroke();
+  // 四肢
+  c.fillStyle = fur2;
+  [[-6, -11, walk], [-6, 11, -walk], [8, -10, -walk], [8, 10, walk]].forEach(([lx, ly, ph]) => {
+    c.beginPath(); c.ellipse(lx + ph * 3, ly, 4.5, 3.5, 0, 0, 6.3); c.fill();
+  });
+  // 身體
+  c.fillStyle = fur; c.beginPath(); c.ellipse(-2, 0, 15, 10.5, 0, 0, 6.3); c.fill();
+  c.fillStyle = 'rgba(255,255,255,.5)'; c.beginPath(); c.ellipse(-4, 3, 9, 5, 0, 0, 6.3); c.fill();
+  // 背心
+  c.fillStyle = P.power > 0 ? '#ffd166' : '#3f4a63';
+  c.beginPath(); c.ellipse(-4, 0, 7, 9.5, 0, 0, 6.3); c.fill();
+  // 頭
+  c.fillStyle = fur; c.beginPath(); c.arc(11, 0, 9, 0, 6.3); c.fill();
+  c.fillStyle = fur2;                                     // 耳朵
+  c.beginPath(); c.moveTo(9, -7); c.lineTo(5, -14); c.lineTo(13, -9); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(9, 7); c.lineTo(5, 14); c.lineTo(13, 9); c.closePath(); c.fill();
+  c.fillStyle = '#fff3e0'; c.beginPath(); c.ellipse(18, 0, 5.5, 4, 0, 0, 6.3); c.fill();
+  c.fillStyle = '#221a12'; c.beginPath(); c.arc(22, 0, 2.2, 0, 6.3); c.fill();
+  c.fillStyle = '#1b1b1b'; c.beginPath(); c.arc(13, -4.2, 1.6, 0, 6.3); c.arc(13, 4.2, 1.6, 0, 6.3); c.fill();
+  // 斧頭
+  let ang = -0.75, ext = 0;
+  if (P.swing > 0){ const t = 1 - P.swing / .26; ang = -0.95 + t * 1.9; ext = Math.sin(t * Math.PI) * 12; }
+  c.save(); c.rotate(ang); c.translate(20 + ext, 0);
+  c.strokeStyle = '#6b4a2a'; c.lineWidth = 4.5; c.lineCap = 'round';
+  c.beginPath(); c.moveTo(-16, 0); c.lineTo(16, 0); c.stroke();
+  c.fillStyle = '#cfd8e6';
+  c.beginPath(); c.moveTo(12, -3); c.lineTo(26, -13); c.lineTo(31, 0); c.lineTo(26, 13); c.lineTo(12, 3); c.closePath(); c.fill();
+  c.fillStyle = '#8b97ad';
+  c.beginPath(); c.moveTo(12, -3); c.lineTo(20, -8); c.lineTo(20, 8); c.lineTo(12, 3); c.closePath(); c.fill();
+  c.restore();
+  c.restore();
+  // 揮擊軌跡
+  if (P.swing > 0){
+    const t = 1 - P.swing / .26;
+    c.save(); c.translate(P.x, P.y);
+    c.strokeStyle = 'rgba(255,255,255,' + (0.5 * (1 - t)) + ')'; c.lineWidth = 9; c.lineCap = 'round';
+    c.beginPath(); c.arc(0, 0, 58, P.aim - .95 + t * 1.9 - .7, P.aim - .95 + t * 1.9 + .2); c.stroke();
+    c.restore();
+  }
+}
+
+function drawEnemy(c, e){
+  const bob = Math.sin(e.ph * (e.awake ? 6 : 2)) * 2;
+  c.save(); c.translate(e.x, e.y + bob);
+  c.fillStyle = 'rgba(0,0,0,.32)'; c.beginPath(); c.ellipse(0, e.r * .75 - bob, e.r * .95, e.r * .35, 0, 0, 6.3); c.fill();
+  const flash = e.flash > 0;
+  const col = flash ? '#ffffff' : e.def.col, ink = flash ? '#ff9aa8' : e.def.ink;
+
+  if (e.boss){
+    c.save(); c.rotate(Math.sin(e.ph * 2) * .06);
+    c.fillStyle = col; roundRect(c, -e.r, -e.r, e.r * 2, e.r * 2, e.r * .45); c.fill();
+    c.fillStyle = ink; c.fillRect(-e.r, -4, e.r * 2, 8);
+    c.fillStyle = '#141821';
+    c.beginPath(); c.arc(-e.r * .38, -e.r * .25, 5.5, 0, 6.3); c.arc(e.r * .38, -e.r * .25, 5.5, 0, 6.3); c.fill();
+    c.fillStyle = '#ff5566';
+    c.beginPath(); c.arc(-e.r * .38, -e.r * .25, 2.4, 0, 6.3); c.arc(e.r * .38, -e.r * .25, 2.4, 0, 6.3); c.fill();
+    c.fillStyle = '#141821';
+    c.beginPath(); c.moveTo(-e.r * .5, e.r * .42);
+    for (let i = 0; i <= 6; i++) c.lineTo(-e.r * .5 + i * e.r / 6, e.r * .42 + (i % 2 ? 7 : 0));
+    c.lineTo(e.r * .5, e.r * .62); c.lineTo(-e.r * .5, e.r * .62); c.closePath(); c.fill();
+    c.restore();
+    // 頭目血條
+    c.fillStyle = 'rgba(0,0,0,.55)'; c.fillRect(-e.r - 6, -e.r - 16, (e.r + 6) * 2, 6);
+    c.fillStyle = '#ff6b8a'; c.fillRect(-e.r - 5, -e.r - 15, ((e.r + 6) * 2 - 2) * (e.hp / e.max), 4);
+    c.restore(); return;
+  }
+
+  if (e.type === 'wheel'){
+    c.strokeStyle = ink; c.lineWidth = 3;
+    c.beginPath(); c.arc(-e.r * .6, e.r * .5, e.r * .5, 0, 6.3); c.arc(e.r * .6, e.r * .5, e.r * .5, 0, 6.3); c.stroke();
+  }
+  if (e.type === 'iv'){
+    c.strokeStyle = '#c8d2e0'; c.lineWidth = 2.5;
+    c.beginPath(); c.moveTo(e.r * .8, -4); c.lineTo(e.r * .8, -e.r - 14); c.stroke();
+    c.fillStyle = '#bfe8dd'; roundRect(c, e.r * .4, -e.r - 20, 10, 12, 3); c.fill();
+  }
+  if (e.type === 'crutch'){
+    c.strokeStyle = '#a8763c'; c.lineWidth = 3.5; c.lineCap = 'round';
+    const sw = Math.sin(e.ph * 8) * .4;
+    c.save(); c.rotate(sw); c.beginPath(); c.moveTo(e.r * .7, -e.r * .3); c.lineTo(e.r * .9, e.r + 6); c.stroke(); c.restore();
+  }
+  // 軀幹（繃帶）
+  c.fillStyle = col; roundRect(c, -e.r * .85, -e.r, e.r * 1.7, e.r * 1.9, e.r * .55); c.fill();
+  c.strokeStyle = ink; c.lineWidth = 1.6; c.globalAlpha = .55;
+  for (let i = -2; i <= 2; i++){
+    c.beginPath(); c.moveTo(-e.r * .85, i * 5 + 2); c.lineTo(e.r * .85, i * 5 - 1); c.stroke();
+  }
+  c.globalAlpha = 1;
+  if (e.type === 'cast'){
+    c.fillStyle = '#f2eee2'; roundRect(c, -e.r * .9, -2, e.r * .8, e.r * 1.1, 4); c.fill();
+    c.strokeStyle = '#b9b3a2'; c.lineWidth = 1.4; c.strokeRect(-e.r * .9, -2, e.r * .8, e.r * 1.1);
+  }
+  // 眼睛
+  c.fillStyle = '#1b2030';
+  c.beginPath(); c.arc(-e.r * .3, -e.r * .35, 2.6, 0, 6.3); c.arc(e.r * .3, -e.r * .35, 2.6, 0, 6.3); c.fill();
+  if (e.awake){
+    c.fillStyle = '#ff5566'; c.globalAlpha = .55;
+    c.beginPath(); c.arc(-e.r * .3, -e.r * .35, 4.5, 0, 6.3); c.arc(e.r * .3, -e.r * .35, 4.5, 0, 6.3); c.fill();
+    c.globalAlpha = 1;
+  }
+  // 小血條
+  if (e.hp < e.max){
+    c.fillStyle = 'rgba(0,0,0,.5)'; c.fillRect(-e.r, -e.r - 11, e.r * 2, 4);
+    c.fillStyle = '#8fd46a'; c.fillRect(-e.r, -e.r - 11, e.r * 2 * (e.hp / e.max), 4);
+  }
+  c.restore();
+}
+
+function drawDrop(c, d){
+  const y = d.y + Math.sin(d.t * 3) * 3;
+  c.save(); c.translate(d.x, y);
+  c.fillStyle = 'rgba(0,0,0,.3)'; c.beginPath(); c.ellipse(0, 12, 10, 4, 0, 0, 6.3); c.fill();
+  if (d.kind === 'bone'){
+    c.fillStyle = '#f6f1e2'; c.strokeStyle = '#c9c0aa'; c.lineWidth = 1.5;
+    c.beginPath(); c.roundRect ? c.roundRect(-9, -3, 18, 6, 3) : c.rect(-9, -3, 18, 6); c.fill(); c.stroke();
+    [[-9,-3],[-9,3],[9,-3],[9,3]].forEach(([x0,y0]) => { c.beginPath(); c.arc(x0, y0, 3.4, 0, 6.3); c.fill(); c.stroke(); });
+  } else if (d.kind === 'coffee'){
+    c.fillStyle = '#e8a05c'; roundRect(c, -7, -9, 14, 17, 3); c.fill();
+    c.fillStyle = '#4b2e1a'; c.fillRect(-7, -9, 14, 5);
+  } else if (d.kind === 'whet'){
+    c.fillStyle = '#8b97ad'; roundRect(c, -10, -6, 20, 12, 3); c.fill();
+    c.fillStyle = '#ffd166'; c.fillRect(-10, -6, 20, 3);
+  } else {
+    c.fillStyle = '#ffd166'; roundRect(c, -11, -8, 22, 16, 3); c.fill();
+    c.fillStyle = '#8c6b1f'; c.fillRect(-11, -2, 22, 3); c.fillRect(4, -8, 4, 16);
+    c.strokeStyle = 'rgba(255,209,102,.9)'; c.lineWidth = 2;
+    c.beginPath(); c.arc(0, 0, 18 + Math.sin(d.t * 4) * 3, 0, 6.3); c.stroke();
+  }
+  c.restore();
+}
+
+/* =========================================================================
+   11. 主繪製
+   ========================================================================= */
+function render(){
+  const c = ctx;
+  c.setTransform(DPR, 0, 0, DPR, 0, 0);
+  c.fillStyle = '#080a12'; c.fillRect(0, 0, VW, VH);
+
+  cam.x = clamp(P.x - VW / 2, -40, Math.max(-40, W - VW + 40));
+  cam.y = clamp(P.y - VH / 2, -40, Math.max(-40, H - VH + 40));
+  const sh = G.shake;
+  const ox = -cam.x + (sh ? rand(-sh, sh) : 0), oy = -cam.y + (sh ? rand(-sh, sh) : 0);
+
+  c.save(); c.translate(ox, oy);
+  c.drawImage(mapCvs, 0, 0);
+
+  G.drops.forEach(d => drawDrop(c, d));
+
+  // 敵人（依 y 排序）
+  const list = G.enemies.slice().sort((a, b) => a.y - b.y);
+  for (const e of list){
+    if (e.x < cam.x - 60 || e.x > cam.x + VW + 60 || e.y < cam.y - 60 || e.y > cam.y + VH + 60) continue;
+    drawEnemy(c, e);
+  }
+  drawDog(c);
+
+  for (const s of G.shots){
+    c.fillStyle = s.col; c.beginPath(); c.arc(s.x, s.y, s.r, 0, 6.3); c.fill();
+    c.fillStyle = 'rgba(255,255,255,.6)'; c.beginPath(); c.arc(s.x - s.vx * .01, s.y - s.vy * .01, s.r * .5, 0, 6.3); c.fill();
+  }
+  for (const p of G.parts){
+    const a = 1 - p.t / p.life;
+    c.save(); c.translate(p.x, p.y); c.rotate(p.rot); c.globalAlpha = a;
+    c.fillStyle = p.col; c.fillRect(-p.sz / 2, -p.sz / 2, p.sz, p.sz * .6); c.restore();
+  }
+  c.globalAlpha = 1;
+  for (const t of G.texts){
+    c.globalAlpha = 1 - t.t / .9;
+    c.font = '700 15px "Noto Sans TC",sans-serif'; c.textAlign = 'center';
+    c.fillStyle = 'rgba(0,0,0,.6)'; c.fillText(t.s, t.x + 1, t.y + 1);
+    c.fillStyle = t.col; c.fillText(t.s, t.x, t.y);
+  }
+  c.globalAlpha = 1;
+  c.restore();
+
+  // 夜間照明
+  const g = c.createRadialGradient(VW / 2, VH / 2, 40, VW / 2, VH / 2, 330);
+  g.addColorStop(0, 'rgba(8,10,22,0)'); g.addColorStop(.55, 'rgba(8,10,22,.18)'); g.addColorStop(1, 'rgba(8,10,22,.5)');
+  c.fillStyle = g; c.fillRect(0, 0, VW, VH);
+  if (P.flash > 0){ c.fillStyle = 'rgba(255,60,80,' + (P.flash * .5) + ')'; c.fillRect(0, 0, VW, VH); }
+
+  drawHUD(c);
+}
+
+function drawHUD(c){
+  // 血條
+  const bw = 260, bx = 24, by = VH - 58;
+  c.fillStyle = 'rgba(10,14,26,.8)'; roundRect(c, bx - 6, by - 24, bw + 12, 52, 10); c.fill();
+  c.fillStyle = '#242c42'; roundRect(c, bx, by, bw, 16, 8); c.fill();
+  const hp = clamp(P.hp / P.max, 0, 1);
+  c.fillStyle = hp > .5 ? '#8fd46a' : hp > .25 ? '#ffd166' : '#ff6b8a';
+  roundRect(c, bx, by, Math.max(6, bw * hp), 16, 8); c.fill();
+  c.font = '700 13px "Noto Sans TC",sans-serif'; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+  c.fillStyle = '#cbd5e6'; c.fillText('阿斧　HP ' + Math.ceil(P.hp) + '/' + P.max, bx, by - 8);
+
+  // 狀態
+  let sx = bx + 6, sy = by + 34;
+  c.font = '600 12px "Noto Sans TC",sans-serif';
+  if (P.power > 0){ c.fillStyle = '#ffd166'; c.fillText('磨刀石 ' + P.power.toFixed(1) + 's', sx, sy); sx += 96; }
+  if (P.haste > 0){ c.fillStyle = '#e8a05c'; c.fillText('咖啡因 ' + P.haste.toFixed(1) + 's', sx, sy); sx += 96; }
+  if (P.dashCd > 0){ c.fillStyle = '#6f7c99'; c.fillText('翻滾冷卻', sx, sy); }
+  else { c.fillStyle = '#9fd8ff'; c.fillText('翻滾就緒 (Shift)', sx, sy); }
+
+  // 門禁卡
+  c.textAlign = 'left';
+  c.font = '700 14px "Noto Sans TC",sans-serif';
+  c.fillStyle = 'rgba(10,14,26,.75)'; roundRect(c, 20, 20, 176, 40, 10); c.fill();
+  c.fillStyle = '#cbd5e6'; c.fillText('門禁卡', 34, 45);
+  ['pill','magnet','drill'].forEach((k, i) => {
+    const x = 92 + i * 32;
+    c.fillStyle = G.cardSet[k] ? '#ffd166' : '#333c56';
+    roundRect(c, x, 30, 24, 18, 4); c.fill();
+    if (G.cardSet[k]){ c.fillStyle = '#8c6b1f'; c.fillRect(x, 37, 24, 3); }
+  });
+  if (G.unlocked){
+    c.fillStyle = '#7fd4c1'; c.font = '700 13px "Noto Sans TC",sans-serif';
+    c.fillText('▶ 大門已解鎖：往西邊主通道撤離', 24, 78);
+  } else {
+    c.fillStyle = '#8b99b5'; c.font = '600 12px "Noto Sans TC",sans-serif';
+    c.fillText('擊倒藥劑部／MRI／牙科部的頭目', 24, 78);
+  }
+
+  // 連擊
+  if (P.combo > 1){
+    c.textAlign = 'center'; c.font = '800 26px "Noto Sans TC",sans-serif';
+    c.fillStyle = 'rgba(255,209,102,' + clamp(P.comboT, 0, 1) + ')';
+    c.fillText(P.combo + ' 連擊', VW / 2, VH - 40);
+  }
+
+  // 小地圖
+  const mw = miniCvs.width, mh = miniCvs.height, mx = VW - mw - 20, my = 20;
+  c.globalAlpha = .92;
+  c.fillStyle = 'rgba(8,11,20,.85)'; roundRect(c, mx - 6, my - 6, mw + 12, mh + 12, 8); c.fill();
+  c.drawImage(miniCvs, mx, my);
+  c.globalAlpha = 1;
+  c.strokeStyle = 'rgba(120,140,180,.5)'; c.lineWidth = 1; c.strokeRect(mx, my, mw, mh);
+  ROOMS.forEach(r => {
+    if (!r.boss) return;
+    const alive = G.enemies.some(e => e.boss === r.boss);
+    c.fillStyle = alive ? '#ff6b8a' : '#5a6a86';
+    c.beginPath(); c.arc(mx + (r.x + r.w / 2) * MINI_S, my + (r.y + r.h / 2) * MINI_S, 4.5, 0, 6.3); c.fill();
+  });
+  G.enemies.forEach(e => {
+    if (!e.awake || e.boss) return;
+    c.fillStyle = 'rgba(255,120,120,.75)';
+    c.fillRect(mx + e.x * MINI_S - 1, my + e.y * MINI_S - 1, 2.4, 2.4);
+  });
+  G.drops.forEach(d => {
+    c.fillStyle = '#ffd166';
+    c.fillRect(mx + d.x * MINI_S - 1, my + d.y * MINI_S - 1, 2.2, 2.2);
+  });
+  // 出口
+  const ex = EXITS[0];
+  c.fillStyle = G.unlocked ? '#7fd4c1' : '#3f5a55';
+  c.fillRect(mx + ex.x * MINI_S, my + ex.y * MINI_S, 5, 5);
+  // 玩家
+  c.fillStyle = '#fff'; c.beginPath(); c.arc(mx + P.x * MINI_S, my + P.y * MINI_S, 3.6, 0, 6.3); c.fill();
+  c.strokeStyle = '#e0a760'; c.lineWidth = 2;
+  c.beginPath(); c.moveTo(mx + P.x * MINI_S, my + P.y * MINI_S);
+  c.lineTo(mx + P.x * MINI_S + Math.cos(P.aim) * 9, my + P.y * MINI_S + Math.sin(P.aim) * 9); c.stroke();
+
+  // 準心
+  c.strokeStyle = 'rgba(255,255,255,.75)'; c.lineWidth = 2;
+  c.beginPath(); c.arc(mouse.x, mouse.y, 9, 0, 6.3); c.stroke();
+  c.beginPath(); c.moveTo(mouse.x - 14, mouse.y); c.lineTo(mouse.x - 4, mouse.y);
+  c.moveTo(mouse.x + 4, mouse.y); c.lineTo(mouse.x + 14, mouse.y);
+  c.moveTo(mouse.x, mouse.y - 14); c.lineTo(mouse.x, mouse.y - 4);
+  c.moveTo(mouse.x, mouse.y + 4); c.lineTo(mouse.x, mouse.y + 14); c.stroke();
+}
+
+/* =========================================================================
+   12. 流程
+   ========================================================================= */
+const elToast = document.getElementById('toast'), elObj = document.getElementById('objective');
+let toastT = 0;
+function showToast(title, sub){
+  elToast.textContent = title; elObj.textContent = sub || '';
+  elToast.style.opacity = 1; elObj.style.opacity = sub ? 1 : 0;
+  toastT = 2.2;
+}
+function startGame(){
+  G.state = 'play'; G.t = 0; G.kills = 0; G.cards = 0; G.cardSet = {}; G.time = 0;
+  G.parts.length = 0; G.texts.length = 0; G.shots.length = 0;
+  G.shake = 0; G.curRoom = -1; G.bossAlert = null; G.unlocked = false;
+  Object.assign(P, {x:110, y:1135, hp:100, swing:0, swingCd:0, dash:0, dashCd:0,
+    inv:0, power:0, haste:0, combo:0, comboT:0, flash:0, step:0});
+  populate();
+  buildFlow(P.x, P.y);
+  document.getElementById('title').classList.add('hidden');
+  document.getElementById('endscreen').classList.add('hidden');
+  document.getElementById('pause').style.display = 'none';
+  showToast('大門', '夜班開始 — 找出三張門禁卡');
+  try{ ac().resume(); }catch(e){}
+  SFX.bark();
+}
+function endGame(win){
+  G.state = 'end';
+  document.getElementById('endTitle').textContent = win ? '成功撤離！' : '阿斧倒下了⋯⋯';
+  document.getElementById('endText').innerHTML = win
+    ? '晨光從<b style="color:#b9c94e">大門</b>照進來，繃帶散了一地。<br>你是這棟醫院唯一還站著的員工。'
+    : '走廊燈閃了兩下，繃帶把你捲了進去。<br>下一班警衛犬會在<b style="color:#b9c94e">大門</b>接手。';
+  document.getElementById('endStats').innerHTML =
+    '擊倒 <b>' + G.kills + '</b> 隻　|　門禁卡 <b>' + G.cards + '/3</b>　|　時間 <b>' +
+    Math.floor(G.time / 60) + ':' + String(Math.floor(G.time % 60)).padStart(2, '0') + '</b>';
+  document.getElementById('endscreen').classList.remove('hidden');
+  blip(win ? 660 : 160, .6, win ? 'triangle' : 'sawtooth', .14, win ? 300 : -100);
+}
+document.getElementById('btnStart').onclick = startGame;
+document.getElementById('btnRetry').onclick = startGame;
+
+// 想自己調數值：主控台輸入 AXEDOG.P.sp = 300 之類
+window.AXEDOG = {G, P, ROOMS, CORRIDORS, ETYPES, BOSSES, map: mapCvs, respawn: populate};
+
+let last = performance.now();
+function loop(now){
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  if (G.state === 'play'){
+    G.t += dt; G.time += dt;
+    flowTimer -= dt;
+    const pc = idx(clamp(P.x / CELL | 0, 0, GW - 1), clamp(P.y / CELL | 0, 0, GH - 1));
+    if (flowTimer <= 0 || pc !== flowCell){ flowCell = pc; flowTimer = .18; buildFlow(P.x, P.y); }
+    updatePlayer(dt); updateEnemies(dt); updateShots(dt); updateFX(dt);
+    if (mouse.down) doSwing();
+    if (toastT > 0){ toastT -= dt; if (toastT <= 0){ elToast.style.opacity = 0; elObj.style.opacity = 0; } }
+  }
+  if (G.state !== 'title') render();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
