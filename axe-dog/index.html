@@ -100,9 +100,10 @@
         · 武器分階級 T1–T3，<b style="color:#ff5566">階級高於怪物就是秒殺</b>，低一階只剩三成傷害；
           怪物每上一層就變強，舊武器會打不動。<br>
         · 按 <kbd>C</kbd> 開組合台：<b>兩把武器＋錢</b>可以合成更高階的武器。<br>
-        · 每解鎖 <b>3 個成就</b>送一把傳說武器；紀錄與成就會存在這台裝置上。<br>
-        · 全院清空後搭訪客電梯上<b>二樓</b>，清完二樓其他房間，
-          <b style="color:#ff6b8a">頂層手術房</b>的封印才會解開——裡面是大魔王 💀。
+        · <b style="color:#c9a0ff">每爬三層送一把傳說武器</b>；紀錄、成就與進度會存在這台裝置上。<br>
+        · 清空整層，訪客電梯才會往上開。一樓 → 二樓 → 三樓，每層怪物都高一階。<br>
+        · 每層最後一間房都封著，清完同層其他房間才解開——
+          三樓的<b style="color:#ff6b8a">頂樓手術室</b>裡是大魔王 💀。
       </div>
       <h2>紀錄</h2>
       <div id="recWrap" class="sub" style="margin:0"></div>
@@ -151,7 +152,7 @@ const F1_ROOMS = [
   {id:'radA',  name:'放射科A區',   x:480, y:800, w:300, h:280, c:'clinic',
                doors:[D('n',100,80),D('e',100,80),D('s',110,80)]},
   {id:'elevM', name:'醫療電梯',    x:880, y:800, w:110, h:130, c:'lift',   doors:[D('w',40,55)]},
-  {id:'elevV', name:'訪客電梯',    x:880, y:950, w:110, h:130, c:'lift',   doors:[D('w',40,55)], lift:'up'},
+  {id:'elevV', name:'訪客電梯',    x:880, y:950, w:110, h:130, c:'lift',   doors:[D('w',40,55)], lift:'both'},
   {id:'radB',  name:'放射科B區',   x:1010,y:800, w:210, h:170, c:'clinic', doors:[D('n',80,80),D('e',50,70)]},
   {id:'mri',   name:'MRI',         x:1010,y:1000,w:210, h:80,  c:'clinic', boss:'magnet',
                doors:[D('s',80,80),D('e',20,45)]},
@@ -214,10 +215,10 @@ const FLOORS = [
     rooms: [
       {id:'or',    name:'手術室',     x:180, y:180, w:240, h:200, c:'clinic', doors:[D('n',85,70)]},
       {id:'chief', name:'頂層手術房', x:440, y:180, w:320, h:220, c:'clinic', doors:[D('n',125,70)],
-                   boss:'reaper', sealed:true},
+                   boss:'drill', sealed:true},
       {id:'icu',   name:'加護病房',   x:780, y:180, w:240, h:200, c:'clinic', doors:[D('n',85,70)]},
       {id:'birth', name:'產房',       x:180, y:580, w:240, h:200, c:'clinic', doors:[D('n',85,70)]},
-      {id:'liftD', name:'訪客電梯',   x:500, y:580, w:200, h:140, c:'lift',   doors:[D('n',75,50)], lift:'down'},
+      {id:'liftD', name:'訪客電梯',   x:500, y:580, w:200, h:140, c:'lift',   doors:[D('n',75,50)], lift:'both'},
       {id:'ward',  name:'病房區',     x:780, y:580, w:240, h:200, c:'clinic', doors:[D('n',85,70)]},
     ],
     corridors: [
@@ -231,7 +232,32 @@ const FLOORS = [
     exits: [],
     notes: [
       {t:'頂層手術房的門封著 — 清空本層其他房間才會解鎖', x:600, y:480, size:14, col:'rgba(140,70,90,.8)'},
-      {t:'（走回訪客電梯可以下樓）', x:600, y:505, size:13, col:'rgba(90,104,132,.7)'},
+      {t:'（清空整層後，訪客電梯就會往上開到三樓）', x:600, y:505, size:13, col:'rgba(90,104,132,.7)'},
+    ],
+  },
+  {
+    id:'f3', name:'三樓', tier:3, W:1200, H:1000, spawn:{x:600, y:490},
+    rooms: [
+      {id:'office',  name:'院長室',     x:180, y:180, w:240, h:200, c:'admin',  doors:[D('n',85,70)]},
+      {id:'top',     name:'頂樓手術室', x:440, y:180, w:320, h:220, c:'clinic', doors:[D('n',125,70)],
+                     boss:'reaper', sealed:true},
+      {id:'archive', name:'資料室',     x:780, y:180, w:240, h:200, c:'util',   doors:[D('n',85,70)]},
+      {id:'lab3',    name:'研究室',     x:180, y:580, w:240, h:200, c:'clinic', doors:[D('n',85,70)]},
+      {id:'liftD3',  name:'訪客電梯',   x:500, y:580, w:200, h:140, c:'lift',   doors:[D('n',75,50)], lift:'both'},
+      {id:'duty',    name:'值班室',     x:780, y:580, w:240, h:200, c:'util',   doors:[D('n',85,70)]},
+    ],
+    corridors: [
+      {x:60,  y:60,  w:1080,h:100, id:'F3-N'},
+      {x:60,  y:60,  w:100, h:880, id:'F3-W'},
+      {x:1040,y:60,  w:100, h:880, id:'F3-E'},
+      {x:60,  y:840, w:1080,h:100, id:'F3-S'},
+      {x:160, y:420, w:980, h:140, id:'F3-HALL', label:'三樓行政層', lx:600, ly:445},
+    ],
+    props: [],
+    exits: [],
+    notes: [
+      {t:'頂樓手術室封著 — 清空本層其他房間才會解開', x:600, y:480, size:14, col:'rgba(140,70,90,.8)'},
+      {t:'裡面是死神主任 💀', x:600, y:505, size:14, col:'rgba(180,90,110,.85)'},
     ],
   },
 ];
@@ -434,6 +460,10 @@ const WEAPONS = {
   laser:  {name:'雷射槍', icon:'雷', col:'#a6f0ff', tier:2, dmg:34, cd:.16, speed:980, ammoMax:160, refill:34, r:4, knock:70},
   freeze: {name:'冷凍槍', icon:'冰', col:'#9fc7ff', tier:2, dmg:26, cd:.34, speed:520, ammoMax:110, refill:24, r:7,
            splash:64, slow:4.2, knock:90},
+  // ── 三樓科技（tier 3）──
+  plasma: {name:'電漿槍', icon:'漿', col:'#d8a6ff', tier:3, dmg:58, cd:.26, speed:700, ammoMax:120, refill:26, r:7,
+           splash:56, knock:180},
+  nailgun:{name:'釘槍',   icon:'釘', col:'#ffe08a', tier:3, dmg:26, cd:.09, speed:900, ammoMax:260, refill:56, r:3, knock:50},
   // ── 組合武器（tier = 素材最高階 + 1）──
   autoshot:{name:'雙管快炮', icon:'雙', col:'#ffb45c', tier:2, dmg:14, cd:.34, speed:620, ammoMax:90, refill:18, r:4,
             pellets:5, spread:.34, knock:230, made:true},
@@ -452,13 +482,16 @@ const WEAPONS = {
            ammoMax:0, legend:true},
   voidball:{name:'黑洞彈',  icon:'洞', col:'#b08aff', tier:3, dmg:70, cd:1.2, speed:300, ammoMax:26, refill:6, r:12,
            splash:150, pull:true, knock:200, legend:true},
+  railgun: {name:'軌道砲',  icon:'軌', col:'#ffffff', tier:4, dmg:180, cd:1.1, speed:1400, ammoMax:20, refill:4, r:6,
+           chain:4, knock:700, made:true},
 };
-const WEAPON_ORDER = ['axe','pistol','shotgun','balloon','cannon','laser','freeze',
+const WEAPON_ORDER = ['axe','pistol','shotgun','balloon','cannon','laser','freeze','plasma','nailgun',
                       'autoshot','gcannon','hydro','waterbomb','rocketaxe','arc','sawnado','voidball'];
 // 指定房間第一次清空時給出的武器
 const WEAPON_ROOMS = {
   mart:'pistol', radA:'shotgun', beauty:'balloon', mri:'cannon',   // 一樓
   or:'laser', icu:'freeze',                                        // 二樓
+  office:'plasma', lab3:'nailgun',                                 // 三樓
 };
 const LV_DMG = [1, 1.35, 1.75];     // Lv1 / Lv2 / Lv3 傷害倍率
 const LV_CD  = [1, .85, .72];       // 射速倍率（越小越快）
@@ -471,6 +504,7 @@ const RECIPES = [
   {a:'balloon', b:'cannon',  out:'waterbomb', cost:700},
   {a:'axe',     b:'cannon',  out:'rocketaxe', cost:800},
   {a:'laser',   b:'freeze',  out:'voidball',  cost:900},
+  {a:'plasma',  b:'nailgun', out:'railgun',   cost:1200},
 ];
 const LEGENDS = ['arc','sawnado','voidball'];
 
@@ -548,7 +582,7 @@ const G = {
   enemies:[], shots:[], parts:[], drops:[], texts:[],
   shake:0, curRoom:-1, bossAlert:null, unlocked:false, liftOpen:false,
   cleared:0, totalRooms:0, clearStreak:0, liftLock:0, sawF2:false,
-  money:0, achQueue:[], doorWarn:0, combine:false, seals:[],
+  money:0, achQueue:[], doorWarn:0, combine:false, seals:[], legendsGiven:0,
 };
 const P = {
   x:110, y:1135, r:14, hp:100, max:100, sp:200, aim:0,
@@ -603,6 +637,14 @@ const SPAWN_TABLE = {
   colo:['crutch'], chest:['iv'], ortho:['cast'], breast:['bandage'],
   neuro:['crutch'], plast:['bandage'], cast2:['cast'], r112:['iv'],
 };
+const F3_SPAWN = {
+  office:['cast','wheel','iv','bandage','crutch','bandage'],
+  archive:['bandage','cast','crutch','iv','bandage'],
+  lab3:['iv','iv','wheel','cast','bandage'],
+  duty:['crutch','bandage','cast','wheel','iv','bandage'],
+  liftD3:[],
+  top:[],
+};
 const F2_SPAWN = {
   or:['bandage','cast','iv','bandage','crutch'],
   icu:['wheel','cast','iv','bandage','bandage'],
@@ -620,7 +662,7 @@ function populate(){
     f.rooms.forEach((rm, i) => {
       rm.seen = false; rm.cleared = false; rm.total = 0; rm.alive = 0; rm.stub = false;
       rm.locked = !!rm.sealed;
-      const list = (fi === 0 ? SPAWN_TABLE : F2_SPAWN)[rm.id] || [];
+      const list = (fi === 0 ? SPAWN_TABLE : fi === 1 ? F2_SPAWN : F3_SPAWN)[rm.id] || [];
       list.forEach(t => { const sp = freeSpotIn(rm); if (sp){ spawnEnemy(t, sp.x, sp.y, null, i, f.tier); rm.total++; } });
       if (rm.boss){
         const c = roomCenter(rm);
@@ -975,15 +1017,19 @@ function unlockAch(id){
   G.achQueue.push(a);
   SFX.card();
   showToast('成就解鎖：' + a.name, a.desc);
-  const n = Object.keys(STORE.ach).length;
-  if (n >= (STORE.legendsGiven + 1) * 3 && STORE.legendsGiven < LEGENDS.length){
-    const g = LEGENDS[STORE.legendsGiven++];
-    P.owned[g] = true; P.lv[g] = P.lv[g] || 1;
-    if (!WEAPONS[g].melee) P.ammo[g] = WEAPONS[g].ammoMax;
-    P.weapon = g;
-    setTimeout(() => showToast('傳說武器：' + WEAPONS[g].name, '每三個成就換一把（' + n + ' 個成就）'), 1600);
-  }
   saveStore();
+}
+// 每爬三層送一把傳說武器
+function grantFloorLegend(floorNo){
+  if (floorNo % 3 !== 0) return;
+  if (G.legendsGiven >= LEGENDS.length) return;
+  const g = LEGENDS[G.legendsGiven++];
+  P.owned[g] = true; P.lv[g] = P.lv[g] || 1;
+  if (!WEAPONS[g].melee) P.ammo[g] = WEAPONS[g].ammoMax;
+  P.weapon = g;
+  SFX.card();
+  setTimeout(() => showToast('傳說武器：' + WEAPONS[g].name,
+                             '爬上第 ' + floorNo + ' 層的獎勵（每三層一把）'), 1500);
 }
 function addMoney(n, x, y){
   P.money += n;
@@ -1007,7 +1053,8 @@ function killEnemy(e){
       unlockAch('reaper');
       STORE.records.reaperKills = (STORE.records.reaperKills || 0) + 1; saveStore();
       setTimeout(() => endGame(true, 'reaper'), 1400);
-    } else spawnDrop('card:' + e.boss, e.x, e.y);
+    } else if (e.fl === 0) spawnDrop('card:' + e.boss, e.x, e.y);
+    else { addMoney(400, e.x, e.y); spawnDrop('up', e.x, e.y); }
   }
   const rm = ROOMS[e.home];
   if (rm){ rm.alive = Math.max(0, rm.alive - 1); if (rm.alive === 0 && !rm.cleared) clearRoom(rm); }
@@ -1047,9 +1094,10 @@ function clearRoom(rm){
   }
   showToast(rm.name.replace('\n', ' ') + '　清空', '🤑 +' + cash + '　' + sub + '　|　' + G.cleared + '/' + G.totalRooms + ' 間');
 
-  if (G.cleared >= G.totalRooms && !G.liftOpen){
+  if (floorCleared(G.floor) && !G.liftOpen){
     G.liftOpen = true; SFX.lift();
-    setTimeout(() => showToast('訪客電梯已啟動', '全院清空 — 搭電梯上二樓'), 1800);
+    const nextName = FLOORS[G.floor + 1] ? FLOORS[G.floor + 1].name : null;
+    if (nextName) setTimeout(() => showToast('訪客電梯已啟動', FL.name + '清空 — 搭電梯上' + nextName), 1800);
   }
 }
 
@@ -1179,22 +1227,35 @@ function updatePlayer(dt){
   // 電梯／出口
   if (G.liftLock <= 0 && rid >= 0){
     const rm = ROOMS[rid];
-    if (rm.lift === 'up' && G.liftOpen) goFloor(1);
-    else if (rm.lift === 'down') goFloor(0);
+    if (rm.lift){
+      const up = G.floor + 1 < FLOORS.length, cleared = floorCleared(G.floor);
+      if (up && cleared) goFloor(G.floor + 1);
+      else if (G.floor > 0) goFloor(G.floor - 1);
+      else if (up && !cleared && G.doorWarn <= 0){
+        G.doorWarn = 2;
+        floatText(P.x, P.y - 40, '先把這層清空，電梯才會往上', '#ff9a68');
+      }
+    }
   }
   if (G.floor === 0 && G.unlocked && P.x < 62 && P.y > 1090 && P.y < 1180) endGame(true, 'escape');
 }
 
+function floorCleared(fi){ return FLOORS[fi].rooms.every(r => r.cleared); }
+const FLOOR_ARRIVE = [{x:830, y:1017}, {x:600, y:490}, {x:600, y:490}];
 function goFloor(n){
   const from = G.floor;
   G.floor = n; useFloor(n);
   G.liftLock = 1.6; G.curRoom = -1;
-  if (n === 1){ P.x = 500; P.y = 470; }
-  else { P.x = 830; P.y = 1017; }
+  const a = FLOOR_ARRIVE[n] || FL.spawn;
+  P.x = a.x; P.y = a.y;
   buildFlow(P.x, P.y);
   SFX.lift();
-  showToast(FL.name, n === 1 ? '第二層 — 怪物更強了，舊武器打不動' : '回到一樓');
-  if (n === 1){ unlockAch('floor2'); G.sawF2 = true; }
+  const fno = n + 1;
+  showToast(FL.name, n > from ? '第 ' + fno + ' 層 — 怪物是 T' + (FL.tier || 1) + '，低階武器打不動'
+                              : '回到 ' + FL.name);
+  if (n === 1) unlockAch('floor2');
+  if (n > from) grantFloorLegend(fno);
+  G.liftOpen = floorCleared(n);
   refreshSeals();
   autoSave();
 }
@@ -1903,8 +1964,8 @@ function render(){
     }
   });
   // 電梯開啟時的指示光圈
-  if (G.liftOpen && G.floor === 0){
-    const lf = ROOMS.find(r => r.lift === 'up');
+  if (G.liftOpen && FLOORS[G.floor + 1]){
+    const lf = ROOMS.find(r => r.lift);
     if (lf){
       const cc = roomCenter(lf), s = scr(cc.x, cc.y);
       c.strokeStyle = 'rgba(127,212,193,' + (.4 + .35 * Math.sin(G.t * 4)) + ')'; c.lineWidth = 5;
@@ -1979,7 +2040,9 @@ function drawHUD(c){
     c.fillStyle = G.cardSet[k] ? '#ffd166' : '#333c56';
     roundRect(c, x, 70, 20, 14, 3); c.fill();
   });
-  if (G.liftOpen){ c.fillStyle = '#7fd4c1'; c.fillText('▶ 訪客電梯已開：可上二樓', 150, 80); }
+  if (G.liftOpen && FLOORS[G.floor + 1]){
+    c.fillStyle = '#7fd4c1'; c.fillText('▶ 電梯可上' + FLOORS[G.floor + 1].name, 150, 80);
+  }
   else if (G.unlocked){ c.fillStyle = '#7fd4c1'; c.fillText('▶ 大門已解鎖', 150, 80); }
 
   // 目前房間
@@ -2060,7 +2123,7 @@ function drawHUD(c){
       c.fillStyle = r.seen ? '#ff6b8a' : 'rgba(255,107,138,.45)';
       c.beginPath(); c.arc(rx + rw / 2, ry + rh / 2, 3.5, 0, 6.3); c.fill();
     }
-    if (r.lift === 'up' && G.liftOpen){
+    if (r.lift && G.liftOpen){
       c.fillStyle = '#7fd4c1'; c.beginPath(); c.arc(rx + rw / 2, ry + rh / 2, 4, 0, 6.3); c.fill();
     }
   });
@@ -2163,7 +2226,7 @@ function autoSave(){
   STORE.save = {
     v:3, at: Date.now(), floor: G.floor, time: G.time, kills: G.kills, money: P.money,
     hp: P.hp, cards: G.cards, cardSet: Object.assign({}, G.cardSet),
-    unlocked: G.unlocked, liftOpen: G.liftOpen, streak: G.clearStreak,
+    unlocked: G.unlocked, liftOpen: G.liftOpen, streak: G.clearStreak, legends: G.legendsGiven,
     weapon: P.weapon, owned: Object.assign({}, P.owned),
     ammo: Object.assign({}, P.ammo), lv: Object.assign({}, P.lv),
     rooms: FLOORS.map(f => f.rooms.map(r => (r.cleared ? 2 : r.seen ? 1 : 0))),
@@ -2186,7 +2249,7 @@ function applySave(sv){
   FLOORS.forEach(f => f.rooms.forEach(rm => { G.totalRooms++; if (rm.cleared) G.cleared++; }));
   G.kills = sv.kills || 0; G.time = sv.time || 0; G.cards = sv.cards || 0;
   G.cardSet = sv.cardSet || {}; G.unlocked = !!sv.unlocked; G.liftOpen = !!sv.liftOpen;
-  G.clearStreak = sv.streak || 0;
+  G.clearStreak = sv.streak || 0; G.legendsGiven = sv.legends || 0;
   P.money = sv.money || 0; P.hp = clamp(sv.hp || 100, 1, P.max);
   P.owned = Object.assign({axe:true}, sv.owned); P.ammo = Object.assign({}, sv.ammo);
   P.lv = Object.assign({axe:1}, sv.lv);
@@ -2194,6 +2257,7 @@ function applySave(sv){
   refreshSeals();
   const fl = sv.floor || 0;
   G.floor = fl; useFloor(fl);
+  G.liftOpen = floorCleared(fl);
   P.x = FL.spawn.x; P.y = FL.spawn.y; G.curRoom = -1; G.liftLock = 1.2;
   buildFlow(P.x, P.y);
 }
@@ -2256,6 +2320,7 @@ function startGame(resume){
   });
   populate();
   useFloor(0);
+  G.liftOpen = floorCleared(0);
   buildFlow(P.x, P.y);
   anyInput = false;
   document.getElementById('hint').style.display = 'none';
@@ -2264,7 +2329,7 @@ function startGame(resume){
   document.getElementById('pause').style.display = 'none';
   document.getElementById('busy').style.display = 'none';
   focusGame();
-  P.money = 0; G.achQueue.length = 0; G.doorWarn = 0; doorWarnCount = 0;
+  P.money = 0; G.achQueue.length = 0; G.doorWarn = 0; doorWarnCount = 0; G.legendsGiven = 0;
   if (resume && STORE.save) applySave(STORE.save);
   else { STORE.save = null; saveStore(); }
   renderRecords();
