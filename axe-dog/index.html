@@ -95,11 +95,19 @@
       <h2>規則</h2>
       <div class="sub" style="margin:0">
         · 敵人被關在各自的房間裡，不會追到走廊——但<b>進門前你不會知道裡面有幾隻</b>。<br>
-        · 清空一間房，房裡會掉出<b style="color:#7fd4c1">骨頭</b>補血，外加武器或彈藥。<br>
-        · 藥劑部、MRI、牙科部各有一名頭目，掉落門禁卡；集滿三張可從大門提前撤離。<br>
-        · <b style="color:#b9c94e">全部房間清空</b>後，訪客電梯會打開通往<b>二樓</b>。
+        · <b style="color:#ff9a68">站門口打不到裡面</b>：攻擊只對你所在那間房的敵人有效，子彈會在門檻消失。<br>
+        · 清空一間房會掉<b style="color:#7fd4c1">骨頭</b>、武器或彈藥，還有<b style="color:#ffd166">🤑 錢</b>。<br>
+        · 武器分階級 T1–T3，<b style="color:#ff5566">階級高於怪物就是秒殺</b>，低一階只剩三成傷害；
+          怪物每上一層就變強，舊武器會打不動。<br>
+        · 按 <kbd>C</kbd> 開組合台：<b>兩把武器＋錢</b>可以合成更高階的武器。<br>
+        · 每解鎖 <b>3 個成就</b>送一把傳說武器；紀錄與成就會存在這台裝置上。<br>
+        · 全院清空後搭訪客電梯上<b>二樓</b>，清完二樓其他房間，
+          <b style="color:#ff6b8a">頂層手術房</b>的封印才會解開——裡面是大魔王 💀。
       </div>
-      <button class="start" id="btnStart">按此開始夜班</button>
+      <h2>紀錄</h2>
+      <div id="recWrap" class="sub" style="margin:0"></div>
+      <button class="start" id="btnResume" style="display:none;background:linear-gradient(90deg,#7fd4c1,#a6e8da)">繼續上次進度</button>
+      <button class="start" id="btnStart">開始新的一輪</button>
     </div>
   </div>
 
@@ -171,7 +179,7 @@ const F1_ROOMS = [
 
 const FLOORS = [
   {
-    id:'f1', name:'一樓', W:1400, H:1970, spawn:{x:110, y:1135},
+    id:'f1', name:'一樓', tier:1, W:1400, H:1970, spawn:{x:110, y:1135},
     rooms: F1_ROOMS,
     corridors: [
       {x:60,  y:60,   w:120, h:1910, id:'CV0'},
@@ -202,26 +210,28 @@ const FLOORS = [
     ],
   },
   {
-    id:'f2', name:'二樓', W:1000, H:900, spawn:{x:500, y:470},
+    id:'f2', name:'二樓', tier:2, W:1200, H:1000, spawn:{x:600, y:490},
     rooms: [
-      {id:'or',    name:'手術室',   x:180, y:180, w:230, h:160, c:'clinic', doors:[D('n',80,70)]},
-      {id:'icu',   name:'加護病房', x:590, y:180, w:230, h:160, c:'clinic', doors:[D('n',80,70)]},
-      {id:'birth', name:'產房',     x:180, y:540, w:230, h:160, c:'clinic', doors:[D('n',80,70)]},
-      {id:'ward',  name:'病房區',   x:590, y:540, w:230, h:160, c:'clinic', doors:[D('n',80,70)]},
-      {id:'liftD', name:'訪客電梯', x:440, y:540, w:120, h:110, c:'lift',   doors:[D('n',35,50)], lift:'down'},
+      {id:'or',    name:'手術室',     x:180, y:180, w:240, h:200, c:'clinic', doors:[D('n',85,70)]},
+      {id:'chief', name:'頂層手術房', x:440, y:180, w:320, h:220, c:'clinic', doors:[D('n',125,70)],
+                   boss:'reaper', sealed:true},
+      {id:'icu',   name:'加護病房',   x:780, y:180, w:240, h:200, c:'clinic', doors:[D('n',85,70)]},
+      {id:'birth', name:'產房',       x:180, y:580, w:240, h:200, c:'clinic', doors:[D('n',85,70)]},
+      {id:'liftD', name:'訪客電梯',   x:500, y:580, w:200, h:140, c:'lift',   doors:[D('n',75,50)], lift:'down'},
+      {id:'ward',  name:'病房區',     x:780, y:580, w:240, h:200, c:'clinic', doors:[D('n',85,70)]},
     ],
     corridors: [
-      {x:60,  y:60,  w:880, h:100, id:'F2-N'},
-      {x:60,  y:60,  w:100, h:780, id:'F2-W'},
-      {x:840, y:60,  w:100, h:780, id:'F2-E'},
-      {x:60,  y:740, w:880, h:100, id:'F2-S'},
-      {x:160, y:380, w:680, h:140, id:'F2-HALL', label:'二樓大廳 — 空間規劃中', lx:500, ly:440},
+      {x:60,  y:60,  w:1080,h:100, id:'F2-N'},
+      {x:60,  y:60,  w:100, h:880, id:'F2-W'},
+      {x:1040,y:60,  w:100, h:880, id:'F2-E'},
+      {x:60,  y:840, w:1080,h:100, id:'F2-S'},
+      {x:160, y:420, w:980, h:140, id:'F2-HALL', label:'二樓大廳', lx:600, ly:445},
     ],
     props: [],
     exits: [],
     notes: [
-      {t:'待設計：手術室連線關卡 · 加護病房潛行段 · 產房頭目 · 病房區清版', x:500, y:475, size:14},
-      {t:'（往南走回訪客電梯可下樓）', x:500, y:500, size:13, col:'rgba(90,104,132,.7)'},
+      {t:'頂層手術房的門封著 — 清空本層其他房間才會解鎖', x:600, y:480, size:14, col:'rgba(140,70,90,.8)'},
+      {t:'（走回訪客電梯可以下樓）', x:600, y:505, size:13, col:'rgba(90,104,132,.7)'},
     ],
   },
 ];
@@ -411,20 +421,67 @@ const SFX = {
    4. 武器
    ========================================================================= */
 const WEAPONS = {
-  axe:    {name:'消防斧', icon:'斧', col:'#cfd8e6', melee:true, dmg:22, cd:.38, range:66, arc:.85, ammoMax:0},
-  pistol: {name:'手槍',   icon:'槍', col:'#ffd166', dmg:17, cd:.2,  speed:640, ammoMax:120, refill:26, r:5, knock:110},
-  shotgun:{name:'散彈槍', icon:'散', col:'#ff9a68', dmg:11, cd:.6,  speed:540, ammoMax:60,  refill:12, r:4,
+  // tier = 這把武器屬於第幾層的科技。階級高於怪物 → 秒殺；低於怪物 → 傷害大幅衰減
+  axe:    {name:'消防斧', icon:'斧', col:'#cfd8e6', tier:1, melee:true, dmg:22, cd:.38, range:66, arc:.85, ammoMax:0},
+  pistol: {name:'手槍',   icon:'槍', col:'#ffd166', tier:1, dmg:17, cd:.2,  speed:640, ammoMax:120, refill:26, r:5, knock:110},
+  shotgun:{name:'散彈槍', icon:'散', col:'#ff9a68', tier:1, dmg:11, cd:.6,  speed:540, ammoMax:60,  refill:12, r:4,
            pellets:7, spread:.46, knock:260},
-  balloon:{name:'水球',   icon:'水', col:'#7fd4c1', dmg:24, cd:.46, speed:440, ammoMax:80,  refill:16, r:8,
+  balloon:{name:'水球',   icon:'水', col:'#7fd4c1', tier:1, dmg:24, cd:.46, speed:440, ammoMax:80,  refill:16, r:8,
            splash:74, slow:2.6, knock:120},
-  cannon: {name:'大炮',   icon:'炮', col:'#ff6b8a', dmg:72, cd:1.0, speed:380, ammoMax:30,  refill:5,  r:10,
+  cannon: {name:'大炮',   icon:'炮', col:'#ff6b8a', tier:1, dmg:72, cd:1.0, speed:380, ammoMax:30,  refill:5,  r:10,
            splash:104, knock:520},
+  // ── 二樓科技（tier 2）──
+  laser:  {name:'雷射槍', icon:'雷', col:'#a6f0ff', tier:2, dmg:34, cd:.16, speed:980, ammoMax:160, refill:34, r:4, knock:70},
+  freeze: {name:'冷凍槍', icon:'冰', col:'#9fc7ff', tier:2, dmg:26, cd:.34, speed:520, ammoMax:110, refill:24, r:7,
+           splash:64, slow:4.2, knock:90},
+  // ── 組合武器（tier = 素材最高階 + 1）──
+  autoshot:{name:'雙管快炮', icon:'雙', col:'#ffb45c', tier:2, dmg:14, cd:.34, speed:620, ammoMax:90, refill:18, r:4,
+            pellets:5, spread:.34, knock:230, made:true},
+  gcannon: {name:'榴彈散射', icon:'榴', col:'#ff8aa0', tier:2, dmg:44, cd:.8,  speed:430, ammoMax:44, refill:9,  r:8,
+            pellets:3, spread:.3, splash:78, knock:380, made:true},
+  hydro:   {name:'高壓水槍', icon:'壓', col:'#7fe0d4', tier:2, dmg:22, cd:.12, speed:760, ammoMax:200, refill:40, r:4,
+            slow:1.6, knock:60, made:true},
+  waterbomb:{name:'水壓炸彈', icon:'炸', col:'#5fc8ff', tier:3, dmg:88, cd:.95, speed:400, ammoMax:34, refill:7, r:11,
+            splash:132, slow:3.4, knock:560, made:true},
+  rocketaxe:{name:'火箭斧',  icon:'火', col:'#ffca6b', tier:3, dmg:96, cd:.85, speed:520, ammoMax:30, refill:6, r:10,
+            splash:110, knock:600, made:true},
+  // ── 成就解鎖的傳說武器（tier 3）──
+  arc:    {name:'除顫電弧', icon:'電', col:'#c9a0ff', tier:3, dmg:52, cd:.3,  speed:720, ammoMax:90, refill:20, r:6,
+           chain:3, knock:140, legend:true},
+  sawnado:{name:'骨鋸旋風', icon:'鋸', col:'#e8e2d4', tier:3, melee:true, dmg:58, cd:.26, range:92, arc:2.6,
+           ammoMax:0, legend:true},
+  voidball:{name:'黑洞彈',  icon:'洞', col:'#b08aff', tier:3, dmg:70, cd:1.2, speed:300, ammoMax:26, refill:6, r:12,
+           splash:150, pull:true, knock:200, legend:true},
 };
-const WEAPON_ORDER = ['axe','pistol','shotgun','balloon','cannon'];
+const WEAPON_ORDER = ['axe','pistol','shotgun','balloon','cannon','laser','freeze',
+                      'autoshot','gcannon','hydro','waterbomb','rocketaxe','arc','sawnado','voidball'];
 // 指定房間第一次清空時給出的武器
-const WEAPON_ROOMS = {mart:'pistol', radA:'shotgun', beauty:'balloon', mri:'cannon'};
+const WEAPON_ROOMS = {
+  mart:'pistol', radA:'shotgun', beauty:'balloon', mri:'cannon',   // 一樓
+  or:'laser', icu:'freeze',                                        // 二樓
+};
 const LV_DMG = [1, 1.35, 1.75];     // Lv1 / Lv2 / Lv3 傷害倍率
 const LV_CD  = [1, .85, .72];       // 射速倍率（越小越快）
+
+// ── 武器組合：消耗兩把武器與金錢，換一把更高階的 ──
+const RECIPES = [
+  {a:'pistol',  b:'shotgun', out:'autoshot',  cost:300},
+  {a:'shotgun', b:'cannon',  out:'gcannon',   cost:450},
+  {a:'pistol',  b:'balloon', out:'hydro',     cost:320},
+  {a:'balloon', b:'cannon',  out:'waterbomb', cost:700},
+  {a:'axe',     b:'cannon',  out:'rocketaxe', cost:800},
+  {a:'laser',   b:'freeze',  out:'voidball',  cost:900},
+];
+const LEGENDS = ['arc','sawnado','voidball'];
+
+/* ── 階級對照：武器階級 − 怪物階級 ── */
+function tierMul(wt, et){
+  const d = wt - et;
+  if (d >= 1) return 'kill';        // 高一階以上 → 秒殺
+  if (d === 0) return 1;
+  if (d === -1) return .32;
+  return .14;
+}
 
 /* =========================================================================
    5. 敵人 / 頭目
@@ -437,10 +494,50 @@ const ETYPES = {
   cast:   {name:'石膏重甲', hp:100,sp:30, r:21, dmg:19, col:'#ddd7c4', ink:'#8b8574'},
 };
 const BOSSES = {
+  reaper:{name:'死神主任 💀', title:'頂層手術房', hp:1200, sp:52, r:44, dmg:34, col:'#c0b8d8', ink:'#3b3450', final:true},
   pill:  {name:'藥罐巨人', title:'藥劑部',  hp:430, sp:46, r:34, dmg:22, col:'#f0a8bd', ink:'#8c3f56'},
   magnet:{name:'磁力核心', title:'MRI',     hp:480, sp:36, r:36, dmg:20, col:'#8fbaff', ink:'#33518c'},
   drill: {name:'鑽頭王',   title:'牙科部',  hp:540, sp:54, r:32, dmg:25, col:'#ff9a68', ink:'#94421c'},
 };
+
+/* =========================================================================
+   5b. 成就與紀錄（存在瀏覽器 localStorage）
+   ========================================================================= */
+const ACHIEVEMENTS = [
+  {id:'first_kill', name:'初次見血',   desc:'擊倒第一隻繃帶怪'},
+  {id:'first_room', name:'開張',       desc:'清空第一間房'},
+  {id:'flawless',   name:'毫髮無傷',   desc:'不掉血清空一整間房'},
+  {id:'triple',     name:'一發三殺',   desc:'一次爆炸解決三隻'},
+  {id:'boss1',      name:'頭目獵人',   desc:'擊倒任何一名頭目'},
+  {id:'cards',      name:'全門禁',     desc:'集滿三張門禁卡'},
+  {id:'rich',       name:'發財了 🤑',  desc:'身上錢超過 1000'},
+  {id:'ten_rooms',  name:'清潔隊',     desc:'清空 10 間房'},
+  {id:'floor1',     name:'一樓淨空',   desc:'清空一樓全部房間'},
+  {id:'craft',      name:'黑手',       desc:'組合出第一把武器'},
+  {id:'floor2',     name:'登上二樓',   desc:'搭電梯抵達二樓'},
+  {id:'combo10',    name:'十連擊',     desc:'達成 10 連擊'},
+  {id:'oneshot',    name:'越級打怪',   desc:'用高階武器秒殺一隻怪'},
+  {id:'reaper',     name:'送走死神 💀',desc:'擊敗大魔王'},
+];
+const STORE_KEY = 'axedog.v3';
+function loadStore(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  }catch(e){}
+  return null;
+}
+function saveStore(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(STORE)); }catch(e){}
+}
+const STORE = Object.assign({
+  ach: {},                                       // 已解鎖成就
+  legendsGiven: 0,                               // 已發出的傳說武器數
+  records: {bestRooms:0, bestMoney:0, bestKills:0, bestFloor:1, bestTime:0, runs:0, wins:0, reaperKills:0},
+  save: null,                                    // 進度存檔
+}, loadStore() || {});
+STORE.records = Object.assign({bestRooms:0, bestMoney:0, bestKills:0, bestFloor:1, bestTime:0, runs:0, wins:0, reaperKills:0}, STORE.records || {});
+STORE.ach = STORE.ach || {};
 
 /* =========================================================================
    6. 遊戲狀態
@@ -451,12 +548,13 @@ const G = {
   enemies:[], shots:[], parts:[], drops:[], texts:[],
   shake:0, curRoom:-1, bossAlert:null, unlocked:false, liftOpen:false,
   cleared:0, totalRooms:0, clearStreak:0, liftLock:0, sawF2:false,
+  money:0, achQueue:[], doorWarn:0, combine:false, seals:[],
 };
 const P = {
   x:110, y:1135, r:14, hp:100, max:100, sp:200, aim:0,
   swing:0, cd:0, hitSet:null, dash:0, dashCd:0, dvx:0, dvy:0,
   inv:0, power:0, haste:0, step:0, flash:0, combo:0, comboT:0,
-  weapon:'axe', owned:{axe:true}, ammo:{}, lv:{axe:1},
+  weapon:'axe', owned:{axe:true}, ammo:{}, lv:{axe:1}, roomNoHit:true,
 };
 const cam = {x:0, y:0};
 
@@ -464,11 +562,15 @@ function curWeapon(){ return WEAPONS[P.weapon]; }
 function weaponLv(k){ return P.lv[k] || 1; }
 function ammoOf(k){ return WEAPONS[k].melee ? Infinity : (P.ammo[k] || 0); }
 
-function spawnEnemy(type, x, y, boss, home){
+function spawnEnemy(type, x, y, boss, home, tier){
   const d = boss ? BOSSES[boss] : ETYPES[type];
+  const t = tier || (FLOORS[G.floor].tier || 1);
+  const hpM = 1 + 1.25 * (t - 1), dmgM = 1 + .6 * (t - 1), spM = 1 + .12 * (t - 1);
+  const hp = Math.round(d.hp * hpM);
   G.enemies.push({
-    type: boss ? 'boss' : type, boss: boss || null, def: d, home,
-    fl: G.floor, x, y, r: d.r, hp: d.hp, max: d.hp, sp: d.sp,
+    type: boss ? 'boss' : type, boss: boss || null, def: d, home, tier: t,
+    dmg: Math.round(d.dmg * dmgM),
+    fl: G.floor, x, y, r: d.r, hp, max: hp, sp: d.sp * spM,
     kx:0, ky:0, cd: rand(0, 1), tcd:0, st:0, ph: rand(0, 6.3),
     awake:false, flash:0, ang: rand(0, 6.3), slow:0, dash:0,
   });
@@ -501,24 +603,62 @@ const SPAWN_TABLE = {
   colo:['crutch'], chest:['iv'], ortho:['cast'], breast:['bandage'],
   neuro:['crutch'], plast:['bandage'], cast2:['cast'], r112:['iv'],
 };
+const F2_SPAWN = {
+  or:['bandage','cast','iv','bandage','crutch'],
+  icu:['wheel','cast','iv','bandage','bandage'],
+  birth:['crutch','crutch','bandage','iv','cast'],
+  ward:['bandage','wheel','cast','iv','crutch','bandage'],
+  liftD:[],
+  chief:[],                                       // 只有大魔王
+};
 function populate(){
   G.enemies.length = 0; G.drops.length = 0; G.shots.length = 0;
-  G.cleared = 0; G.totalRooms = 0;
+  G.cleared = 0; G.totalRooms = 0; G.seals = [];
+  const back = G.floor;
   FLOORS.forEach((f, fi) => {
+    G.floor = fi; useFloor(fi);
     f.rooms.forEach((rm, i) => {
-      rm.seen = false; rm.cleared = false; rm.total = 0; rm.alive = 0;
-      if (fi !== 0){ rm.seen = true; rm.stub = true; return; }   // 二樓待設計，暫不佈敵
-      const list = SPAWN_TABLE[rm.id] || [];
-      list.forEach(t => { const s = freeSpotIn(rm); if (s){ spawnEnemy(t, s.x, s.y, null, i); rm.total++; } });
+      rm.seen = false; rm.cleared = false; rm.total = 0; rm.alive = 0; rm.stub = false;
+      rm.locked = !!rm.sealed;
+      const list = (fi === 0 ? SPAWN_TABLE : F2_SPAWN)[rm.id] || [];
+      list.forEach(t => { const sp = freeSpotIn(rm); if (sp){ spawnEnemy(t, sp.x, sp.y, null, i, f.tier); rm.total++; } });
       if (rm.boss){
         const c = roomCenter(rm);
-        if (!isSolidAt(c.x, c.y)){ spawnEnemy(null, c.x, c.y, rm.boss, i); rm.total++; }
+        if (!isSolidAt(c.x, c.y)){ spawnEnemy(null, c.x, c.y, rm.boss, i, f.tier); rm.total++; }
       }
       rm.alive = rm.total;
       G.totalRooms++;
       if (rm.total === 0){ rm.cleared = true; rm.seen = true; G.cleared++; }
+      if (rm.locked) G.seals.push({fl: fi, room: i, rects: (rm.doors || []).map(d => doorRect(rm, d))});
     });
   });
+  G.floor = back; useFloor(back);
+}
+// 封印的門：只擋玩家，清空同層其他房間後解除
+function sealBlocks(x, y, r){
+  for (const s of G.seals){
+    if (s.fl !== G.floor) continue;
+    const rm = FLOORS[s.fl].rooms[s.room];
+    if (!rm.locked) continue;
+    for (const q of s.rects)
+      if (x + r > q.x && x - r < q.x + q.w && y + r > q.y && y - r < q.y + q.h) return true;
+    if (x + r > rm.x && x - r < rm.x + rm.w && y + r > rm.y && y - r < rm.y + rm.h) return true;
+  }
+  return false;
+}
+function refreshSeals(){
+  let changed = false;
+  FLOORS.forEach((f, fi) => f.rooms.forEach(rm => {
+    if (!rm.locked) return;
+    const others = f.rooms.filter(o => o !== rm && o.total > 0);
+    if (others.length && others.every(o => o.cleared)){
+      rm.locked = false; changed = true;
+      if (fi === G.floor){
+        SFX.lift(); showToast('頂層手術房解封', '大魔王 💀 在裡面等你');
+      }
+    }
+  }));
+  return changed;
 }
 
 /* =========================================================================
@@ -564,15 +704,16 @@ const KEY_BY_CODE = {
   KeyW:'up', KeyA:'left', KeyS:'down', KeyD:'right',
   ArrowUp:'up', ArrowLeft:'left', ArrowDown:'down', ArrowRight:'right',
   Space:'attack', ShiftLeft:'dash', ShiftRight:'dash',
-  KeyP:'pause', Escape:'pause', KeyR:'restart', KeyQ:'cycle', KeyV:'view',
+  KeyP:'pause', Escape:'pause', KeyR:'restart', KeyQ:'cycle', KeyV:'view', KeyC:'craft',
   Digit1:'w1', Digit2:'w2', Digit3:'w3', Digit4:'w4', Digit5:'w5',
+  Digit6:'w6', Digit7:'w7', Digit8:'w8', Digit9:'w9',
 };
 const KEY_BY_NAME = {
   w:'up', a:'left', s:'down', d:'right',
   arrowup:'up', arrowleft:'left', arrowdown:'down', arrowright:'right',
   ' ':'attack', spacebar:'attack', shift:'dash', p:'pause', escape:'pause',
-  r:'restart', q:'cycle', v:'view',
-  1:'w1', 2:'w2', 3:'w3', 4:'w4', 5:'w5',
+  r:'restart', q:'cycle', v:'view', c:'craft',
+  1:'w1', 2:'w2', 3:'w3', 4:'w4', 5:'w5', 6:'w6', 7:'w7', 8:'w8', 9:'w9',
 };
 function actionOf(e){
   return KEY_BY_CODE[e.code] || KEY_BY_NAME[(e.key || '').toLowerCase()] || null;
@@ -582,15 +723,27 @@ addEventListener('keydown', e => {
   if (!a) return;
   anyInput = true;
   if (a !== 'pause' && a !== 'restart') e.preventDefault();
-  if (a === 'pause'){ if (G.state === 'play' || G.state === 'pause') togglePause(); return; }
+  if (a === 'pause'){
+    if (G.state === 'combine'){ G.state = 'play'; return; }
+    if (G.state === 'play' || G.state === 'pause') togglePause();
+    return;
+  }
   if (a === 'restart'){ if (G.state !== 'title') startGame(); return; }
   if (keys[a]) return;
   keys[a] = true;
+  if (a === 'craft'){ toggleCombine(); return; }
+  if (G.state === 'combine'){
+    if (a[0] === 'w' && a.length === 2) doCombine(+a[1] - 1);
+    return;
+  }
   if (G.state !== 'play') return;
   if (a === 'attack') fire();
   if (a === 'cycle') cycleWeapon(1);
   if (a === 'view') toggleView();
-  if (a[0] === 'w' && a.length === 2) selectWeapon(WEAPON_ORDER[+a[1] - 1]);
+  if (a[0] === 'w' && a.length === 2){
+    const own = WEAPON_ORDER.filter(k => P.owned[k]);
+    selectWeapon(own[+a[1] - 1]);
+  }
 });
 addEventListener('keyup', e => { const a = actionOf(e); if (a) keys[a] = false; });
 addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
@@ -601,8 +754,21 @@ cvs.addEventListener('mousemove', e => {
   usingTouch = false; anyInput = true;
 });
 cvs.addEventListener('mousedown', e => {
-  if (e.button === 0){ mouse.down = true; anyInput = true; focusGame(); if (G.state === 'play') fire(); }
+  if (e.button !== 0) return;
+  anyInput = true; focusGame();
+  if (G.state === 'combine'){ pickCombineAt(mouse.x, mouse.y); return; }
+  mouse.down = true;
+  if (G.state === 'play') fire();
 });
+function pickCombineAt(px, py){
+  const R = combineRows();
+  for (let i = 0; i < R.list.length; i++){
+    const y = R.top + i * R.rowH;
+    if (px > R.x && px < R.x + R.w && py > y && py < y + R.rowH - 6){ doCombine(i); return true; }
+  }
+  if (py < R.y0 - 20 || py > R.y0 + R.list.length * R.rowH + 110) G.state = 'play';
+  return false;
+}
 addEventListener('mouseup', () => { mouse.down = false; });
 cvs.addEventListener('contextmenu', e => e.preventDefault());
 cvs.addEventListener('wheel', e => {
@@ -618,6 +784,7 @@ function touchButtons(){
     dash: {x: VW - 158 * s, y: VH - 58 * s,  r: 30 * s, label:'滾'},
     swap: {x: VW - 58 * s,  y: VH - 198 * s, r: 27 * s, label:'換'},
     view: {x: VW - 146 * s, y: VH - 158 * s, r: 25 * s, label:'3D'},
+    craft:{x: VW - 136 * s, y: VH - 244 * s, r: 25 * s, label:'合'},
   };
 }
 function localPt(t){ const b = cvs.getBoundingClientRect(); return {x: t.clientX - b.left, y: t.clientY - b.top}; }
@@ -626,12 +793,18 @@ function hitBtn(p, b){ return Math.hypot(p.x - b.x, p.y - b.y) < b.r + 12; }
 cvs.addEventListener('touchstart', e => {
   usingTouch = true; anyInput = true; focusGame();
   const B = touchButtons();
+  if (G.state === 'combine'){
+    const t0 = e.changedTouches[0];
+    if (t0){ const p = localPt(t0); if (hitBtn(p, B.craft)) G.state = 'play'; else pickCombineAt(p.x, p.y); }
+    e.preventDefault(); return;
+  }
   for (const t of e.changedTouches){
     const p = localPt(t);
     if (hitBtn(p, B.atk)){ stick.atkId = t.identifier; if (G.state === 'play') fire(); continue; }
     if (hitBtn(p, B.dash)){ stick.dashId = t.identifier; keys.dash = true; continue; }
     if (hitBtn(p, B.swap)){ if (G.state === 'play') cycleWeapon(1); continue; }
     if (hitBtn(p, B.view)){ if (G.state === 'play') toggleView(); continue; }
+    if (hitBtn(p, B.craft)){ toggleCombine(); continue; }
     if (stick.id === null){ stick.id = t.identifier; stick.ox = p.x; stick.oy = p.y; stick.dx = 0; stick.dy = 0; }
   }
   e.preventDefault();
@@ -663,6 +836,38 @@ function togglePause(){
   G.state = G.state === 'play' ? 'pause' : 'play';
   document.getElementById('pause').style.display = G.state === 'pause' ? 'flex' : 'none';
 }
+function availableRecipes(){
+  return RECIPES.filter(r => P.owned[r.a] && P.owned[r.b] && !P.owned[r.out]);
+}
+function toggleCombine(){
+  if (G.state === 'combine'){ G.state = 'play'; return; }
+  if (G.state !== 'play') return;
+  G.state = 'combine'; SFX.swap();
+}
+function doCombine(i){
+  const list = availableRecipes(), r = list[i];
+  if (!r) return;
+  if (P.money < r.cost){ SFX.empty(); floatText(P.x, P.y - 40, '錢不夠，還差 ' + (r.cost - P.money), '#ff6b8a'); return; }
+  P.money -= r.cost;
+  [r.a, r.b].forEach(k => {
+    if (k === 'axe') return;                     // 斧頭是本命武器，不會被吃掉
+    delete P.owned[k]; delete P.ammo[k]; delete P.lv[k];
+    if (P.weapon === k) P.weapon = 'axe';
+  });
+  P.owned[r.out] = true; P.lv[r.out] = 1;
+  if (!WEAPONS[r.out].melee) P.ammo[r.out] = WEAPONS[r.out].ammoMax;
+  P.weapon = r.out;
+  unlockAch('craft'); SFX.card();
+  showToast('組合成功：' + WEAPONS[r.out].name,
+            WEAPONS[r.a].name + ' ＋ ' + WEAPONS[r.b].name + '　-🤑' + r.cost);
+  G.state = 'play';
+  autoSave();
+}
+function combineRows(){
+  const list = availableRecipes();
+  const w = Math.min(520, VW - 48), x = (VW - w) / 2, y0 = VH / 2 - (list.length * 52 + 96) / 2;
+  return {list, x, w, y0, rowH: 52, top: y0 + 74};
+}
 function selectWeapon(k){
   if (!k || !P.owned[k] || k === P.weapon) return;
   P.weapon = k; P.cd = Math.max(P.cd, .12); SFX.swap();
@@ -685,7 +890,7 @@ function fire(){
   P.cd = w.cd * LV_CD[lv - 1];
   const dmg = w.dmg * LV_DMG[lv - 1] * (P.power > 0 ? 1.5 : 1);
 
-  if (w.melee){ P.swing = .26; P.hitSet = new Set(); SFX.swing(); return; }
+  if (w.melee){ P.swing = .26; P.hitSet = new Set(); P.meleeKind = wk; SFX.swing(); return; }
 
   P.ammo[wk]--;
   const n = w.pellets || 1, spread = w.spread || 0;
@@ -695,8 +900,9 @@ function fire(){
       friend:true, kind:wk, x:P.x, y:P.y, r:w.r,
       vx: Math.cos(P.aim + off) * w.speed * rand(.92, 1.08),
       vy: Math.sin(P.aim + off) * w.speed * rand(.92, 1.08),
-      dmg: dmg / (n > 1 ? 1 : 1), col:w.col, life:1.4, knock:w.knock || 120,
-      splash:w.splash || 0, slow:w.slow || 0, room: roomAt(P.x, P.y),
+      dmg, col:w.col, life:1.4, knock:w.knock || 120, tier:w.tier || 1,
+      splash:w.splash || 0, slow:w.slow || 0, chain:w.chain || 0, pull:!!w.pull,
+      room: roomAt(P.x, P.y),
     });
   }
   SFX[wk] ? SFX[wk]() : SFX.pistol();
@@ -710,32 +916,79 @@ function autoFallback(){
   const next = own.find(k => k !== P.weapon && !WEAPONS[k].melee) || 'axe';
   if (next !== P.weapon){ P.weapon = next; SFX.swap(); }
 }
+let doorWarnCount = 0;
+function doorWarn(){
+  if (G.doorWarn > 0) return;
+  G.doorWarn = 1.4;
+  if (doorWarnCount++ < 3) floatText(P.x, P.y - 40, '要進房間才打得到', '#ff9a68');
+}
 function damagePlayer(n){
+  P.roomNoHit = false;
   if (P.inv > 0 || P.dash > 0) return;
   P.hp -= n; P.inv = .55; P.flash = .3; G.shake = Math.min(16, G.shake + 6);
   P.combo = 0; SFX.hurt();
   if (P.hp <= 0){ P.hp = 0; endGame(false); }
 }
-function hitEnemy(e, dmg, kx, ky, slow){
+function hitEnemy(e, dmg, kx, ky, slow, wtier){
+  let inst = false;
+  if (wtier){
+    const m = tierMul(wtier, e.tier || 1);
+    if (m === 'kill'){
+      if (e.boss) dmg *= 1.6;                    // 頭目不吃秒殺，改成額外傷害
+      else { dmg = e.max * 99; inst = true; unlockAch('oneshot'); }
+    } else dmg *= m;
+  }
   e.hp -= dmg; e.flash = .18;
   e.kx += kx; e.ky += ky;
   if (slow) e.slow = Math.max(e.slow, slow);
-  burst(e.x, e.y, e.def.col, 6, 140);
-  floatText(e.x, e.y - e.r - 6, Math.round(dmg), dmg > 40 ? '#ff6b8a' : dmg > 26 ? '#ffd166' : '#fff');
+  burst(e.x, e.y, e.def.col, inst ? 14 : 6, inst ? 220 : 140);
+  if (inst){
+    floatText(e.x, e.y - e.r - 6, '秒殺！', '#ff5566');
+    blip(1200, .1, 'square', .1, -800);
+  } else {
+    floatText(e.x, e.y - e.r - 6, Math.round(dmg), dmg > 40 ? '#ff6b8a' : dmg > 26 ? '#ffd166' : '#fff');
+  }
   SFX.hit();
   if (e.hp <= 0) killEnemy(e);
 }
-function explode(x, y, radius, dmg, col, slow){
+function explode(x, y, radius, dmg, col, slow, wtier, room){
+  let hits = 0;
   burst(x, y, col, 26, radius * 3);
   burst(x, y, '#ffffff', 8, radius * 2);
   G.shake = Math.min(20, G.shake + 10); SFX.boom();
   for (const e of G.enemies){
     if (e.dead || e.fl !== G.floor) continue;
+    if (room !== undefined && e.home !== room) continue;      // 只打得到同一間房裡的敵人
     const d = Math.hypot(e.x - x, e.y - y);
     if (d > radius + e.r) continue;
     const f = 1 - d / (radius + e.r), a = Math.atan2(e.y - y, e.x - x);
-    hitEnemy(e, dmg * (.45 + .55 * f), Math.cos(a) * 340 * f, Math.sin(a) * 340 * f, slow);
+    hitEnemy(e, dmg * (.45 + .55 * f), Math.cos(a) * 340 * f, Math.sin(a) * 340 * f, slow, wtier);
+    hits++;
   }
+  if (hits >= 3) unlockAch('triple');
+}
+function unlockAch(id){
+  if (STORE.ach[id]) return;
+  const a = ACHIEVEMENTS.find(x => x.id === id);
+  if (!a) return;
+  STORE.ach[id] = true;
+  G.achQueue.push(a);
+  SFX.card();
+  showToast('成就解鎖：' + a.name, a.desc);
+  const n = Object.keys(STORE.ach).length;
+  if (n >= (STORE.legendsGiven + 1) * 3 && STORE.legendsGiven < LEGENDS.length){
+    const g = LEGENDS[STORE.legendsGiven++];
+    P.owned[g] = true; P.lv[g] = P.lv[g] || 1;
+    if (!WEAPONS[g].melee) P.ammo[g] = WEAPONS[g].ammoMax;
+    P.weapon = g;
+    setTimeout(() => showToast('傳說武器：' + WEAPONS[g].name, '每三個成就換一把（' + n + ' 個成就）'), 1600);
+  }
+  saveStore();
+}
+function addMoney(n, x, y){
+  P.money += n;
+  floatText(x === undefined ? P.x : x, (y === undefined ? P.y : y) - 26, '🤑 +' + n, '#ffd166');
+  if (P.money >= 1000) unlockAch('rich');
 }
 function killEnemy(e){
   if (e.dead) return;
@@ -744,7 +997,18 @@ function killEnemy(e){
   burst(e.x, e.y, e.def.col, e.boss ? 60 : 16, e.boss ? 320 : 200);
   burst(e.x, e.y, '#ffffff', 6, 120);
   SFX.kill();
-  if (e.boss){ G.shake = 22; SFX.card(); spawnDrop('card:' + e.boss, e.x, e.y); }
+  unlockAch('first_kill');
+  if (P.combo >= 10) unlockAch('combo10');
+  addMoney(e.boss ? 120 : 6 + (e.tier || 1) * 4, e.x, e.y);
+  if (e.boss){
+    G.shake = 22; SFX.card();
+    unlockAch('boss1');
+    if (e.def.final){
+      unlockAch('reaper');
+      STORE.records.reaperKills = (STORE.records.reaperKills || 0) + 1; saveStore();
+      setTimeout(() => endGame(true, 'reaper'), 1400);
+    } else spawnDrop('card:' + e.boss, e.x, e.y);
+  }
   const rm = ROOMS[e.home];
   if (rm){ rm.alive = Math.max(0, rm.alive - 1); if (rm.alive === 0 && !rm.cleared) clearRoom(rm); }
 }
@@ -754,6 +1018,14 @@ function clearRoom(rm){
   rm.cleared = true; G.cleared++; G.clearStreak++;
   const c = roomCenter(rm);
   SFX.clear(); burst(c.x, c.y, '#b9c94e', 30, 240);
+  const cash = Math.round((60 + rm.total * 18 + (rm.boss ? 260 : 0)) * (FL.tier || 1));
+  addMoney(cash, c.x, c.y);
+  unlockAch('first_room');
+  if (P.roomNoHit) unlockAch('flawless');
+  if (G.cleared >= 10) unlockAch('ten_rooms');
+  if (FLOORS[0].rooms.every(r => r.cleared)) unlockAch('floor1');
+  refreshSeals();
+  autoSave();
   spawnDrop('bone', clamp(c.x - 26, rm.x + 22, rm.x + rm.w - 22), c.y);
 
   const wk = WEAPON_ROOMS[rm.id];
@@ -773,7 +1045,7 @@ function clearRoom(rm){
     spawnDrop('up', clamp(c.x, rm.x + 22, rm.x + rm.w - 22), clamp(c.y + 30, rm.y + 22, rm.y + rm.h - 22));
     sub += '＋強化模組';
   }
-  showToast(rm.name.replace('\n', ' ') + '　清空', sub + '　|　' + G.cleared + '/' + G.totalRooms + ' 間');
+  showToast(rm.name.replace('\n', ' ') + '　清空', '🤑 +' + cash + '　' + sub + '　|　' + G.cleared + '/' + G.totalRooms + ' 間');
 
   if (G.cleared >= G.totalRooms && !G.liftOpen){
     G.liftOpen = true; SFX.lift();
@@ -781,6 +1053,18 @@ function clearRoom(rm){
   }
 }
 
+function movePlayer(dx, dy){
+  const ox = P.x, oy = P.y;
+  moveEntity(P, dx, dy);
+  if (sealBlocks(P.x, P.y, P.r)){
+    P.x = ox; P.y = oy;
+    if (G.doorWarn <= 0){
+      G.doorWarn = 1.6;
+      floatText(P.x, P.y - 40, '門封著 — 先清空本層其他房間', '#ff6b8a');
+      SFX.empty();
+    }
+  }
+}
 function updatePlayer(dt){
   let mx = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
   let my = (keys.down ? 1 : 0) - (keys.up ? 1 : 0);
@@ -810,27 +1094,29 @@ function updatePlayer(dt){
   if (P.comboT <= 0) P.combo = 0;
   if (P.swing > 0) P.swing -= dt;
   if (G.liftLock > 0) G.liftLock -= dt;
+  if (G.doorWarn > 0) G.doorWarn -= dt;
 
   let sp = P.sp * (P.haste > 0 ? 1.35 : 1) * (P.swing > 0 ? .55 : 1);
   if (P.dash > 0){ P.dash -= dt; mx = P.dvx; my = P.dvy; sp = 560; }
-  if (mx || my){ moveEntity(P, mx * sp * dt, my * sp * dt); P.step += sp * dt; }
+  if (mx || my){ movePlayer(mx * sp * dt, my * sp * dt); P.step += sp * dt; }
 
   if (mouse.down || stick.atkId !== null) fire();
 
   // 斧頭揮擊判定
   if (P.swing > .08 && P.hitSet){
-    const w = WEAPONS.axe, lv = weaponLv('axe');
+    const wk = P.meleeKind || 'axe', w = WEAPONS[wk], lv = weaponLv(wk);
     const dmg = (w.dmg * LV_DMG[lv - 1] + P.combo * 1.2) * (P.power > 0 ? 1.5 : 1);
     const prog = 1 - P.swing / .26, sweep = P.aim - .9 + prog * 1.8;
     for (const e of G.enemies){
       if (e.dead || e.fl !== G.floor || P.hitSet.has(e)) continue;
+      if (e.home !== G.curRoom){ doorWarn(); continue; }   // 站門口打不到房裡
       const d = Math.hypot(e.x - P.x, e.y - P.y);
       if (d > w.range + e.r) continue;
       const a = Math.atan2(e.y - P.y, e.x - P.x);
       if (Math.abs(angDiff(a, sweep)) < w.arc){
         P.hitSet.add(e);
         const k = e.boss ? 90 : 320;
-        hitEnemy(e, dmg, Math.cos(a) * k, Math.sin(a) * k);
+        hitEnemy(e, dmg, Math.cos(a) * k, Math.sin(a) * k, w.slow, w.tier);
         G.shake = Math.min(10, G.shake + 3);
       }
     }
@@ -840,6 +1126,7 @@ function updatePlayer(dt){
   const rid = roomAt(P.x, P.y);
   if (rid !== G.curRoom){
     G.curRoom = rid;
+    P.roomNoHit = true;
     if (rid >= 0){
       const rm = ROOMS[rid];
       if (!rm.seen){
@@ -884,7 +1171,7 @@ function updatePlayer(dt){
       const b = k.slice(5);
       if (!G.cardSet[b]){ G.cardSet[b] = true; G.cards++; SFX.card(); }
       floatText(P.x, P.y - 34, '門禁卡 ' + G.cards + '/3', '#ffd166');
-      if (G.cards >= 3 && !G.unlocked){ G.unlocked = true; showToast('大門解鎖', '可提前撤離，或清空全院上二樓'); }
+      if (G.cards >= 3 && !G.unlocked){ G.unlocked = true; unlockAch('cards'); showToast('大門解鎖', '可提前撤離，或清空全院上二樓'); }
     }
   }
   G.drops = G.drops.filter(d => !d.got);
@@ -906,8 +1193,10 @@ function goFloor(n){
   else { P.x = 830; P.y = 1017; }
   buildFlow(P.x, P.y);
   SFX.lift();
-  showToast(FL.name, n === 1 ? '第二層 — 空間規劃中' : '回到一樓');
-  if (n === 1 && !G.sawF2){ G.sawF2 = true; }
+  showToast(FL.name, n === 1 ? '第二層 — 怪物更強了，舊武器打不動' : '回到一樓');
+  if (n === 1){ unlockAch('floor2'); G.sawF2 = true; }
+  refreshSeals();
+  autoSave();
 }
 
 /* =========================================================================
@@ -961,7 +1250,7 @@ function updateEnemies(dt){
         const ok = moveEntity(e, Math.cos(e.ang) * 300 * slowF * dt, Math.sin(e.ang) * 300 * slowF * dt);
         confine(e);
         if (!ok){ e.st = 0; e.cd = 1.4; G.shake = Math.max(G.shake, 5); burst(e.x, e.y, e.def.col, 8, 120); }
-        if (Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r + 3 && e.tcd <= 0){ damagePlayer(e.def.dmg); e.tcd = .8; }
+        if (Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r + 3 && e.tcd <= 0){ damagePlayer(e.dmg); e.tcd = .8; }
         continue;
       }
       if (e.cd <= 0 && d < 380 && d > 60 && lineClear(e.x, e.y, P.x, P.y)){
@@ -973,7 +1262,7 @@ function updateEnemies(dt){
         if (e.cd <= 0){
           e.cd = 1.9;
           G.shots.push({x:e.x, y:e.y, r:6, vx:Math.cos(Math.atan2(dy,dx))*210, vy:Math.sin(Math.atan2(dy,dx))*210,
-                        dmg:e.def.dmg, col:'#9fd8c4', life:2.2, room:e.home});
+                        dmg:e.dmg, col:'#9fd8c4', life:2.2, room:e.home});
           blip(500, .08, 'sine', .06, -200);
         }
       }
@@ -983,7 +1272,7 @@ function updateEnemies(dt){
     confine(e);
 
     if (d < e.r + P.r + 2 && e.tcd <= 0){
-      damagePlayer(e.def.dmg); e.tcd = .9;
+      damagePlayer(e.dmg); e.tcd = .9;
       const a = Math.atan2(dy, dx);
       moveEntity(P, Math.cos(a) * 6, Math.sin(a) * 6);
     }
@@ -1033,40 +1322,110 @@ function bossAI(e, dt, d, dx, dy, slowF){
       blip(300, .2, 'sine', .08, -180);
     }
     sp *= .8;
+  } else if (b === 'reaper'){
+    const f = e.hp / e.max;
+    if (f < .34 && e.dash > 0){
+      e.dash -= dt;
+      const ok = moveEntity(e, Math.cos(e.ang) * 460 * slowF * dt, Math.sin(e.ang) * 460 * slowF * dt);
+      confine(e);
+      if (!ok){ e.dash = 0; G.shake = 16; burst(e.x, e.y, e.def.col, 20, 240); }
+      if (Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r + 6 && e.tcd <= 0){ damagePlayer(e.dmg); e.tcd = .7; }
+      return;
+    }
+    if (e.cd <= 0){
+      if (f > .66){                                   // 第一階段：鐮刀環
+        e.cd = 2.6;
+        for (let i = 0; i < 12; i++){
+          const a = i / 12 * 6.283 + e.ph * .5;
+          G.shots.push({x:e.x, y:e.y, r:7, vx:Math.cos(a)*200, vy:Math.sin(a)*200,
+                        dmg:16, col:'#c0b8d8', life:2.6, room:e.home});
+        }
+        burst(e.x, e.y, '#c0b8d8', 22, 200); G.shake = 9; blip(110, .35, 'sawtooth', .12, -40);
+      } else if (f > .34){                            // 第二階段：召喚＋追蹤彈
+        e.cd = 2.1;
+        const a0 = Math.atan2(dy, dx);
+        [-.5, -.17, .17, .5].forEach(o => G.shots.push({x:e.x, y:e.y, r:8,
+          vx:Math.cos(a0+o)*290, vy:Math.sin(a0+o)*290, dmg:18, col:'#8f7fb8', life:2.2, room:e.home}));
+        const rm = ROOMS[e.home];
+        for (let i = 0; i < 2; i++){
+          const a = rand(0, 6.3), nx = e.x + Math.cos(a) * 80, ny = e.y + Math.sin(a) * 80;
+          if (!isSolidAt(nx, ny)){
+            spawnEnemy('bandage', nx, ny, null, e.home, e.tier);
+            const ne = G.enemies[G.enemies.length - 1];
+            ne.awake = true; confine(ne);
+            if (rm){ rm.total++; rm.alive++; }
+          }
+        }
+        blip(180, .3, 'square', .12, -80);
+      } else {                                        // 第三階段：螺旋＋衝刺
+        e.cd = 1.5; e.dash = .5; e.ang = Math.atan2(dy, dx);
+        for (let i = 0; i < 8; i++){
+          const a = i / 8 * 6.283 + e.ph;
+          G.shots.push({x:e.x, y:e.y, r:6, vx:Math.cos(a)*240, vy:Math.sin(a)*240,
+                        dmg:14, col:'#ff8aa0', life:2, room:e.home});
+        }
+        G.shake = 12; blip(90, .4, 'sawtooth', .14, -30);
+      }
+    }
+    sp *= f < .34 ? 1.25 : 1;
   } else if (b === 'drill'){
     if (e.dash > 0){
       e.dash -= dt;
       const ok = moveEntity(e, Math.cos(e.ang) * 430 * slowF * dt, Math.sin(e.ang) * 430 * slowF * dt);
       confine(e);
       if (!ok){ e.dash = 0; G.shake = 12; burst(e.x, e.y, '#ff9a68', 14, 200); }
-      if (Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r + 4 && e.tcd <= 0){ damagePlayer(e.def.dmg); e.tcd = .7; }
+      if (Math.hypot(P.x - e.x, P.y - e.y) < e.r + P.r + 4 && e.tcd <= 0){ damagePlayer(e.dmg); e.tcd = .7; }
       return;
     }
     if (e.cd <= 0 && d < 460){ e.cd = 1.9; e.dash = .42; e.ang = Math.atan2(dy, dx); blip(700, .14, 'sawtooth', .08, -500); return; }
   }
   moveEntity(e, tx * sp * dt, ty * sp * dt);
   confine(e);
-  if (d < e.r + P.r + 6 && e.tcd <= 0){ damagePlayer(e.def.dmg); e.tcd = 1; }
+  if (d < e.r + P.r + 6 && e.tcd <= 0){ damagePlayer(e.dmg); e.tcd = 1; }
 }
 
 /* ── 投射物 ── */
 function updateShots(dt){
   for (const s of G.shots){
     s.x += s.vx * dt; s.y += s.vy * dt; s.life -= dt;
-    let done = s.life <= 0;
+    let done = s.life <= 0, fizzle = false;
     if (!done && isSolidAt(s.x, s.y)) done = true;
     // 敵人的子彈不准飛出自己的房間
     if (!done && !s.friend && s.room >= 0 && roomAt(s.x, s.y) !== s.room) done = true;
+    // 玩家的子彈跨不過房間門檻：站門口打不到裡面
+    if (!done && s.friend && roomAt(s.x, s.y) !== s.room){ done = true; fizzle = true; doorWarn(); }
 
     let handled = false;
     if (!done && s.friend){
       for (const e of G.enemies){
-        if (e.dead || e.fl !== G.floor) continue;
+        if (e.dead || e.fl !== G.floor || e.home !== s.room) continue;
         if (dist2(s, e) < (e.r + s.r) ** 2){
-          if (s.splash){ explode(s.x, s.y, s.splash, s.dmg, s.col, s.slow); }
-          else {
+          if (s.splash){
+            if (s.pull) for (const o of G.enemies){
+              if (o.dead || o.home !== s.room) continue;
+              const dd = Math.hypot(o.x - s.x, o.y - s.y);
+              if (dd < s.splash * 1.6 && dd > 1){ o.kx -= (o.x - s.x) / dd * 460; o.ky -= (o.y - s.y) / dd * 460; }
+            }
+            explode(s.x, s.y, s.splash, s.dmg, s.col, s.slow, s.tier, s.room);
+          } else {
             const a = Math.atan2(s.vy, s.vx);
-            hitEnemy(e, s.dmg, Math.cos(a) * s.knock, Math.sin(a) * s.knock, s.slow);
+            hitEnemy(e, s.dmg, Math.cos(a) * s.knock, Math.sin(a) * s.knock, s.slow, s.tier);
+            if (s.chain){                                   // 電弧連鎖
+              let n = s.chain, from = e;
+              const hit = new Set([e]);
+              while (n-- > 0){
+                let best = null, bd = 150 * 150;
+                for (const o of G.enemies){
+                  if (o.dead || hit.has(o) || o.home !== s.room) continue;
+                  const d2 = dist2(o, from); if (d2 < bd){ bd = d2; best = o; }
+                }
+                if (!best) break;
+                hit.add(best);
+                G.parts.push({x:from.x, y:from.y, vx:0, vy:0, life:.18, t:0, col:'#c9a0ff', sz:4, spin:0, rot:0});
+                hitEnemy(best, s.dmg * .6, 0, 0, s.slow, s.tier);
+                from = best;
+              }
+            }
           }
           done = true; handled = true; break;
         }
@@ -1076,8 +1435,8 @@ function updateShots(dt){
     }
     if (done){
       if (!handled){
-        if (s.friend && s.splash) explode(s.x, s.y, s.splash, s.dmg, s.col, s.slow);
-        else burst(s.x, s.y, s.col, 5, 90);
+        if (s.friend && s.splash && !fizzle) explode(s.x, s.y, s.splash, s.dmg, s.col, s.slow, s.tier, s.room);
+        else burst(s.x, s.y, s.col, fizzle ? 3 : 5, fizzle ? 40 : 90);
       }
       s.life = -1;
     }
@@ -1608,6 +1967,10 @@ function drawHUD(c){
   c.fillStyle = '#242c42'; roundRect(c, 34, 47, 182, 7, 4); c.fill();
   c.fillStyle = '#b9c94e'; if (pw > 2){ roundRect(c, 34, 47, pw, 7, 4); c.fill(); }
 
+  // 金錢
+  c.font = '800 16px "Noto Sans TC",sans-serif'; c.fillStyle = '#ffd166';
+  c.fillText('🤑 ' + P.money, 240, 42);
+
   // 門禁卡
   c.font = '600 12px "Noto Sans TC",sans-serif'; c.fillStyle = '#8b99b5';
   c.fillText('門禁卡', 24, 80);
@@ -1648,22 +2011,34 @@ function drawHUD(c){
 
   // 武器列
   const own = WEAPON_ORDER.filter(k => P.owned[k]);
-  const slotW = 62, wy = usingTouch ? by + 46 : VH - 48;
+  const slotW = Math.min(64, (VW - 44) / Math.max(1, own.length));
+  const wy = usingTouch ? by + 46 : VH - 48;
+  const foeTier = (rm && !rm.cleared && rm.total > 0) ? (FL.tier || 1) : null;
   own.forEach((k, i) => {
     const w = WEAPONS[k], x = 24 + i * slotW, cur = k === P.weapon;
+    const kills = foeTier !== null && tierMul(w.tier || 1, foeTier) === 'kill';
     c.fillStyle = cur ? 'rgba(255,255,255,.14)' : 'rgba(10,14,26,.6)';
     roundRect(c, x, wy, slotW - 6, 34, 7); c.fill();
     if (cur){ c.strokeStyle = w.col; c.lineWidth = 2; roundRect(c, x, wy, slotW - 6, 34, 7); c.stroke(); }
+    else if (kills){ c.strokeStyle = 'rgba(255,85,102,.8)'; c.lineWidth = 1.5; roundRect(c, x, wy, slotW - 6, 34, 7); c.stroke(); }
     c.fillStyle = w.col; c.font = '800 15px "Noto Sans TC",sans-serif';
-    c.textAlign = 'left'; c.fillText(w.icon, x + 8, wy + 22);
-    c.font = '600 11px "Noto Sans TC",sans-serif';
+    c.textAlign = 'left'; c.fillText(w.icon, x + 7, wy + 22);
+    c.font = '600 10px "Noto Sans TC",sans-serif';
     c.fillStyle = cur ? '#e8edf5' : '#8b99b5';
-    c.fillText(w.melee ? '∞' : ammoOf(k), x + 25, wy + 15);
+    c.fillText(w.melee ? '∞' : ammoOf(k), x + 24, wy + 14);
     const lv = weaponLv(k);
     c.fillStyle = lv > 1 ? '#ffd166' : '#5f6d89';
-    c.fillText('Lv' + lv, x + 25, wy + 28);
-    if (!usingTouch){ c.fillStyle = '#5f6d89'; c.font = '600 9px sans-serif'; c.fillText(i + 1, x + 4, wy + 31); }
+    c.fillText('Lv' + lv, x + 24, wy + 25);
+    c.fillStyle = (w.tier || 1) >= 3 ? '#c9a0ff' : (w.tier || 1) === 2 ? '#a6f0ff' : '#4f5a72';
+    c.font = '800 9px sans-serif'; c.fillText('T' + (w.tier || 1), x + 24, wy + 33);
+    if (!usingTouch){ c.fillStyle = '#5f6d89'; c.font = '600 9px sans-serif'; c.fillText(i + 1, x + 3, wy + 32); }
   });
+  if (foeTier !== null){
+    const cw = curWeapon(), m = tierMul(cw.tier || 1, foeTier);
+    c.font = '700 12px "Noto Sans TC",sans-serif'; c.textAlign = 'left';
+    if (m === 'kill'){ c.fillStyle = '#ff5566'; c.fillText('越級 — 這把可以秒殺', 24, wy - 8); }
+    else if (m < 1){ c.fillStyle = '#ff9a68'; c.fillText('武器階級不足 — 傷害剩 ' + Math.round(m * 100) + '%', 24, wy - 8); }
+  }
 
   if (P.combo > 1){
     c.textAlign = 'center'; c.font = '800 24px "Noto Sans TC",sans-serif';
@@ -1699,13 +2074,56 @@ function drawHUD(c){
   c.font = '600 11px "Noto Sans TC",sans-serif'; c.textAlign = 'right';
   c.fillStyle = '#8b99b5'; c.fillText(G.view === 'iso' ? '立體 (V)' : '平面 (V)', mx + mw, my + mh + 16);
 
-  if (usingTouch){ drawTouchUI(c); return; }
+  if (usingTouch) drawTouchUI(c);
+  if (G.state === 'combine'){ drawCombinePanel(c); if (usingTouch) drawTouchUI(c); return; }
+  if (usingTouch) return;
   c.strokeStyle = 'rgba(255,255,255,.75)'; c.lineWidth = 2;
   c.beginPath(); c.arc(mouse.x, mouse.y, 9, 0, 6.3); c.stroke();
   c.beginPath(); c.moveTo(mouse.x - 14, mouse.y); c.lineTo(mouse.x - 4, mouse.y);
   c.moveTo(mouse.x + 4, mouse.y); c.lineTo(mouse.x + 14, mouse.y);
   c.moveTo(mouse.x, mouse.y - 14); c.lineTo(mouse.x, mouse.y - 4);
   c.moveTo(mouse.x, mouse.y + 4); c.lineTo(mouse.x, mouse.y + 14); c.stroke();
+}
+
+function drawCombinePanel(c){
+  const R = combineRows();
+  const h = R.list.length * R.rowH + 104;
+  c.fillStyle = 'rgba(6,8,16,.82)'; c.fillRect(0, 0, VW, VH);
+  c.fillStyle = '#141b2c'; roundRect(c, R.x, R.y0, R.w, h, 14); c.fill();
+  c.strokeStyle = '#2a3550'; c.lineWidth = 1.5; roundRect(c, R.x, R.y0, R.w, h, 14); c.stroke();
+  c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+  c.font = '800 19px "Noto Sans TC",sans-serif'; c.fillStyle = '#b9c94e';
+  c.fillText('武器組合', R.x + 20, R.y0 + 34);
+  c.font = '700 15px "Noto Sans TC",sans-serif'; c.textAlign = 'right';
+  c.fillStyle = '#ffd166'; c.fillText('🤑 ' + P.money, R.x + R.w - 20, R.y0 + 34);
+  c.textAlign = 'left'; c.font = '600 12px "Noto Sans TC",sans-serif'; c.fillStyle = '#8b99b5';
+  c.fillText('兩把武器合成一把更高階的；素材會消耗（斧頭除外）', R.x + 20, R.y0 + 56);
+
+  if (!R.list.length){
+    c.font = '600 14px "Noto Sans TC",sans-serif'; c.fillStyle = '#6f7c99';
+    c.fillText('目前沒有可以組合的配方 — 先去清房間拿更多武器', R.x + 20, R.top + 26);
+  }
+  R.list.forEach((r, i) => {
+    const y = R.top + i * R.rowH, ok = P.money >= r.cost;
+    c.fillStyle = ok ? 'rgba(255,255,255,.07)' : 'rgba(255,255,255,.03)';
+    roundRect(c, R.x + 14, y, R.w - 28, R.rowH - 8, 8); c.fill();
+    c.font = '800 13px "Noto Sans TC",sans-serif'; c.fillStyle = ok ? '#b9c94e' : '#5f6d89';
+    c.fillText((i + 1) + '', R.x + 26, y + 28);
+    const a = WEAPONS[r.a], b = WEAPONS[r.b], o = WEAPONS[r.out];
+    c.font = '700 14px "Noto Sans TC",sans-serif';
+    c.fillStyle = ok ? '#c9d4e8' : '#5f6d89';
+    c.fillText(a.name + ' ＋ ' + b.name + '  →  ', R.x + 46, y + 28);
+    const wdt = c.measureText(a.name + ' ＋ ' + b.name + '  →  ').width;
+    c.fillStyle = ok ? o.col : '#5f6d89';
+    c.fillText(o.name + '（T' + o.tier + '）', R.x + 46 + wdt, y + 28);
+    c.textAlign = 'right';
+    c.fillStyle = ok ? '#ffd166' : '#ff6b8a';
+    c.fillText('🤑 ' + r.cost, R.x + R.w - 26, y + 28);
+    c.textAlign = 'left';
+  });
+  c.font = '600 12px "Noto Sans TC",sans-serif'; c.fillStyle = '#6f7c99';
+  c.fillText(usingTouch ? '點一下配方即可組合 · 再按「合」關閉' : '按數字鍵選擇 · C 或 Esc 關閉',
+             R.x + 20, R.y0 + h - 18);
 }
 
 function drawTouchUI(c){
@@ -1733,12 +2151,91 @@ function drawTouchUI(c){
   btn(B.dash, P.dashCd > 0 ? 'rgba(127,212,193,.32)' : 'rgba(127,212,193,.9)', 'rgba(255,255,255,.45)', B.dash.r * .72);
   btn(B.swap, 'rgba(232,160,92,.85)', 'rgba(255,255,255,.4)', B.swap.r * .7);
   btn(B.view, 'rgba(143,163,200,.8)', 'rgba(255,255,255,.35)', B.view.r * .62);
+  btn(B.craft, availableRecipes().length ? 'rgba(255,209,102,.9)' : 'rgba(120,130,155,.5)',
+      'rgba(255,255,255,.35)', B.craft.r * .7);
   c.textBaseline = 'alphabetic';
 }
 
 /* =========================================================================
    15. 流程
    ========================================================================= */
+function autoSave(){
+  STORE.save = {
+    v:3, at: Date.now(), floor: G.floor, time: G.time, kills: G.kills, money: P.money,
+    hp: P.hp, cards: G.cards, cardSet: Object.assign({}, G.cardSet),
+    unlocked: G.unlocked, liftOpen: G.liftOpen, streak: G.clearStreak,
+    weapon: P.weapon, owned: Object.assign({}, P.owned),
+    ammo: Object.assign({}, P.ammo), lv: Object.assign({}, P.lv),
+    rooms: FLOORS.map(f => f.rooms.map(r => (r.cleared ? 2 : r.seen ? 1 : 0))),
+  };
+  saveStore();
+}
+function applySave(sv){
+  FLOORS.forEach((f, fi) => {
+    const row = (sv.rooms && sv.rooms[fi]) || [];
+    f.rooms.forEach((rm, i) => {
+      const st = row[i] || 0;
+      rm.seen = st >= 1;
+      if (st === 2 && !rm.cleared){
+        rm.cleared = true; rm.alive = 0;
+        G.enemies = G.enemies.filter(e => !(e.fl === fi && e.home === i));
+      }
+    });
+  });
+  G.cleared = 0; G.totalRooms = 0;
+  FLOORS.forEach(f => f.rooms.forEach(rm => { G.totalRooms++; if (rm.cleared) G.cleared++; }));
+  G.kills = sv.kills || 0; G.time = sv.time || 0; G.cards = sv.cards || 0;
+  G.cardSet = sv.cardSet || {}; G.unlocked = !!sv.unlocked; G.liftOpen = !!sv.liftOpen;
+  G.clearStreak = sv.streak || 0;
+  P.money = sv.money || 0; P.hp = clamp(sv.hp || 100, 1, P.max);
+  P.owned = Object.assign({axe:true}, sv.owned); P.ammo = Object.assign({}, sv.ammo);
+  P.lv = Object.assign({axe:1}, sv.lv);
+  P.weapon = P.owned[sv.weapon] ? sv.weapon : 'axe';
+  refreshSeals();
+  const fl = sv.floor || 0;
+  G.floor = fl; useFloor(fl);
+  P.x = FL.spawn.x; P.y = FL.spawn.y; G.curRoom = -1; G.liftLock = 1.2;
+  buildFlow(P.x, P.y);
+}
+function recordRun(){
+  const r = STORE.records;
+  r.runs = (r.runs || 0) + 1;
+  r.bestRooms = Math.max(r.bestRooms || 0, G.cleared);
+  r.bestMoney = Math.max(r.bestMoney || 0, P.money);
+  r.bestKills = Math.max(r.bestKills || 0, G.kills);
+  r.bestFloor = Math.max(r.bestFloor || 1, G.floor + 1);
+  saveStore();
+}
+function fmtTime(t){ return Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0'); }
+function renderRecords(){
+  const r = STORE.records, got = Object.keys(STORE.ach).length;
+  const el = document.getElementById('recWrap');
+  const rows = [
+    ['最多清空房間', r.bestRooms + ' 間'],
+    ['最高持有金錢', '🤑 ' + (r.bestMoney || 0)],
+    ['最多擊倒', (r.bestKills || 0) + ' 隻'],
+    ['抵達最高樓層', (r.bestFloor || 1) + ' 樓'],
+    ['最快通關', r.bestTime ? fmtTime(r.bestTime) : '—'],
+    ['遊玩 / 通關', (r.runs || 0) + ' / ' + (r.wins || 0)],
+    ['擊敗大魔王', (r.reaperKills || 0) + ' 次'],
+    ['成就', got + ' / ' + ACHIEVEMENTS.length + '（每 3 個換一把傳說武器）'],
+  ];
+  el.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:2px 20px">' +
+    rows.map(x => '<div style="display:flex;justify-content:space-between;gap:10px">' +
+      '<span style="color:#7d8cab">' + x[0] + '</span><b style="color:#c9d4e8">' + x[1] + '</b></div>').join('') +
+    '</div><div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">' +
+    ACHIEVEMENTS.map(a => '<span style="font-size:11px;padding:2px 9px;border-radius:20px;border:1px solid ' +
+      (STORE.ach[a.id] ? '#4d6b3f;background:#26301a;color:#c7d68a' : '#2f3d5e;background:#1d2740;color:#5f6d89') +
+      '" title="' + a.desc + '">' + (STORE.ach[a.id] ? '✔ ' : '') + a.name + '</span>').join('') + '</div>';
+  const btn = document.getElementById('btnResume');
+  if (STORE.save){
+    btn.style.display = 'block';
+    btn.textContent = '繼續上次進度（' + (STORE.save.floor + 1) + '樓・已清 ' +
+      (STORE.save.rooms ? STORE.save.rooms.flat().filter(v => v === 2).length : 0) + ' 間・🤑' + (STORE.save.money || 0) + '）';
+  } else btn.style.display = 'none';
+}
+
 const elToast = document.getElementById('toast'), elObj = document.getElementById('objective');
 let toastT = 0;
 function showToast(title, sub){
@@ -1746,7 +2243,7 @@ function showToast(title, sub){
   elToast.style.opacity = 1; elObj.style.opacity = sub ? 1 : 0;
   toastT = 2.4;
 }
-function startGame(){
+function startGame(resume){
   G.state = 'play'; G.t = 0; G.time = 0; G.kills = 0; G.cards = 0; G.cardSet = {};
   G.floor = 0; G.view = 'flat'; G.liftOpen = false; G.liftLock = 0; G.clearStreak = 0;
   G.parts.length = 0; G.texts.length = 0; G.shots.length = 0;
@@ -1767,26 +2264,40 @@ function startGame(){
   document.getElementById('pause').style.display = 'none';
   document.getElementById('busy').style.display = 'none';
   focusGame();
-  showToast('大門', '一間一間清空 — 走廊是安全的');
+  P.money = 0; G.achQueue.length = 0; G.doorWarn = 0; doorWarnCount = 0;
+  if (resume && STORE.save) applySave(STORE.save);
+  else { STORE.save = null; saveStore(); }
+  renderRecords();
+  showToast(resume ? FL.name : '大門', resume ? '接續上次的進度' : '一間一間清空 — 走廊是安全的');
   try{ ac().resume(); }catch(e){}
   SFX.bark();
 }
-function endGame(win){
+function endGame(win, how){
   G.state = 'end';
-  document.getElementById('endTitle').textContent = win ? '成功撤離！' : '阿斧倒下了⋯⋯';
-  document.getElementById('endText').innerHTML = win
+  recordRun();
+  if (win){
+    STORE.records.wins = (STORE.records.wins || 0) + 1;
+    if (!STORE.records.bestTime || G.time < STORE.records.bestTime) STORE.records.bestTime = G.time;
+  }
+  STORE.save = win ? null : STORE.save;
+  saveStore(); renderRecords();
+  document.getElementById('endTitle').textContent = how === 'reaper' ? '擊敗大魔王 💀' : win ? '成功撤離！' : '阿斧倒下了⋯⋯';
+  document.getElementById('endText').innerHTML = how === 'reaper'
+    ? '死神主任的手術燈熄了。整棟醫院，從大門到頂層，終於安靜下來。'
+    : win
     ? '晨光從<b style="color:#b9c94e">大門</b>照進來，繃帶散了一地。<br>' +
       (G.cleared >= G.totalRooms ? '整棟醫院都被你清乾淨了。' : '不過還有 ' + (G.totalRooms - G.cleared) + ' 間房沒清——二樓還在等。')
     : '走廊燈閃了兩下，繃帶把你捲了進去。<br>下一班警衛犬會在<b style="color:#b9c94e">大門</b>接手。';
   document.getElementById('endStats').innerHTML =
-    '清空 <b>' + G.cleared + '/' + G.totalRooms + '</b> 間　|　擊倒 <b>' + G.kills + '</b> 隻　|　門禁卡 <b>' +
-    G.cards + '/3</b>　|　時間 <b>' + Math.floor(G.time / 60) + ':' +
-    String(Math.floor(G.time % 60)).padStart(2, '0') + '</b>';
+    '清空 <b>' + G.cleared + '/' + G.totalRooms + '</b> 間　|　擊倒 <b>' + G.kills + '</b> 隻　|　🤑 <b>' +
+    P.money + '</b>　|　門禁卡 <b>' + G.cards + '/3</b>　|　時間 <b>' + fmtTime(G.time) + '</b>';
   document.getElementById('endscreen').classList.remove('hidden');
   blip(win ? 660 : 160, .6, win ? 'triangle' : 'sawtooth', .14, win ? 300 : -100);
 }
-document.getElementById('btnStart').onclick = startGame;
-document.getElementById('btnRetry').onclick = startGame;
+document.getElementById('btnStart').onclick = () => startGame(false);
+document.getElementById('btnRetry').onclick = () => startGame(false);
+document.getElementById('btnResume').onclick = () => startGame(true);
+renderRecords();
 
 useFloor(0);
 
@@ -1812,7 +2323,12 @@ function loop(now){
 requestAnimationFrame(loop);
 
 // 主控台改造掛勾：AXEDOG.P.sp = 400、AXEDOG.G.view = 'iso' ⋯
-window.AXEDOG = {G, P, FLOORS, WEAPONS, ETYPES, BOSSES, useFloor, populate, toggleView, goFloor,
+window.AXEDOG = {G, P, FLOORS, WEAPONS, ETYPES, BOSSES, RECIPES, ACHIEVEMENTS, STORE,
+                 useFloor, populate, toggleView, goFloor, autoSave, saveStore, unlockAch,
+                 toggleCombine, doCombine, availableRecipes, renderRecords,
+                 resetStore(){ STORE.ach = {}; STORE.legendsGiven = 0; STORE.save = null;
+                               STORE.records = {bestRooms:0,bestMoney:0,bestKills:0,bestFloor:1,bestTime:0,runs:0,wins:0,reaperKills:0};
+                               saveStore(); renderRecords(); },
                  get FL(){ return FL; }, get ROOMS(){ return ROOMS; }};
 </script>
 </body>
