@@ -41,14 +41,33 @@
     font-weight:700;color:#e8edf5;text-shadow:0 3px 18px rgba(0,0,0,.9);opacity:0;transition:opacity .4s}
   #objective{position:absolute;left:50%;top:calc(9% + 40px);transform:translateX(-50%);font-size:13px;
     letter-spacing:2px;color:#b9c94e;opacity:0;transition:opacity .4s}
-  #pause{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
-    background:rgba(6,8,16,.82);font-size:30px;letter-spacing:10px}
+  #btnPause{position:absolute;left:324px;top:20px;height:40px;padding:0 14px;z-index:15;display:none;
+    font:700 14px inherit;font-family:inherit;color:#cbd5e6;background:rgba(10,14,26,.75);
+    border:1px solid #2a3550;border-radius:10px;cursor:pointer}
+  #btnPause:hover{background:rgba(30,40,64,.9)}
+  .overlay .card button{cursor:pointer}
+  .overlay{cursor:default}
+  .rec{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;margin:14px auto 0;width:max-content;
+    font-size:14px;color:#c9d4e8;text-align:left}
+  .rec b{color:#ffd166}
+  button.sec{margin-top:10px;background:#26314c;color:#cbd5e6}
 </style>
 </head>
 <body>
 <div id="wrap">
   <canvas id="game"></canvas>
-  <div id="hud"><div id="toast"></div><div id="objective"></div><div id="pause">暫 停</div></div>
+  <div id="hud"><div id="toast"></div><div id="objective"></div></div>
+  <button id="btnPause" title="暫停 (P / Esc)">⏸ 暫停</button>
+
+  <div class="overlay hidden" id="pausescreen">
+    <div class="card" style="text-align:center;width:min(460px,92vw)">
+      <h1>暫 停</h1>
+      <div class="rec" id="pauseRec"></div>
+      <button class="start" id="btnResume">繼續（P / Esc）</button>
+      <button class="start sec" id="btnRestartFloor">重來這一層</button>
+      <button class="start sec" id="btnToTitle">存檔並回標題</button>
+    </div>
+  </div>
 
   <div class="overlay" id="title">
     <div class="card">
@@ -82,8 +101,10 @@
       <div class="sub" style="margin:0">
         1:1 還原院區平面圖：急診、放射科 A/B 區、藥劑部、牙科部、外科診間群、批價掛號⋯⋯<br>
         右上角小地圖會標出<b style="color:#ff6b8a">頭目房</b>與<b style="color:#7fd4c1">樓梯</b>（東北角）。<br>
-        上樓時回復 40 HP；倒下後可從同一層重來，進度會自動記住。
+        上樓時回復 40 HP；每進一層自動存檔，倒下後從同一層重來。<br>
+        <kbd>P</kbd>／<kbd>Esc</kbd> 或左上角按鈕暫停；切換視窗也會自動暫停。
       </div>
+      <div class="rec" id="titleRec" style="margin:18px 0 0"></div>
       <button class="start" id="btnStart">從 1 樓開始夜班</button>
       <button class="start" id="btnContinue" style="display:none;margin-top:10px;background:linear-gradient(90deg,#7fd4c1,#9fe0d0)"></button>
     </div>
@@ -385,9 +406,22 @@ function floorScale(f){
     sp:  1 + n * 0.002,   // 第 100 層約 ×1.2
   };
 }
-const SAVE_KEY = 'axedog.floor';
-function loadFloor(){ try{ return clamp(parseInt(localStorage.getItem(SAVE_KEY), 10) || 1, 1, TOP_FLOOR); }catch(e){ return 1; } }
-function saveFloor(f){ try{ localStorage.setItem(SAVE_KEY, String(f)); }catch(e){} }
+/* ── 記錄：目前進度（每進一層自動存）＋ 個人最佳 ── */
+const SAVE_KEY = 'axedog.save', BEST_KEY = 'axedog.best';
+function readJSON(k){ try{ return JSON.parse(localStorage.getItem(k)) || null; }catch(e){ return null; } }
+function writeJSON(k, v){ try{ if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+function loadSave(){
+  const s = readJSON(SAVE_KEY);
+  if (!s || !(s.floor > 1)) return null;
+  return {floor: clamp(s.floor | 0, 1, TOP_FLOOR), hp: clamp(+s.hp || 100, 1, 100), kills: s.kills | 0, time: +s.time || 0};
+}
+function loadBest(){ return readJSON(BEST_KEY) || {floor: 1, clears: 0, fastest: 0}; }
+function fmtTime(t){ t = Math.floor(t); return Math.floor(t / 3600) ? Math.floor(t / 3600) + ':' + String(Math.floor(t / 60) % 60).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0') : Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); }
+function writeSave(){
+  writeJSON(SAVE_KEY, {floor: G.floor, hp: Math.ceil(P.hp), kills: G.kills, time: Math.round(G.time)});
+  const b = loadBest();
+  if (G.floor > b.floor){ b.floor = G.floor; writeJSON(BEST_KEY, b); }
+}
 const STAIR = PROPS.find(p => p.kind === 'stair');
 
 /* =========================================================================
@@ -482,8 +516,8 @@ addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
   keys[k] = true;
   if ([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k)) e.preventDefault();
-  if (k === 'p' && G.state === 'play') togglePause();
-  if (k === 'escape' && G.state === 'play') togglePause();
+  if (k === 'p' && (G.state === 'play' || G.state === 'pause')) togglePause();
+  if (k === 'escape' && (G.state === 'play' || G.state === 'pause')) togglePause();
   if (k === 'r' && (G.state === 'play' || G.state === 'pause' || G.state === 'end')) startGame(G.won ? 1 : G.floor);
   if (k === ' ' && G.state === 'play') doSwing();
 });
@@ -495,7 +529,19 @@ cvs.addEventListener('contextmenu', e => e.preventDefault());
 
 function togglePause(){
   G.state = G.state === 'play' ? 'pause' : 'play';
-  document.getElementById('pause').style.display = G.state === 'pause' ? 'flex' : 'none';
+  const paused = G.state === 'pause';
+  if (paused){
+    const best = loadBest();
+    document.getElementById('pauseRec').innerHTML =
+      '<span>樓層</span><span><b>' + G.floor + '</b> / ' + TOP_FLOOR + '</span>' +
+      '<span>HP</span><span>' + Math.ceil(P.hp) + ' / ' + P.max + '</span>' +
+      '<span>門禁卡</span><span>' + G.cards + ' / 3</span>' +
+      '<span>擊倒</span><span>' + G.kills + ' 隻</span>' +
+      '<span>累計時間</span><span>' + fmtTime(G.time) + '</span>' +
+      '<span>最高樓層</span><span>' + Math.max(best.floor, G.floor) + ' 樓</span>';
+    keys.shift = keys.w = keys.a = keys.s = keys.d = false; mouse.down = false;
+  }
+  document.getElementById('pausescreen').classList.toggle('hidden', !paused);
 }
 
 /* =========================================================================
@@ -1173,26 +1219,38 @@ function enterFloor(f, climbed){
     floatText(P.x, P.y - 30, '+40 HP', '#7fd4c1');
     SFX.card();
   }
-  saveFloor(f);
   populate();
+  writeSave();
   buildFlow(P.x, P.y);
   showToast(f + ' 樓', f >= TOP_FLOOR ? '最高樓 — 擊倒三名頭目登頂' : '擊倒三名頭目，打開樓梯');
 }
-function startGame(floor){
+// rec 有值 = 從記錄接續（帶回 HP、擊倒數、累計時間）
+function startGame(floor, rec){
   if (typeof floor !== 'number') floor = G.floor || 1;
-  G.state = 'play'; G.t = 0; G.kills = 0; G.time = 0; G.won = false;
-  Object.assign(P, {hp:P.max, power:0, haste:0, step:0});
+  G.state = 'play'; G.t = 0; G.won = false;
+  G.kills = rec ? rec.kills : (floor === 1 ? 0 : G.kills);
+  G.time  = rec ? rec.time  : (floor === 1 ? 0 : G.time);
+  Object.assign(P, {hp: rec ? rec.hp : P.max, power:0, haste:0, step:0});
   enterFloor(floor, false);
   document.getElementById('title').classList.add('hidden');
   document.getElementById('endscreen').classList.add('hidden');
-  document.getElementById('pause').style.display = 'none';
+  document.getElementById('pausescreen').classList.add('hidden');
+  document.getElementById('btnPause').style.display = 'block';
   try{ ac().resume(); }catch(e){}
   SFX.bark();
 }
 function endGame(win){
   G.state = 'end';
   G.won = win;
-  if (win){ saveFloor(1); }
+  document.getElementById('btnPause').style.display = 'none';
+  let bestNote = '';
+  if (win){
+    const b = loadBest();
+    b.floor = TOP_FLOOR; b.clears = (b.clears | 0) + 1;
+    if (!b.fastest || G.time < b.fastest){ b.fastest = Math.round(G.time); bestNote = '　|　<b style="color:#7fd4c1">新紀錄！</b>'; }
+    writeJSON(BEST_KEY, b);
+    writeJSON(SAVE_KEY, null);
+  }
   document.getElementById('endTitle').textContent = win ? '登上第 ' + TOP_FLOOR + ' 樓！' : '阿斧倒在 ' + G.floor + ' 樓⋯⋯';
   document.getElementById('endText').innerHTML = win
     ? '晨光從<b style="color:#b9c94e">頂樓</b>照進來，一百層的繃帶散了一地。<br>你是這棟醫院唯一還站著的員工。'
@@ -1200,16 +1258,50 @@ function endGame(win){
   document.getElementById('btnRetry').textContent = win ? '從 1 樓再爬一次' : '從 ' + G.floor + ' 樓再來';
   document.getElementById('endStats').innerHTML =
     '樓層 <b>' + G.floor + '/' + TOP_FLOOR + '</b>　|　擊倒 <b>' + G.kills + '</b> 隻　|　門禁卡 <b>' + G.cards + '/3</b>　|　時間 <b>' +
-    Math.floor(G.time / 60) + ':' + String(Math.floor(G.time % 60)).padStart(2, '0') + '</b>';
+    fmtTime(G.time) + '</b>' + bestNote + '<br>最高紀錄：<b>' + loadBest().floor + ' 樓</b>';
   document.getElementById('endscreen').classList.remove('hidden');
   blip(win ? 660 : 160, .6, win ? 'triangle' : 'sawtooth', .14, win ? 300 : -100);
 }
-document.getElementById('btnStart').onclick = () => startGame(1);
+document.getElementById('btnStart').onclick = () => {
+  const rec = loadSave();
+  if (rec && !confirm('目前記錄在 ' + rec.floor + ' 樓，從 1 樓重新開始會覆蓋這份記錄。確定嗎？')) return;
+  startGame(1);
+};
 document.getElementById('btnRetry').onclick = () => startGame(G.won ? 1 : G.floor);
+document.getElementById('btnPause').onclick = e => { e.currentTarget.blur(); if (G.state === 'play') togglePause(); };
+document.getElementById('btnResume').onclick = () => { if (G.state === 'pause') togglePause(); };
+document.getElementById('btnRestartFloor').onclick = () => { const r = loadSave(); startGame(G.floor, r && r.floor === G.floor ? r : null); };
+document.getElementById('btnToTitle').onclick = () => {
+  writeSave();          // 記下目前 HP／擊倒數／時間；下次從這一層開頭接續
+  G.state = 'title';
+  document.getElementById('pausescreen').classList.add('hidden');
+  document.getElementById('btnPause').style.display = 'none';
+  showTitle();
+};
+function showTitle(){
+  const rec = loadSave(), best = loadBest(), b = document.getElementById('btnContinue');
+  if (rec){
+    b.textContent = '繼續：' + rec.floor + ' 樓（HP ' + rec.hp + '）';
+    b.style.display = ''; b.onclick = () => startGame(rec.floor, rec);
+  } else b.style.display = 'none';
+  document.getElementById('titleRec').innerHTML =
+    '<span>目前記錄</span><span>' + (rec ? '<b>' + rec.floor + ' 樓</b>　擊倒 ' + rec.kills + '　時間 ' + fmtTime(rec.time) : '尚無') + '</span>' +
+    '<span>最高樓層</span><span><b>' + best.floor + '</b> / ' + TOP_FLOOR + '</span>' +
+    '<span>登頂次數</span><span>' + (best.clears | 0) + (best.fastest ? '　最快 ' + fmtTime(best.fastest) : '') + '</span>';
+  document.getElementById('title').classList.remove('hidden');
+}
+// 切到別的視窗自動暫停
+addEventListener('blur', () => { if (G.state === 'play') togglePause(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden && G.state === 'play') togglePause(); });
+// 舊版只存樓層：轉成新格式
 (function(){
-  const f = loadFloor(), b = document.getElementById('btnContinue');
-  if (f > 1){ b.textContent = '繼續：從 ' + f + ' 樓開始'; b.style.display = ''; b.onclick = () => startGame(f); }
+  try{
+    const old = parseInt(localStorage.getItem('axedog.floor'), 10);
+    if (old > 1 && !readJSON(SAVE_KEY)){ writeJSON(SAVE_KEY, {floor: old, hp: 100, kills: 0, time: 0}); writeJSON(BEST_KEY, {floor: old, clears: 0, fastest: 0}); }
+    localStorage.removeItem('axedog.floor');
+  }catch(e){}
 })();
+showTitle();
 
 // 想自己調數值：主控台輸入 AXEDOG.P.sp = 300 之類
 window.AXEDOG = {G, P, ROOMS, CORRIDORS, ETYPES, BOSSES, map: mapCvs, respawn: populate};
