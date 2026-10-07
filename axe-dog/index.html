@@ -56,7 +56,8 @@
       <div class="sub">
         凌晨三點，整棟醫院被「痛覺病毒」吞沒，病患化成一團團會走路的繃帶惡夢。<br>
         你是院區警衛犬 <b style="color:#e8c88a">阿斧</b>——四條腿、一把消防斧，還有一份沒人想接的夜班。<br>
-        搶回三張門禁卡，從<b style="color:#b9c94e">大門</b>殺出去。
+        這棟醫院有 <b style="color:#ffd166">100 層樓</b>，每一層都長得跟一樓一樣。<br>
+        每層搶回三張門禁卡打開<b style="color:#b9c94e">樓梯</b>往上爬——越高的樓，妖怪越強。
       </div>
       <div class="grid2">
         <div>
@@ -80,9 +81,11 @@
       <h2>地圖</h2>
       <div class="sub" style="margin:0">
         1:1 還原院區平面圖：急診、放射科 A/B 區、藥劑部、牙科部、外科診間群、批價掛號⋯⋯<br>
-        右上角小地圖會標出<b style="color:#ff6b8a">頭目房</b>與<b style="color:#7fd4c1">出口</b>。
+        右上角小地圖會標出<b style="color:#ff6b8a">頭目房</b>與<b style="color:#7fd4c1">樓梯</b>（東北角）。<br>
+        上樓時回復 40 HP；倒下後可從同一層重來，進度會自動記住。
       </div>
-      <button class="start" id="btnStart">按此開始夜班</button>
+      <button class="start" id="btnStart">從 1 樓開始夜班</button>
+      <button class="start" id="btnContinue" style="display:none;margin-top:10px;background:linear-gradient(90deg,#7fd4c1,#9fe0d0)"></button>
     </div>
   </div>
 
@@ -184,7 +187,7 @@ const PROPS = [
 
 // 出入口
 const EXITS = [
-  {id:'main', name:'大門',   x:0,   y:1100,w:60, h:70, dir:'w', goal:true},
+  {id:'main', name:'大門',   x:0,   y:1100,w:60, h:70, dir:'w'},
   {id:'south',name:'南側門', x:1340,y:1100,w:60, h:70, dir:'e'},
   {id:'west', name:'西側門', x:1220,y:1930,w:120,h:40, dir:'s'},
 ];
@@ -372,11 +375,26 @@ const BOSSES = {
   drill: {name:'鑽頭王',   title:'牙科部',  hp:540, sp:54, r:32, dmg:25, col:'#ff9a68', ink:'#94421c'},
 };
 
+/* ── 100 層高樓：每層同一張平面圖、同一批妖怪，只是慢慢變強 ── */
+const TOP_FLOOR = 100;
+function floorScale(f){
+  const n = f - 1;
+  return {
+    hp:  1 + n * 0.03,    // 第 100 層約 ×3.97
+    dmg: 1 + n * 0.012,   // 第 100 層約 ×2.19
+    sp:  1 + n * 0.002,   // 第 100 層約 ×1.2
+  };
+}
+const SAVE_KEY = 'axedog.floor';
+function loadFloor(){ try{ return clamp(parseInt(localStorage.getItem(SAVE_KEY), 10) || 1, 1, TOP_FLOOR); }catch(e){ return 1; } }
+function saveFloor(f){ try{ localStorage.setItem(SAVE_KEY, String(f)); }catch(e){} }
+const STAIR = PROPS.find(p => p.kind === 'stair');
+
 /* =========================================================================
    5. 遊戲狀態
    ========================================================================= */
 const G = {
-  state:'title', t:0, kills:0, cards:0, cardSet:{}, time:0,
+  state:'title', t:0, kills:0, cards:0, cardSet:{}, time:0, floor:1, scale:floorScale(1),
   enemies:[], shots:[], parts:[], drops:[], texts:[],
   shake:0, curRoom:-1, bossAlert:null, escaped:false, unlocked:false,
 };
@@ -391,7 +409,7 @@ function spawnEnemy(type, x, y, boss){
   const d = boss ? BOSSES[boss] : ETYPES[type];
   G.enemies.push({
     type: boss ? 'boss' : type, boss: boss || null, def: d,
-    x, y, r: d.r, hp: d.hp, max: d.hp, sp: d.sp,
+    x, y, r: d.r, hp: d.hp * G.scale.hp, max: d.hp * G.scale.hp, sp: d.sp * G.scale.sp,
     vx:0, vy:0, kx:0, ky:0, cd: rand(0, 1), tcd: 0, st: 0, ph: rand(0, 6.3),
     awake: false, flash: 0, ang: rand(0, 6.3), fire: rand(1, 3),
   });
@@ -466,7 +484,7 @@ addEventListener('keydown', e => {
   if ([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k)) e.preventDefault();
   if (k === 'p' && G.state === 'play') togglePause();
   if (k === 'escape' && G.state === 'play') togglePause();
-  if (k === 'r' && (G.state === 'play' || G.state === 'pause' || G.state === 'end')) startGame();
+  if (k === 'r' && (G.state === 'play' || G.state === 'pause' || G.state === 'end')) startGame(G.won ? 1 : G.floor);
   if (k === ' ' && G.state === 'play') doSwing();
 });
 addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
@@ -490,6 +508,7 @@ function doSwing(){
 }
 function damagePlayer(n){
   if (P.inv > 0 || P.dash > 0) return;
+  n = Math.round(n * G.scale.dmg);
   P.hp -= n; P.inv = .55; P.flash = .3; G.shake = Math.min(16, G.shake + 6);
   P.combo = 0; SFX.hurt();
   if (P.hp <= 0){ P.hp = 0; endGame(false); }
@@ -569,14 +588,22 @@ function updatePlayer(dt){
         const b = d.kind.slice(5);
         if (!G.cardSet[b]){ G.cardSet[b] = true; G.cards++; SFX.card(); }
         floatText(P.x, P.y - 34, '取得門禁卡 ' + G.cards + '/3', '#ffd166');
-        if (G.cards >= 3){ G.unlocked = true; showToast('大門解鎖', '往西邊主通道盡頭撤離！'); }
+        if (G.cards >= 3){
+          G.unlocked = true;
+          showToast('樓梯開啟', G.floor >= TOP_FLOOR ? '最後一段樓梯！往東北角登頂' : '往東北角樓梯上 ' + (G.floor + 1) + ' 樓');
+        }
       }
     }
   }
   G.drops = G.drops.filter(d => !d.got);
 
-  // 撤離
-  if (G.unlocked && P.x < 62 && P.y > 1090 && P.y < 1180) endGame(true);
+  // 上樓：碰到東北角樓梯
+  if (G.unlocked){
+    const nx = clamp(P.x, STAIR.x, STAIR.x + STAIR.w), ny = clamp(P.y, STAIR.y, STAIR.y + STAIR.h);
+    if ((P.x - nx) ** 2 + (P.y - ny) ** 2 < (P.r + 10) ** 2){
+      if (G.floor >= TOP_FLOOR) endGame(true); else enterFloor(G.floor + 1, true);
+    }
+  }
 }
 
 /* =========================================================================
@@ -1062,9 +1089,14 @@ function drawHUD(c){
     roundRect(c, x, 30, 24, 18, 4); c.fill();
     if (G.cardSet[k]){ c.fillStyle = '#8c6b1f'; c.fillRect(x, 37, 24, 3); }
   });
+  c.fillStyle = 'rgba(10,14,26,.75)'; roundRect(c, 204, 20, 112, 40, 10); c.fill();
+  c.fillStyle = '#ffd166'; c.font = '800 16px "Noto Sans TC",sans-serif';
+  c.fillText(G.floor + ' 樓', 216, 46);
+  c.fillStyle = '#8b99b5'; c.font = '600 12px "Noto Sans TC",sans-serif';
+  c.fillText('/ ' + TOP_FLOOR, 268, 46);
   if (G.unlocked){
     c.fillStyle = '#7fd4c1'; c.font = '700 13px "Noto Sans TC",sans-serif';
-    c.fillText('▶ 大門已解鎖：往西邊主通道撤離', 24, 78);
+    c.fillText(G.floor >= TOP_FLOOR ? '▶ 樓梯已開啟：往東北角登頂！' : '▶ 樓梯已開啟：往東北角上樓', 24, 78);
   } else {
     c.fillStyle = '#8b99b5'; c.font = '600 12px "Noto Sans TC",sans-serif';
     c.fillText('擊倒藥劑部／MRI／牙科部的頭目', 24, 78);
@@ -1099,10 +1131,9 @@ function drawHUD(c){
     c.fillStyle = '#ffd166';
     c.fillRect(mx + d.x * MINI_S - 1, my + d.y * MINI_S - 1, 2.2, 2.2);
   });
-  // 出口
-  const ex = EXITS[0];
+  // 樓梯
   c.fillStyle = G.unlocked ? '#7fd4c1' : '#3f5a55';
-  c.fillRect(mx + ex.x * MINI_S, my + ex.y * MINI_S, 5, 5);
+  c.fillRect(mx + STAIR.x * MINI_S, my + STAIR.y * MINI_S, STAIR.w * MINI_S, STAIR.h * MINI_S);
   // 玩家
   c.fillStyle = '#fff'; c.beginPath(); c.arc(mx + P.x * MINI_S, my + P.y * MINI_S, 3.6, 0, 6.3); c.fill();
   c.strokeStyle = '#e0a760'; c.lineWidth = 2;
@@ -1128,35 +1159,57 @@ function showToast(title, sub){
   elToast.style.opacity = 1; elObj.style.opacity = sub ? 1 : 0;
   toastT = 2.2;
 }
-function startGame(){
-  G.state = 'play'; G.t = 0; G.kills = 0; G.cards = 0; G.cardSet = {}; G.time = 0;
+// 進入某一層：同一張平面圖、同一批妖怪，數值依樓層放大
+function enterFloor(f, climbed){
+  G.floor = f; G.scale = floorScale(f);
+  G.cards = 0; G.cardSet = {}; G.unlocked = false;
   G.parts.length = 0; G.texts.length = 0; G.shots.length = 0;
-  G.shake = 0; G.curRoom = -1; G.bossAlert = null; G.unlocked = false;
-  Object.assign(P, {x:110, y:1135, hp:100, swing:0, swingCd:0, dash:0, dashCd:0,
-    inv:0, power:0, haste:0, combo:0, comboT:0, flash:0, step:0});
+  G.shake = 0; G.curRoom = -1; G.bossAlert = null;
+  // 第 1 層從大門進來，之後從樓梯口上來
+  const start = f === 1 ? {x:110, y:1135} : {x:STAIR.x + STAIR.w / 2, y:STAIR.y + STAIR.h + 26};
+  Object.assign(P, start, {swing:0, swingCd:0, dash:0, dashCd:0, inv:1, combo:0, comboT:0, flash:0});
+  if (climbed){
+    P.hp = Math.min(P.max, P.hp + 40);
+    floatText(P.x, P.y - 30, '+40 HP', '#7fd4c1');
+    SFX.card();
+  }
+  saveFloor(f);
   populate();
   buildFlow(P.x, P.y);
+  showToast(f + ' 樓', f >= TOP_FLOOR ? '最高樓 — 擊倒三名頭目登頂' : '擊倒三名頭目，打開樓梯');
+}
+function startGame(floor){
+  if (typeof floor !== 'number') floor = G.floor || 1;
+  G.state = 'play'; G.t = 0; G.kills = 0; G.time = 0; G.won = false;
+  Object.assign(P, {hp:P.max, power:0, haste:0, step:0});
+  enterFloor(floor, false);
   document.getElementById('title').classList.add('hidden');
   document.getElementById('endscreen').classList.add('hidden');
   document.getElementById('pause').style.display = 'none';
-  showToast('大門', '夜班開始 — 找出三張門禁卡');
   try{ ac().resume(); }catch(e){}
   SFX.bark();
 }
 function endGame(win){
   G.state = 'end';
-  document.getElementById('endTitle').textContent = win ? '成功撤離！' : '阿斧倒下了⋯⋯';
+  G.won = win;
+  if (win){ saveFloor(1); }
+  document.getElementById('endTitle').textContent = win ? '登上第 ' + TOP_FLOOR + ' 樓！' : '阿斧倒在 ' + G.floor + ' 樓⋯⋯';
   document.getElementById('endText').innerHTML = win
-    ? '晨光從<b style="color:#b9c94e">大門</b>照進來，繃帶散了一地。<br>你是這棟醫院唯一還站著的員工。'
-    : '走廊燈閃了兩下，繃帶把你捲了進去。<br>下一班警衛犬會在<b style="color:#b9c94e">大門</b>接手。';
+    ? '晨光從<b style="color:#b9c94e">頂樓</b>照進來，一百層的繃帶散了一地。<br>你是這棟醫院唯一還站著的員工。'
+    : '走廊燈閃了兩下，繃帶把你捲了進去。<br>再來一次會從<b style="color:#b9c94e">' + G.floor + ' 樓</b>重新開始。';
+  document.getElementById('btnRetry').textContent = win ? '從 1 樓再爬一次' : '從 ' + G.floor + ' 樓再來';
   document.getElementById('endStats').innerHTML =
-    '擊倒 <b>' + G.kills + '</b> 隻　|　門禁卡 <b>' + G.cards + '/3</b>　|　時間 <b>' +
+    '樓層 <b>' + G.floor + '/' + TOP_FLOOR + '</b>　|　擊倒 <b>' + G.kills + '</b> 隻　|　門禁卡 <b>' + G.cards + '/3</b>　|　時間 <b>' +
     Math.floor(G.time / 60) + ':' + String(Math.floor(G.time % 60)).padStart(2, '0') + '</b>';
   document.getElementById('endscreen').classList.remove('hidden');
   blip(win ? 660 : 160, .6, win ? 'triangle' : 'sawtooth', .14, win ? 300 : -100);
 }
-document.getElementById('btnStart').onclick = startGame;
-document.getElementById('btnRetry').onclick = startGame;
+document.getElementById('btnStart').onclick = () => startGame(1);
+document.getElementById('btnRetry').onclick = () => startGame(G.won ? 1 : G.floor);
+(function(){
+  const f = loadFloor(), b = document.getElementById('btnContinue');
+  if (f > 1){ b.textContent = '繼續：從 ' + f + ' 樓開始'; b.style.display = ''; b.onclick = () => startGame(f); }
+})();
 
 // 想自己調數值：主控台輸入 AXEDOG.P.sp = 300 之類
 window.AXEDOG = {G, P, ROOMS, CORRIDORS, ETYPES, BOSSES, map: mapCvs, respawn: populate};
