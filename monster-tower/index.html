@@ -73,6 +73,17 @@
 
   .pz{position:absolute;width:44px;height:44px;border-radius:50%;font-size:18px}
   #bPause{left:calc(192px + env(safe-area-inset-left));top:calc(10px + env(safe-area-inset-top))}
+  #bRec{left:calc(242px + env(safe-area-inset-left));top:calc(10px + env(safe-area-inset-top))}
+  .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;margin-top:8px}
+  .st{background:#fff;border:3px solid #e2d3b0;border-radius:14px;padding:8px 6px;text-align:center}
+  .st b{display:block;font-size:22px;color:#c4483a;font-variant-numeric:tabular-nums}
+  .st span{font-size:12px;color:#7a6a4a;font-weight:700}
+  .log{list-style:none;margin-top:6px;font-size:14px;line-height:1.6}
+  .log li{padding:4px 8px;border-bottom:1px dashed #e2d3b0}
+  .log small{color:#9c8a66;margin-right:6px;font-variant-numeric:tabular-nums}
+  .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px;margin-top:6px}
+  .gal img{width:100%;aspect-ratio:1;border-radius:8px;border:2px solid #e2d3b0;background:#fff}
+  .card h3{font-size:16px;margin-top:14px}
   #bPause2{right:calc(84px + env(safe-area-inset-right));top:calc(70px + env(safe-area-inset-top))}
   /* 畫畫比賽 */
   #drawUI{position:fixed;inset:0;z-index:35;background:#fdf3dc;color:#2a2416;display:flex;flex-direction:column;
@@ -123,6 +134,7 @@
   <button class="btn" id="bId"><span class="em" id="idEm">🏹</span><small>身分</small></button>
   <button class="btn hidden" id="bRoll"><span class="em">🤸</span><small>翻滾</small></button>
   <button class="btn pz" id="bPause">⏸</button>
+  <button class="btn pz" id="bRec">📜</button>
 </div>
 
 <!-- 開車操作 -->
@@ -137,6 +149,7 @@
 <div id="ctlHome" class="layer hidden">
   <div id="homeBar">
     <button class="pill" id="hShop">🛒 玩具店</button>
+    <button class="pill red" id="hRec">📜 紀錄</button>
     <button class="pill blue" id="hId">🧑 換身分</button>
     <button class="pill green hidden" id="hCall">📞 等任務電話</button>
   </div>
@@ -182,7 +195,7 @@ function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h
 
 /* ---------- 存檔 ---------- */
 const SKEY='monster_tower_save_v1';
-let save={money:0,toys:[],clears:0,id:0,floor:1,best:1,c2:null};
+let save={money:0,toys:[],clears:0,id:0,floor:1,best:1,c2:null,st:{}};
 try{const s=JSON.parse(localStorage.getItem(SKEY));if(s)save=Object.assign(save,s);}catch(e){}
 function persist(){try{localStorage.setItem(SKEY,JSON.stringify(save));}catch(e){}}
 
@@ -702,7 +715,7 @@ function defeat(e){
   if(mode==='human'){
     e.dead=true;burst(e.x,e.y,'#ffe66d',16);sfx(880,.12,'triangle',.05,500);
     const heal=idk()==='nurse'?12:6;P.hp=Math.min(P.max,P.hp+heal);floatT(P.x,P.y-30,'+'+heal+' ❤️','#ff8fb1',15);
-    rescued++;
+    rescued++;stat('rescued');
     if(followers.length<12){followers.push({x:e.x,y:e.y,hp:40,max:40,weapon:null,face:pick(FACES)});floatT(e.x,e.y-26,'謝謝你！我來幫你拿武器','#bff7c3',13);}
     else floatT(e.x,e.y-26,'謝謝！我先去避難了','#bff7c3',13);
   }else{
@@ -760,7 +773,7 @@ function pickWeapon(it){
   toast(`${w.surprise?'✨ 驚奇武器！':'撿到武器！'} ${w.e} ${w.n}`,1600);sfx(990,.15,'triangle',.06,500);refreshButtons();return true;
 }
 function becomeMonster(){
-  mode='monster';shake=14;
+  mode='monster';shake=14;stat('monster');logRec(`👹 在 ${curFloor} 樓大家都變成妖怪了`);
   const lost=followers.length;
   followers.forEach(f=>{const k=pick(MONSTER_KINDS),e=makeEnemy(k,f.x,f.y,roomAt(f.x,f.y));e.wt=0;enemies.push(e);burst(f.x,f.y,'#b06bff',10);});
   followers=[];
@@ -786,6 +799,8 @@ function floorComplete(){
 /* 過關：記錄樓層，選擇往上爬或回家 */
 function clearFloor(head){
   save.clears++;
+  if(curFloor!==2)logRec(`🚪 通過 ${curFloor} 樓（救回 ${rescued} 人）`);
+  if(curFloor>=TOP)logRec('🏆 登上 100 樓頂樓！');
   if(curFloor>=TOP){
     save.best=TOP;save.floor=1;save.c2=null;save.tops=(save.tops||0)+1;save.money+=100;persist();
     showModal(`${head}<h2>🏆 登上第 ${TOP} 樓！</h2><p>你爬完整棟最高樓了！獎金 <b>💰 100</b> 元。</p><p>下次接電話會從 1 樓重新開始。</p>
@@ -1349,6 +1364,9 @@ function castVote(myPick){
 function voteResult(){
   const c=c2(),sc=c.vote.score,A=AUTH(),mx=Math.max(...sc),order=[0,1,2,3,4].sort((a,b)=>sc[b]-sc[a]);
   const win=sc[0]===mx,tie=sc.filter(x=>x===mx).length>1;
+  stat('contests');if(win)stat('contestWins');save.st.bestVotes=Math.max(save.st.bestVotes||0,sc[0]);
+  logRec(win?`🎨 畫畫比賽${tie?'平手':'第一名'}！拿到 ${sc[0]} 分`:`🎨 畫畫比賽輸了（${sc[0]} 分，最高 ${mx} 分）`);
+  const pics=c.rounds.map(r=>r.imgs[0]);save.st.lastPics=pics;
   let h=`<h2>${win?'🏆 你贏了！':'🥈 這次沒有贏……'}</h2>`;
   order.forEach((k,i)=>{h+=`<div class="rank ${sc[k]===mx?'win':''}"><span style="width:28px">${sc[k]===mx?'👑':i+1}</span><span style="width:120px">${A[k].e} ${A[k].n}</span><span class="bar"><i style="width:${mx?sc[k]/mx*100:0}%"></i></span><span>${sc[k]} 分</span></div>`;});
   if(win){
@@ -1365,6 +1383,33 @@ function voteResult(){
   }
 }
 
+/* ---------- 紀錄 ---------- */
+function stat(k,n){save.st=save.st||{};save.st[k]=(save.st[k]||0)+(n||1);}
+function logRec(t){save.st=save.st||{};const d=new Date(),L=save.st.log=save.st.log||[];
+  L.unshift({d:`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`,t});
+  if(L.length>30)L.length=30;persist();}
+function fmtTime(t){t=Math.floor(t||0);const h=Math.floor(t/3600),m=Math.floor(t/60)%60;return h?`${h} 小時 ${m} 分`:`${m} 分 ${t%60} 秒`;}
+function openRecords(){
+  if(scene!=='home'&&!$('modal').classList.contains('hidden')&&!document.getElementById('pRes'))return;
+  input.atk=false;input.keys={};joy.active=false;
+  const st=save.st||{},c=save.c2,cur=scene==='home'?(save.floor||1):curFloor;
+  const box=(v,l)=>`<div class="st"><b>${v}</b><span>${l}</span></div>`;
+  let h=`<h2>📜 我的紀錄</h2><div class="stats">
+    ${box(cur+' 樓','現在在')}${box(Math.max(save.best||1,cur)+' 樓','最高到過')}${box(save.clears||0,'過關次數')}${box(save.tops||0,'登上 100 樓')}
+    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.bestVotes||0,'畫畫最高分')}
+    ${box('💰 '+save.money,'現在的錢')}${box((save.toys||[]).length+' / '+TOYS.length,'收集的玩具')}${box(fmtTime(st.time),'一共玩了')}${box(IDS[P.id].e+' '+IDS[P.id].n,'現在的身分')}
+  </div>`;
+  const now=c&&c.rounds&&c.rounds.length?c.rounds.map(r=>r.imgs[0]):null,pics=now||st.lastPics;
+  if(pics&&pics.length)h+=`<h3>🖼️ ${now?`這次畫畫比賽畫好的圖（${pics.length}/${ROUNDS}）`:'上一次畫畫比賽我畫的圖'}</h3><div class="gal">${pics.map(s=>`<img src="${s}" alt="">`).join('')}</div>`;
+  const L=st.log||[];
+  h+=`<h3>🕒 最近發生的事</h3>${L.length?`<ul class="log">${L.slice(0,12).map(x=>`<li><small>${x.d}</small>${x.t}</li>`).join('')}</ul>`:'<p style="color:#9c8a66">還沒有紀錄，去最高樓救人吧！</p>'}
+   <p style="color:#7a6a4a;font-size:13px;margin-top:8px">💾 紀錄會自動存在這支手機的瀏覽器裡。</p>
+   <div class="row"><button class="pill green" id="rClose">關閉</button></div>`;
+  showModal(h);$('rClose').onclick=hideModal;
+}
+$('hRec').onclick=openRecords;
+$('bRec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
+
 /* ---------- 暫停 / 存檔 ---------- */
 function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
 function openPause(){
@@ -1375,8 +1420,9 @@ function openPause(){
    <p>💰 ${save.money} 元　🎖️ 過關 ${save.clears} 次</p>
    ${scene==='draw2'?`<p>🎨 畫畫比賽：已經畫了 ${(save.c2&&save.c2.rounds.length)||0} / 10 張（畫好的圖都有存起來）</p>`:''}
    <p style="color:#7a6a4a">💾 存檔會記住樓層、錢和玩具。回家後接電話，會從這一層的開頭繼續。</p>
-   <div class="row"><button class="pill green" id="pRes">▶️ 繼續</button><button class="pill blue" id="pSave">💾 存檔回家</button></div>`);
+   <div class="row"><button class="pill green" id="pRes">▶️ 繼續</button><button class="pill blue" id="pSave">💾 存檔回家</button><button class="pill red" id="pRec">📜 看紀錄</button></div>`);
   $('pRes').onclick=hideModal;
+  $('pRec').onclick=openRecords;
   $('pSave').onclick=()=>{persist();hideModal();home.ring=false;enterHome();toast('💾 已存檔！按「📞 等任務電話」就能繼續',2600);};
 }
 $('bPause').addEventListener('pointerdown',e=>{e.preventDefault();openPause();});
@@ -1427,6 +1473,7 @@ let last=performance.now();
 function frame(now){
   let dt=Math.min(.033,(now-last)/1000);last=now;T+=dt;shake=Math.max(0,shake-dt*40);
   const paused=!$('modal').classList.contains('hidden');
+  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
   ctx.setTransform(DPR,0,0,DPR,0,0);
   if(scene==='home')drawHome(dt);
   else if(scene==='drive'){if(!paused)updDrive(dt);ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));drawDrive();ctx.restore();}
