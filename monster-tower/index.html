@@ -128,6 +128,17 @@
   .shopRow button{border:2px solid #3a2f1c;border-radius:12px;background:#fffaf0;padding:6px 8px;font-family:inherit;font-weight:800;font-size:13px;color:#2a2416}
   .shopRow button.cur{background:#effbe9;border-color:#4a9d3c}
   .shopRow button:disabled{opacity:.4}
+  /* 電梯 */
+  .card.elev{background:#c9ced8;border-color:#4a5263;color:#1f2430}
+  .elevTop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .elevLed{font:900 30px/1 ui-monospace,"Courier New",monospace;color:#ff5a3c;background:#140c0a;border-radius:10px;padding:8px 14px;min-width:100px;text-align:center;letter-spacing:2px;text-shadow:0 0 8px #ff5a3c}
+  .fgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin-top:10px}
+  .fb{aspect-ratio:1;border-radius:50%;border:2px solid #6b7385;background:linear-gradient(#f4f6fa,#b9bfcb);font:800 13px/1 inherit;font-family:inherit;color:#2a2f3a;position:relative;padding:0;touch-action:manipulation}
+  .fb.done{background:linear-gradient(#e6f7df,#a8d898);border-color:#4a9d3c}
+  .fb.next{box-shadow:0 0 0 3px #ffd23f;background:linear-gradient(#fff6c8,#ffd65c)}
+  .fb.sel{background:radial-gradient(#fff,#ff9a5a);border-color:#c4483a;box-shadow:0 0 10px #ff9a5a}
+  .fb i{position:absolute;top:-6px;right:-6px;font-style:normal;font-size:12px}
+  .elevInfo{min-height:44px;margin-top:10px;font-size:15px;font-weight:700}
   #toast{position:fixed;left:50%;top:calc(64px + env(safe-area-inset-top));transform:translateX(-50%);z-index:50;pointer-events:none;
     background:rgba(20,24,36,.86);border:2px solid #ffd65c;color:#fff;padding:8px 16px;border-radius:14px;font-weight:800;font-size:16px;
     text-align:center;max-width:90vw;opacity:0;transition:opacity .25s}
@@ -363,7 +374,7 @@ let toastT=null;
 function toast(s,ms){const el=$('toast');el.innerHTML=s;el.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('show'),ms||2200);}
 function floatT(x,y,s,col,size){floats.push({x,y,s,col:col||'#fff',t:1,size:size||16});}
 function burst(x,y,col,n){for(let i=0;i<(n||12);i++){const a=rand(0,6.28),s=rand(60,220);parts.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,t:rand(.3,.7),col});}}
-function showModal(html){$('modalCard').innerHTML=html;$('modal').classList.remove('hidden');}
+function showModal(html){$('modalCard').className='card';$('modalCard').innerHTML=html;$('modal').classList.remove('hidden');}
 function hideModal(){$('modal').classList.add('hidden');}
 
 /* 身分選單（任何時候都能切換） */
@@ -612,8 +623,8 @@ function updDrive(dt){
       else{save.money++;drive.coins++;persist();sfx(1300,.06,'square',.03,300);}}
   }
   drive.objs=drive.objs.filter(o=>!(o.t==='coin'&&o.hit)&&o.d>drive.dist-200);
-  if(drive.dist>=drive.len&&!drive.done){drive.done=T;toast(`🏢 到了！搭電梯到 ${save.floor||1} 樓`,1600);sfx(660,.3,'triangle',.06,300);}
-  if(drive.done&&T-drive.done>1.8)goFloor(save.floor||1);
+  if(drive.dist>=drive.len&&!drive.done){drive.done=T;toast('🏢 到了！去搭電梯',1600);sfx(660,.3,'triangle',.06,300);}
+  if(drive.done&&T-drive.done>1.8&&!drive.elev){drive.elev=1;openElevator();}
 }
 function drawDrive(){
   const rw=Math.min(W*.62,330),rx=W/2-rw/2,py=H*.78,sc=drive.dist;
@@ -1833,6 +1844,68 @@ function drawChase(){
   f3txt.forEach((f,i)=>{ctx.globalAlpha=Math.min(1,f.t*2);txt(f.s,W/2,H*.4-i*26-(1.4-f.t)*20,20,f.col);ctx.globalAlpha=1;});
 }
 
+/* =========================================================
+   電梯：抵達大樓後可以選任何一層
+   ========================================================= */
+const FLOOR_TAG={1:['🧟','妖怪辦公室'],2:['🎨','畫畫比賽'],3:['🎪','馬戲團']};
+function floorInfo(f){const t=FLOOR_TAG[f];return t?`${t[0]} ${f} 樓：${t[1]}`:`🧟 ${f} 樓：妖怪辦公室（妖怪血 ×${fscale(f).hp.toFixed(2)}、攻擊 ×${fscale(f).dmg.toFixed(2)}）`;}
+const elev={sel:1,from:1,to:1,t:0,T:1};
+function openElevator(){
+  input.keys={};joy.active=false;
+  const nx=save.floor||1,best=save.best||1;elev.sel=nx;
+  let h=`<div class="elevTop"><h2 style="margin:0">🛗 電梯</h2><div class="elevLed" id="eLed">${nx}F</div></div>
+   <p style="margin-top:6px">想去哪一層都可以！按一下樓層，再按「出發」。</p>
+   <p style="font-size:13px">🟡 下一個要挑戰的樓層　🟢 已經到過　🎨🎪 特別樓層</p>
+   <div class="fgrid">`;
+  for(let f=1;f<=TOP;f++){const t=FLOOR_TAG[f];h+=`<button class="fb ${f===nx?'next sel':f<best?'done':''}" data-f="${f}">${f}${t&&f>1?`<i>${t[0]}</i>`:''}</button>`;}
+  h+=`</div><div class="elevInfo" id="eInfo">${floorInfo(nx)}</div>
+   <div class="row"><button class="pill red" id="eGo">🛗 出發！</button><button class="pill green" id="eNext">⏩ 直接去 ${nx} 樓</button></div>`;
+  showModal(h);$('modalCard').classList.add('elev');
+  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{elev.sel=+b.dataset.f;
+    document.querySelectorAll('[data-f]').forEach(x=>x.classList.toggle('sel',x===b));
+    $('eLed').textContent=elev.sel+'F';$('eInfo').textContent=floorInfo(elev.sel);sfx(880,.05,'sine',.04);});
+  $('eGo').onclick=()=>rideTo(elev.sel);
+  $('eNext').onclick=()=>rideTo(nx);
+}
+function rideTo(f){
+  $('modalCard').classList.remove('elev');hideModal();
+  Object.assign(elev,{from:1,to:f,t:0,T:f===1?1.2:1.6+Math.min(2.2,f/30),dinged:0});
+  scene='elev';setLayers();sfx(440,.2,'sine',.05);
+  if(f!==(save.floor||1))logRec(`🛗 搭電梯到 ${f} 樓`);
+}
+function updElev(dt){
+  elev.t+=dt;
+  const doorsClose=.45,doorsOpen=elev.T-.5;
+  if(elev.t>doorsOpen&&!elev.dinged){elev.dinged=1;sfx(1320,.35,'sine',.07);setTimeout(()=>sfx(1046,.5,'sine',.06),180);}
+  if(elev.t>=elev.T){goFloor(elev.to);}
+}
+function elevFloorNow(){const a=.5,b=elev.T-.55,p=clamp((elev.t-a)/(b-a),0,1),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;return Math.round(elev.from+(elev.to-elev.from)*e);}
+function drawElev(){
+  ctx.fillStyle='#2a2f3a';ctx.fillRect(0,0,W,H);
+  const w=Math.min(W*.8,520),h=Math.min(H*.86,560),x=W/2-w/2,y=H/2-h/2+10;
+  // 電梯內部
+  const g=ctx.createLinearGradient(x,0,x+w,0);g.addColorStop(0,'#8e96a6');g.addColorStop(.5,'#d9dee7');g.addColorStop(1,'#8e96a6');ctx.fillStyle=g;ctx.fillRect(x,y,w,h);
+  // 樓層顯示
+  const n=elevFloorNow(),up=elev.to>n;
+  ctx.fillStyle='#140c0a';rr(W/2-70,y-2,140,52,10);ctx.fill();
+  ctx.font='900 34px ui-monospace,"Courier New",monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ff5a3c';ctx.shadowColor='#ff5a3c';ctx.shadowBlur=10;
+  ctx.fillText((up&&elev.t<elev.T-.55?'▲':' ')+n+'F',W/2,y+25);ctx.shadowBlur=0;
+  // 門
+  const t=elev.t,open=t<.45?1-t/.45:t>elev.T-.5?(t-(elev.T-.5))/.5:0,dw=w*.36,dh=h*.72,dy=y+70,cx=W/2;
+  ctx.fillStyle='#1b2130';ctx.fillRect(cx-dw,dy,dw*2,dh);
+  if(open>0){ // 門外：目的地的樣子
+    const tag=FLOOR_TAG[elev.to];emo(t<.45?'🚗':(tag?tag[0]:'🧟'),cx,dy+dh*.5,Math.min(dw,90));}
+  const off=dw*open;
+  const dg=ctx.createLinearGradient(0,dy,0,dy+dh);dg.addColorStop(0,'#c3c9d4');dg.addColorStop(1,'#9aa2b1');ctx.fillStyle=dg;
+  ctx.fillRect(cx-dw-off+0,dy,dw,dh);ctx.fillRect(cx+off,dy,dw,dh);
+  ctx.strokeStyle='#6b7385';ctx.lineWidth=2;ctx.strokeRect(cx-dw-off,dy,dw,dh);ctx.strokeRect(cx+off,dy,dw,dh);
+  // 按鈕面板與主角
+  ctx.fillStyle='#4a5263';rr(x+w-46,dy+dh*.3,30,90,8);ctx.fill();
+  for(let i=0;i<4;i++){ctx.fillStyle=i===0?'#ffd23f':'#d9dee7';ctx.beginPath();ctx.arc(x+w-31,dy+dh*.3+16+i*20,6,0,7);ctx.fill();}
+  drawHero(cx,dy+dh-10,Math.max(1.6,Math.min(W,H)/300),0,0,0,false);
+  txt(elev.t<elev.T-.5?`往 ${elev.to} 樓……`:`叮！${elev.to} 樓到了`,W/2,y+h+(H-(y+h))/2-4,18,'#fff');
+}
+
 /* ---------- 紀錄 ---------- */
 function stat(k,n){save.st=save.st||{};save.st[k]=(save.st[k]||0)+(n||1);}
 function logRec(t){save.st=save.st||{};const d=new Date(),L=save.st.log=save.st.log||[];
@@ -1931,6 +2004,7 @@ function frame(now){
   else if(scene==='drive'){if(!paused)updDrive(dt);ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));drawDrive();ctx.restore();}
   else if(scene==='draw2'){if(!paused&&!dr.open)updDraw2(dt);drawDraw2();if(dr.open)updDrawUI(dt);}
   else if(scene==='bike3'){if(!paused)upd3(dt);draw3();}
+  else if(scene==='elev'){updElev(dt);drawElev();}
   else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else if(curFloor===3&&scene==='result')draw3();else drawFloor();}
   requestAnimationFrame(frame);
 }
