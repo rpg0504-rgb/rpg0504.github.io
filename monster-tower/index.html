@@ -116,6 +116,18 @@
   .rank.win{background:#fff2d6;border:3px solid #ffd65c}
   .rank .bar{flex:1;height:12px;background:#eee;border-radius:6px;overflow:hidden}
   .rank .bar i{display:block;height:100%;background:#ff9f1c}
+  /* 3 樓：腳踏車特技秀 */
+  .k3{position:absolute;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom));display:flex;gap:12px;justify-content:center;align-items:flex-end;flex-wrap:wrap;padding:0 12px}
+  .kb{position:relative;width:76px;height:76px;border-radius:20px;font-size:30px;flex:none}
+  .kb small{font-size:12px}
+  .kb.wide{width:120px}
+  #b3Pause{right:calc(66px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))}
+  #b3Rec{right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))}
+  .shopRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:#fff;border:3px solid #e2d3b0;border-radius:14px;padding:8px 10px;margin-top:8px}
+  .shopRow .slot{font-weight:900;min-width:96px}
+  .shopRow button{border:2px solid #3a2f1c;border-radius:12px;background:#fffaf0;padding:6px 8px;font-family:inherit;font-weight:800;font-size:13px;color:#2a2416}
+  .shopRow button.cur{background:#effbe9;border-color:#4a9d3c}
+  .shopRow button:disabled{opacity:.4}
   #toast{position:fixed;left:50%;top:calc(64px + env(safe-area-inset-top));transform:translateX(-50%);z-index:50;pointer-events:none;
     background:rgba(20,24,36,.86);border:2px solid #ffd65c;color:#fff;padding:8px 16px;border-radius:14px;font-weight:800;font-size:16px;
     text-align:center;max-width:90vw;opacity:0;transition:opacity .25s}
@@ -143,6 +155,13 @@
   <button class="btn arrow" id="dR">▶</button>
   <button class="btn pz" id="bPause2">⏸</button>
   <button class="btn" id="bId2" style="width:58px;height:58px;right:calc(16px + env(safe-area-inset-right));top:calc(70px + env(safe-area-inset-top))"><span class="em" id="idEm2">🏹</span><small>身分</small></button>
+</div>
+
+<!-- 3 樓操作 -->
+<div id="ctl3" class="layer hidden">
+  <button class="btn pz" id="b3Pause">⏸</button>
+  <button class="btn pz" id="b3Rec">📜</button>
+  <div class="k3" id="k3"></div>
 </div>
 
 <!-- 家裡 -->
@@ -637,7 +656,7 @@ $('bId2').addEventListener('pointerdown',e=>{e.preventDefault();openIdentity();}
 function makeEnemy(kind,x,y,room){const t=ETYPE[kind];return{kind,x,y,r:t.r,hp:t.hp*FS.hp,max:t.hp*FS.hp,spd:t.spd*FS.spd,room,cd:rand(.6,1.6),aggro:false,flash:0,frozen:0,wind:0,stab:0,wdx:0,wdy:0,wt:0,losT:0,seen:false,face:1,bob:Math.random()*6,dead:false};}
 function goFloor(f){
   curFloor=clamp(f,1,TOP);FS=fscale(curFloor);
-  if(curFloor===2)startDraw2();else startFloor();
+  if(curFloor===2)startDraw2();else if(curFloor===3)startBike3();else startFloor();
 }
 function startFloor(){
   useWalls(WALLS1);
@@ -799,7 +818,7 @@ function floorComplete(){
 /* 過關：記錄樓層，選擇往上爬或回家 */
 function clearFloor(head){
   save.clears++;
-  if(curFloor!==2)logRec(`🚪 通過 ${curFloor} 樓（救回 ${rescued} 人）`);
+  if(curFloor===3)logRec('🎪 通過 3 樓馬戲團');else if(curFloor!==2)logRec(`🚪 通過 ${curFloor} 樓（救回 ${rescued} 人）`);
   if(curFloor>=TOP)logRec('🏆 登上 100 樓頂樓！');
   if(curFloor>=TOP){
     save.best=TOP;save.floor=1;save.c2=null;save.tops=(save.tops||0)+1;save.money+=100;persist();
@@ -1130,6 +1149,47 @@ const TOPICS=[
     p.poly([...Array(15)].map((_,i)=>[.5+Math.cos(i/14*Math.PI)*.3,.4+Math.sin(i/14*Math.PI)*.3]),'#ff5a6a',1);
     [[.38,.5],[.5,.56],[.62,.5],[.44,.62],[.56,.62]].forEach(([x,y])=>p.ell(x,y,.012,.022,'#222',1));}},
 ];
+/* 更多題目（加在後面，舊存檔的題目編號不會變） */
+TOPICS.push(
+  {n:'小狗',d:p=>{p.circ(.5,.52,.24,'#c98a4a',1);p.ell(.27,.5,.07,.16,'#8a5a30',1);p.ell(.73,.5,.07,.16,'#8a5a30',1);p.dot(.42,.47,.03,'#222');p.dot(.58,.47,.03,'#222');p.ell(.5,.6,.06,.04,'#222',1);p.arc(.5,.64,.06,.3,2.84,'#a33',3);p.ell(.52,.72,.03,.05,'#ff7eb6',1);}},
+  {n:'兔子',d:p=>{p.ell(.4,.2,.05,.17,'#fff',1);p.ell(.6,.2,.05,.17,'#fff',1);p.circ(.5,.5,.2,'#fff',1);p.dot(.43,.47,.025,'#222');p.dot(.57,.47,.025,'#222');p.dot(.5,.55,.02,'#ff7eb6');p.circ(.5,.82,.13,'#fff',1);p.ell(.42,.2,.02,.1,'#ffb3c8',1);}},
+  {n:'小鳥',d:p=>{p.circ(.48,.5,.2,'#4a9ee8',1);p.poly([[.66,.48],[.8,.52],[.66,.56]],'#ff9f1c',1);p.dot(.55,.44,.03,'#222');p.ell(.4,.55,.12,.07,'#3b7fc4',1);p.line([[.42,.7],[.42,.85]],'#ff9f1c',3);p.line([[.52,.7],[.52,.85]],'#ff9f1c',3);p.line([[.1,.88],[.9,.88]],'#8a5a30',6);}},
+  {n:'烏龜',d:p=>{p.ell(.5,.55,.28,.18,'#5bc46a',1);p.ell(.5,.5,.22,.14,'#3b8f4a',1);p.circ(.83,.52,.08,'#8be07b',1);p.dot(.85,.5,.015,'#222');[[.3,.7],[.45,.73],[.6,.73],[.72,.7]].forEach(([x,y])=>p.ell(x,y,.04,.05,'#8be07b',1));}},
+  {n:'章魚',d:p=>{p.circ(.5,.38,.22,'#ff7eb6',1);for(let i=0;i<6;i++){const x=.3+i*.08;p.line([[x,.55],[x-.03,.7],[x+.02,.82],[x-.02,.92]],'#ff7eb6',8);}p.dot(.43,.36,.03,'#222');p.dot(.57,.36,.03,'#222');p.arc(.5,.42,.05,.3,2.84,'#a33',3);}},
+  {n:'大象',d:p=>{p.ell(.5,.55,.3,.2,'#9fb2c8',1);p.circ(.3,.42,.16,'#9fb2c8',1);p.ell(.18,.42,.09,.13,'#b8c8da',1);p.line([[.22,.5],[.18,.68],[.24,.78]],'#9fb2c8',12);p.dot(.32,.38,.025,'#222');[.35,.5,.62,.74].forEach(x=>p.rect(x-.04,.68,x+.04,.86,'#9fb2c8',1));}},
+  {n:'長頸鹿',d:p=>{p.ell(.55,.7,.2,.1,'#f2c84b',1);p.poly([[.36,.68],[.3,.18],[.38,.18],[.44,.66]],'#f2c84b',1);p.ell(.3,.15,.09,.06,'#f2c84b',1);p.dot(.28,.13,.015,'#222');[[.4,.7],[.55,.66],[.65,.73],[.35,.4],[.36,.28]].forEach(([x,y])=>p.dot(x,y,.025,'#b07a3a'));[.42,.52,.62,.7].forEach(x=>p.line([[x,.78],[x,.94]],'#f2c84b',5));}},
+  {n:'青蛙',d:p=>{p.ell(.5,.6,.28,.2,'#5bc46a',1);p.circ(.36,.38,.09,'#5bc46a',1);p.circ(.64,.38,.09,'#5bc46a',1);p.dot(.36,.38,.04,'#222');p.dot(.64,.38,.04,'#222');p.arc(.5,.6,.14,.3,2.84,'#a33',4);p.ell(.5,.9,.4,.05,'#4a9ee8',1);}},
+  {n:'企鵝',d:p=>{p.ell(.5,.55,.2,.3,'#2a2a30',1);p.ell(.5,.6,.13,.22,'#fff',1);p.dot(.44,.38,.025,'#fff');p.dot(.56,.38,.025,'#fff');p.poly([[.46,.44],[.54,.44],[.5,.5]],'#ff9f1c',1);p.ell(.42,.88,.06,.03,'#ff9f1c',1);p.ell(.58,.88,.06,.03,'#ff9f1c',1);}},
+  {n:'獅子',d:p=>{for(let i=0;i<12;i++){const a=i/12*6.283;p.circ(.5+Math.cos(a)*.22,.5+Math.sin(a)*.22,.09,'#c9741a',1);}p.circ(.5,.5,.2,'#f2c84b',1);p.dot(.43,.46,.03,'#222');p.dot(.57,.46,.03,'#222');p.poly([[.46,.55],[.54,.55],[.5,.6]],'#6b4a2b',1);}},
+  {n:'小豬',d:p=>{p.circ(.5,.5,.26,'#ffb3c8',1);p.poly([[.3,.32],[.32,.18],[.42,.28]],'#ff9fbf',1);p.poly([[.7,.32],[.68,.18],[.58,.28]],'#ff9fbf',1);p.ell(.5,.58,.1,.07,'#ff8fb1',1);p.dot(.46,.58,.015,'#a33');p.dot(.54,.58,.015,'#a33');p.dot(.42,.45,.025,'#222');p.dot(.58,.45,.025,'#222');}},
+  {n:'蘋果',d:p=>{p.circ(.5,.56,.27,'#e8483a',1);p.line([[.5,.3],[.52,.18]],'#6b4a2b',5);p.ell(.6,.22,.08,.04,'#5bc46a',1);p.ell(.4,.48,.05,.08,'#ff9a8a',1);}},
+  {n:'草莓',d:p=>{p.poly([[.25,.35],[.75,.35],[.5,.9]],'#e8483a',1);p.poly([[.3,.36],[.4,.22],[.5,.32],[.6,.22],[.7,.36]],'#5bc46a',1);[[.4,.45],[.55,.45],[.48,.58],[.4,.65],[.58,.62],[.5,.75]].forEach(([x,y])=>p.ell(x,y,.012,.02,'#ffd23f',1));}},
+  {n:'披薩',d:p=>{p.poly([[.15,.25],[.85,.25],[.5,.9]],'#ffd23f',1);p.line([[.15,.25],[.85,.25]],'#e0a35a',12);[[.4,.38],[.6,.38],[.5,.55],[.45,.7]].forEach(([x,y])=>p.circ(x,y,.05,'#e8483a',1));p.ell(.62,.5,.03,.02,'#5bc46a',1);}},
+  {n:'漢堡',d:p=>{p.ell(.5,.35,.3,.16,'#e0a35a',1);p.rect(.22,.48,.78,.55,'#5bc46a',1);p.rect(.2,.55,.8,.64,'#6b3a1b',1);p.rect(.22,.64,.78,.68,'#ffd23f',1);p.ell(.5,.74,.3,.08,'#e0a35a',1);[[.4,.28],[.5,.25],[.6,.29]].forEach(([x,y])=>p.ell(x,y,.015,.01,'#fff',1));}},
+  {n:'甜甜圈',d:p=>{p.circ(.5,.5,.3,'#e0a35a',1);p.circ(.5,.5,.25,'#ff7eb6',1);p.circ(.5,.5,.09,'#fff',1);[[.35,.4],[.6,.32],[.68,.55],[.4,.66],[.55,.7]].forEach(([x,y],i)=>p.line([[x,y],[x+.03,y+.02]],BRIGHT[i],5));}},
+  {n:'棒棒糖',d:p=>{p.line([[.5,.55],[.5,.95]],'#e8e2d4',8);p.circ(.5,.35,.24,'#ff7eb6',1);p.line([...Array(30)].map((_,i)=>{const a=i*.55,r=.22*i/30;return[.5+Math.cos(a)*r,.35+Math.sin(a)*r];}),'#fff',6);}},
+  {n:'月亮和星星',d:p=>{p.rect(0,0,1,1,'#1f2a55',1);p.circ(.4,.45,.22,'#ffe066',1);p.circ(.5,.38,.2,'#1f2a55',1);[[.75,.25],[.8,.6],[.6,.78],[.25,.8]].forEach(([x,y])=>EXTRAS.star(p,x,y,.05,'#ffe066'));}},
+  {n:'雪人',d:p=>{p.circ(.5,.7,.22,'#fff',1);p.circ(.5,.38,.15,'#fff',1);p.rect(.38,.12,.62,.24,'#2a2a30',1);p.rect(.33,.23,.67,.26,'#2a2a30',1);p.dot(.45,.36,.02,'#222');p.dot(.55,.36,.02,'#222');p.poly([[.5,.4],[.62,.42],[.5,.44]],'#ff9f1c',1);p.line([[.35,.6],[.15,.5]],'#8a5a30',4);p.line([[.65,.6],[.85,.5]],'#8a5a30',4);p.rect(.4,.5,.6,.54,'#e8483a',1);}},
+  {n:'聖誕樹',d:p=>{p.poly([[.5,.1],[.25,.45],[.75,.45]],'#2f8a3a',1);p.poly([[.5,.25],[.18,.7],[.82,.7]],'#2f8a3a',1);p.rect(.45,.7,.55,.85,'#8a5a30',1);EXTRAS.star(p,.5,.1,.06,'#ffd23f');[[.4,.4],[.6,.55],[.35,.6],[.55,.35]].forEach(([x,y],i)=>p.dot(x,y,.025,BRIGHT[i]));}},
+  {n:'熱氣球',d:p=>{p.ell(.5,.35,.26,.28,'#e8483a',1);p.ell(.5,.35,.12,.28,'#ffd23f',1);p.line([[.32,.55],[.42,.75]],'#6b4a2b',2);p.line([[.68,.55],[.58,.75]],'#6b4a2b',2);p.rect(.4,.75,.6,.88,'#8a5a30',1);EXTRAS.cloud(p,.15,.8,.08);}},
+  {n:'飛機',d:p=>{p.ell(.5,.5,.38,.08,'#e8edf5',1);p.poly([[.45,.5],[.3,.2],[.4,.2],[.6,.5]],'#4a9ee8',1);p.poly([[.45,.5],[.3,.8],[.4,.8],[.6,.5]],'#4a9ee8',1);p.poly([[.15,.5],[.1,.35],[.2,.45]],'#e8483a',1);[.55,.65,.75].forEach(x=>p.dot(x,.49,.02,'#4a9ee8'));}},
+  {n:'帆船',d:p=>{p.poly([[.15,.65],[.85,.65],[.72,.8],[.28,.8]],'#8a5a30',1);p.line([[.5,.15],[.5,.65]],'#555',4);p.poly([[.52,.18],[.8,.6],[.52,.6]],'#fff',1);p.poly([[.48,.25],[.25,.6],[.48,.6]],'#ff9f1c',1);p.line([...Array(12)].map((_,i)=>[i/11,.88+Math.sin(i*1.5)*.02]),'#4a9ee8',5);}},
+  {n:'火車',d:p=>{p.rect(.1,.45,.55,.75,'#e8483a',1);p.rect(.55,.3,.85,.75,'#4a6ee8',1);p.rect(.62,.36,.78,.5,'#bfe6ff',1);p.rect(.2,.3,.3,.45,'#2a2a30',1);[.22,.42,.65,.8].forEach(x=>p.circ(x,.78,.07,'#2a2a30',1));EXTRAS.cloud(p,.25,.18,.07);}},
+  {n:'腳踏車',d:p=>{p.circ(.25,.65,.17,'#2a2a30',0,5);p.circ(.75,.65,.17,'#2a2a30',0,5);p.line([[.25,.65],[.45,.4],[.7,.4],[.75,.65]],'#e8483a',5);p.line([[.45,.4],[.5,.65],[.25,.65]],'#e8483a',5);p.line([[.42,.33],[.52,.33]],'#2a2a30',5);p.line([[.7,.4],[.68,.28],[.76,.26]],'#555',4);}},
+  {n:'飛碟',d:p=>{p.ell(.5,.5,.38,.11,'#9fb2c8',1);p.ell(.5,.42,.16,.12,'#8fe3c4',1);p.circ(.5,.4,.05,'#5bc46a',1);p.dot(.48,.39,.01,'#222');p.dot(.52,.39,.01,'#222');[.25,.4,.6,.75].forEach((x,i)=>p.dot(x,.52,.025,BRIGHT[i]));p.poly([[.4,.6],[.6,.6],[.7,.9],[.3,.9]],'#ffe066',1);}},
+  {n:'皇冠',d:p=>{EXTRAS.crown(p,.5,.5,.3,'#ffd23f');[[.3,.55],[.5,.55],[.7,.55]].forEach(([x,y],i)=>p.dot(x,y,.04,['#e8483a','#4a9ee8','#5bc46a'][i]));}},
+  {n:'鬧鐘',d:p=>{p.circ(.5,.55,.28,'#e8483a',1);p.circ(.5,.55,.22,'#fff',1);p.circ(.3,.25,.08,'#ffd23f',1);p.circ(.7,.25,.08,'#ffd23f',1);p.line([[.5,.55],[.5,.4]],'#222',4);p.line([[.5,.55],[.62,.6]],'#222',4);p.line([[.35,.82],[.3,.9]],'#555',4);p.line([[.65,.82],[.7,.9]],'#555',4);}},
+  {n:'吉他',d:p=>{p.circ(.45,.68,.17,'#c9741a',1);p.circ(.45,.45,.12,'#c9741a',1);p.circ(.45,.62,.05,'#3a2f1c',1);p.rect(.43,.08,.47,.45,'#6b4a2b',1);p.rect(.4,.05,.5,.12,'#3a2f1c',1);for(let i=0;i<3;i++)p.line([[.435+i*.015,.1],[.435+i*.015,.75]],'#eee',1.5);}},
+  {n:'禮物盒',d:p=>{p.rect(.2,.4,.8,.85,'#7c5cff',1);p.rect(.15,.3,.85,.42,'#9f86ff',1);p.rect(.45,.3,.55,.85,'#ffd23f',1);p.ell(.4,.22,.1,.07,'#ffd23f',1);p.ell(.6,.22,.1,.07,'#ffd23f',1);}},
+  {n:'足球',d:p=>{p.circ(.5,.5,.3,'#fff',1);p.poly([...Array(5)].map((_,i)=>{const a=-Math.PI/2+i*1.2566;return[.5+Math.cos(a)*.1,.5+Math.sin(a)*.1];}),'#2a2a30',1);[0,1,2,3,4].forEach(i=>{const a=-Math.PI/2+i*1.2566;p.line([[.5+Math.cos(a)*.1,.5+Math.sin(a)*.1],[.5+Math.cos(a)*.28,.5+Math.sin(a)*.28]],'#2a2a30',3);});}},
+  {n:'杯子蛋糕',d:p=>{p.poly([[.28,.5],[.72,.5],[.65,.88],[.35,.88]],'#4a9ee8',1);p.circ(.38,.45,.12,'#ff9fc4',1);p.circ(.62,.45,.12,'#ff9fc4',1);p.circ(.5,.35,.14,'#ff9fc4',1);p.dot(.5,.18,.04,'#e8483a');[[.4,.4],[.55,.3],[.6,.45]].forEach(([x,y],i)=>p.line([[x,y],[x+.02,y+.02]],BRIGHT[i+3],4));}},
+  {n:'香菇',d:p=>{p.rect(.4,.5,.6,.85,'#f6e6c8',1);p.poly([...Array(13)].map((_,i)=>[.5+Math.cos(Math.PI+i/12*Math.PI)*.32,.52+Math.sin(Math.PI+i/12*Math.PI)*.3]),'#e8483a',1);[[.38,.38],[.58,.32],[.66,.45],[.45,.46]].forEach(([x,y])=>p.circ(x,y,.04,'#fff',1));}},
+  {n:'仙人掌',d:p=>{p.rect(.42,.2,.58,.85,'#4caf50',1);p.rect(.22,.4,.42,.5,'#4caf50',1);p.rect(.22,.28,.32,.5,'#4caf50',1);p.rect(.58,.5,.76,.6,'#4caf50',1);p.rect(.68,.36,.78,.6,'#4caf50',1);p.poly([[.3,.85],[.7,.85],[.65,.95],[.35,.95]],'#c9741a',1);EXTRAS.star(p,.5,.17,.05,'#ff7eb6');}},
+  {n:'燈塔',d:p=>{p.poly([[.4,.25],[.6,.25],[.66,.85],[.34,.85]],'#fff',1);p.rect(.37,.4,.63,.48,'#e8483a',1);p.rect(.36,.62,.64,.7,'#e8483a',1);p.rect(.4,.15,.6,.25,'#ffd23f',1);p.poly([[.38,.15],[.5,.05],[.62,.15]],'#e8483a',1);p.poly([[.6,.18],[.95,.08],[.95,.3]],'#fff3a0',1);p.line([...Array(12)].map((_,i)=>[i/11,.9+Math.sin(i*1.3)*.02]),'#4a9ee8',6);}},
+  {n:'鯨魚',d:p=>{p.ell(.45,.6,.32,.18,'#4a6ee8',1);p.poly([[.75,.55],[.92,.4],[.9,.7]],'#4a6ee8',1);p.ell(.42,.68,.24,.08,'#bfe6ff',1);p.dot(.25,.55,.025,'#222');p.line([[.4,.42],[.38,.25]],'#8fd3ff',4);p.line([[.4,.42],[.46,.26]],'#8fd3ff',4);}},
+  {n:'螃蟹',d:p=>{p.ell(.5,.6,.24,.15,'#e8483a',1);p.circ(.22,.38,.09,'#e8483a',1);p.circ(.78,.38,.09,'#e8483a',1);p.line([[.3,.5],[.24,.44]],'#e8483a',5);p.line([[.7,.5],[.76,.44]],'#e8483a',5);[.32,.42,.58,.68].forEach(x=>p.line([[x,.7],[x+(x<.5?-.06:.06),.82]],'#e8483a',4));p.dot(.44,.52,.025,'#222');p.dot(.56,.52,.025,'#222');}},
+  {n:'向日葵',d:p=>{p.line([[.5,.55],[.5,.95]],'#4caf50',7);for(let i=0;i<12;i++){const a=i/12*6.283;p.ell(.5+Math.cos(a)*.2,.38+Math.sin(a)*.2,.07,.07,'#ffd23f',1);}p.circ(.5,.38,.13,'#6b4a2b',1);p.ell(.62,.75,.09,.04,'#5bc46a',1);}},
+);
 /* 妖怪喜歡加的「創意小東西」 */
 const EXTRAS={
   star:(p,x,y,s,c)=>p.poly([...Array(10)].map((_,i)=>{const a=-Math.PI/2+i*Math.PI/5,r=i%2?s*.45:s;return[x+Math.cos(a)*r,y+Math.sin(a)*r];}),c,1),
@@ -1284,7 +1344,9 @@ function layoutDraw(){
 }
 addEventListener('resize',()=>{if(dr.open)layoutDraw();});
 function openDraw(room){
-  const used=new Set(c2().rounds.map(r=>r.topic));let pool=TOPICS.map((_,i)=>i).filter(i=>!used.has(i));if(!pool.length)pool=TOPICS.map((_,i)=>i);
+  // 這一場用過的、以前比賽畫過的題目都不要再出；全部出過一輪才重新來
+  const used=new Set([...c2().rounds.map(r=>r.topic),...(save.usedTopics||[])]);let pool=TOPICS.map((_,i)=>i).filter(i=>!used.has(i));
+  if(!pool.length){save.usedTopics=[];const cur=new Set(c2().rounds.map(r=>r.topic));pool=TOPICS.map((_,i)=>i).filter(i=>!cur.has(i));}
   Object.assign(dr,{open:true,paused:false,room,topic:pick(pool),t:0,hurry:0,strokes:0,drawing:false});dr.colors.clear();
   dr.rivals=RIVALS.map((_,i)=>rivalDrawing(i,dr.topic));
   dctx.fillStyle='#fff';dctx.fillRect(0,0,480,480);
@@ -1315,7 +1377,7 @@ function playerQuality(){
 function endDraw(){
   const sm=document.createElement('canvas');sm.width=sm.height=200;const sc=sm.getContext('2d');sc.drawImage(DC,0,0,200,200);
   const round={room:dr.room,topic:dr.topic,imgs:[sm.toDataURL('image/jpeg',.7),...dr.rivals.map(rv=>strokesURL(rv.st))],q:[playerQuality(),...dr.rivals.map(rv=>+rv.q.toFixed(3))]};
-  c2().rounds.push(round);persist();
+  c2().rounds.push(round);save.usedTopics=[...(save.usedTopics||[]),dr.topic];persist();
   dr.open=false;$('drawUI').classList.add('hidden');
   const n=c2().rounds.length;burst(P.x,P.y,'#ffd23f',18);sfx(784,.2,'triangle',.06,300);
   if(n>=ROUNDS)toast('🖼️ 10 張都畫好了！去右邊的 🗳️ 投票室',3200);
@@ -1383,6 +1445,394 @@ function voteResult(){
   }
 }
 
+/* =========================================================
+   3 樓：腳踏車特技秀
+   四輪（輔助輪）→ 特技表演；兩輪 → 打鼓比賽；一輪 → 獨輪車平衡
+   表演失敗，妖怪追來吃輪子（20 秒，左右換車道閃開）
+   ========================================================= */
+const WHEELS={
+  wood:{n:'木頭輪',e:'🪵',col:'#b07a3a',bites:1,spd:1,price:5,d:'最不堅固，妖怪一口就吃掉'},
+  rubber:{n:'橡皮輪',e:'⚫',col:'#2f3036',bites:2,spd:1.1,price:12,d:'普通，要咬 2 口'},
+  bolt:{n:'閃電輪',e:'⚡',col:'#ffcf1f',bites:3,spd:1.5,price:25,d:'逃跑超快！可是妖怪最想吃'},
+  iron:{n:'鐵輪',e:'⚙️',col:'#8a94a8',bites:6,spd:.95,price:30,d:'超硬，妖怪要咬 6 口'},
+};
+const WKEYS=['wood','rubber','bolt','iron'];
+const SLOTS=[['front','前輪'],['back','後輪'],['auxL','左輔助輪'],['auxR','右輔助輪']];
+const SHOWS_TO_PASS=5,CHASE_TIME=20,UNI_TIME=60;
+const STARTER_BIKE={front:'rubber',back:'rubber',auxL:'wood',auxR:'wood'};
+const TRICKS=[['丟火把','🔥'],['放開雙手','🙌'],['站上座墊','🧍'],['拋三顆球','⚽'],['轉呼拉圈','⭕'],['吹泡泡','🫧'],['抱貓咪騎車','🐱'],['拋彩帶','🎀'],['頭頂盤子','🍽️'],['拉小提琴','🎻']];
+const PERFORMERS=[{n:'阿明',e:'🧑‍🎤'},{n:'小美',e:'👩‍🎤'},{n:'大雄',e:'👨‍🎤'}];
+const ARROWS4=['←','↑','→','↓'],DRUMS=['左鼓','右鼓','鈸'];
+const b3={ph:'menu',t:0};
+function bike(){if(!save.bike)save.bike={...STARTER_BIKE};return save.bike;}
+function f3(){if(!save.f3)save.f3={wins:0};return save.f3;}
+function mainsN(){const b=bike();return(b.front?1:0)+(b.back?1:0);}
+function auxN(){const b=bike();return(b.auxL?1:0)+(b.auxR?1:0);}
+function stage3(){const m=mainsN();return m===0?'none':m===1?'uni':auxN()?'stunt':'drum';}
+function bikeText(){const b=bike();return SLOTS.filter(([k])=>b[k]).map(([k,n])=>WHEELS[b[k]].e).join('')+`（${['沒有輪子','獨輪車','腳踏車','三輪車','四輪車'][mainsN()+auxN()]}）`;}
+function bikeSpeed(){const b=bike(),ws=SLOTS.map(([k])=>b[k]).filter(Boolean);return ws.length?ws.reduce((a,w)=>a+WHEELS[w].spd,0)/ws.length:1;}
+
+function startBike3(){
+  scene='bike3';setLayers();bike();f3();persist();
+  Object.assign(b3,{ph:'menu',t:0,claps:[],fx:[]});set3Keys();
+  showModal(`<h2>🎪 最高樓 3F：妖怪馬戲團</h2>
+   <div class="tips">
+   <p>🚲 騎著腳踏車上台表演，旁邊坐著一排妖怪觀眾。</p>
+   <p>🤹 <b>四輪車（有輔助輪）</b>：表演特技，畫面出現一串箭頭，<b>照順序按</b>。錯太多次（3 次），妖怪就來吃你的輔助輪！</p>
+   <p>🥁 <b>兩輪腳踏車</b>：跟人類表演者比打鼓，照順序按鼓。得票最高就贏；輸了妖怪來吃一個輪子。</p>
+   <p>🛞 <b>獨輪車</b>：用左右按鈕保持平衡 ${UNI_TIME} 秒。倒下的話最後一個輪子會被吃掉，這層就失敗了。</p>
+   <p>🔥 妖怪來吃輪子時快逃！輪子會著火變快，<b>左右換車道</b>閃開妖怪，撐過 ${CHASE_TIME} 秒就賺到錢。</p>
+   <p>🛒 表演之間可以去<b>輪子店</b>：🪵木頭輪（一口就被吃）→ ⚫橡皮輪 → ⚡閃電輪（最快，但妖怪最想吃）→ ⚙️鐵輪（最硬）</p>
+   <p>🌟 成功表演 <b>${SHOWS_TO_PASS} 場</b>就能上 4 樓！（現在 ${f3().wins} 場）</p>
+   </div><div class="row"><button class="pill red" id="mGo">上台！</button></div>`);
+  $('mGo').onclick=hideModal;
+}
+
+/* ---------- 按鈕 ---------- */
+function set3Keys(){
+  const k=$('k3');let h='';
+  if(b3.ph==='menu'){
+    const st=stage3(),lbl={stunt:'🤹 表演特技',drum:'🥁 打鼓比賽',uni:'🛞 獨輪車平衡'}[st]||'';
+    h=`<button class="pill red" id="k3Go" style="font-size:18px;padding:14px 22px">${lbl}</button><button class="pill" id="k3Shop" style="font-size:18px;padding:14px 22px">🛒 輪子店</button>`;
+  }else if(b3.ph==='stunt')h=ARROWS4.map((a,i)=>`<button class="btn kb" data-k="${i}">${a}</button>`).join('');
+  else if(b3.ph==='drum')h=DRUMS.map((a,i)=>`<button class="btn kb wide" data-k="${i}"><span class="em">${i<2?'🥁':'🔔'}</span><small>${a}</small></button>`).join('');
+  else if(b3.ph==='chase')h=`<button class="btn kb wide" data-k="0">◀</button><div style="flex:1"></div><button class="btn kb wide" data-k="1">▶</button>`;
+  else if(b3.ph==='uni')h=`<button class="btn kb wide" data-h="-1">◀<small>往左</small></button><div style="flex:1"></div><button class="btn kb wide" data-h="1">▶<small>往右</small></button>`;
+  k.innerHTML=h;
+  if($('k3Go'))$('k3Go').onclick=()=>startShow();
+  if($('k3Shop'))$('k3Shop').onclick=openWheelShop;
+  k.querySelectorAll('[data-k]').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();key3(+b.dataset.k);b.classList.add('on');setTimeout(()=>b.classList.remove('on'),120);}));
+  k.querySelectorAll('[data-h]').forEach(b=>{const d=+b.dataset.h;
+    b.addEventListener('pointerdown',e=>{e.preventDefault();b3.hold=d;b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}});
+    const up=()=>{if(b3.hold===d)b3.hold=0;b.classList.remove('on');};b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);});
+}
+addEventListener('keydown',e=>{
+  if(scene!=='bike3'||!$('modal').classList.contains('hidden'))return;
+  const c=e.code;
+  if(b3.ph==='stunt'){const m={ArrowLeft:0,ArrowUp:1,ArrowRight:2,ArrowDown:3,KeyA:0,KeyW:1,KeyD:2,KeyS:3}[c];if(m!==undefined)key3(m);}
+  else if(b3.ph==='drum'){const m={KeyJ:0,KeyK:1,KeyL:2,ArrowLeft:0,ArrowRight:1,ArrowUp:2,KeyA:0,KeyD:1,KeyW:2}[c];if(m!==undefined)key3(m);}
+  else if(b3.ph==='chase'){if(c==='ArrowLeft'||c==='KeyA')key3(0);if(c==='ArrowRight'||c==='KeyD')key3(1);}
+  else if(b3.ph==='uni'){if(c==='ArrowLeft'||c==='KeyA')b3.hold=-1;if(c==='ArrowRight'||c==='KeyD')b3.hold=1;}
+});
+addEventListener('keyup',e=>{if(b3.ph==='uni'&&['ArrowLeft','ArrowRight','KeyA','KeyD'].includes(e.code))b3.hold=0;});
+$('b3Pause').addEventListener('pointerdown',e=>{e.preventDefault();openPause();});
+$('b3Rec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
+
+/* ---------- 輪子店 ---------- */
+function openWheelShop(){
+  if(b3.ph!=='menu'){toast('表演中不能去輪子店，等這場結束吧！');return;}
+  const b=bike(),m=mainsN();
+  let h=`<h2>🛒 輪子店</h2><p>你有 <b>💰 ${save.money}</b> 元。現在的車子：<b>${bikeText()}</b></p>
+   <p style="color:#7a6a4a;font-size:13px">換一顆輪子會把原本那顆換掉。輔助輪要先有前輪和後輪才能裝。</p>`;
+  SLOTS.forEach(([k,n])=>{const isAux=k.startsWith('aux'),cur=b[k],need=isAux&&m<2;
+    h+=`<div class="shopRow"><span class="slot">${n}：${cur?WHEELS[cur].e+' '+WHEELS[cur].n:'（沒有）'}</span>`;
+    WKEYS.forEach(w=>{const W=WHEELS[w];h+=`<button data-buy="${k}|${w}" class="${cur===w?'cur':''}" ${cur===w||need||save.money<W.price?'disabled':''}>${W.e} ${W.n} 💰${W.price}</button>`;});
+    h+=need?'<span style="font-size:12px;color:#c4483a">先補齊前後輪</span>':'';h+='</div>';});
+  h+=`<div class="tips" style="margin-top:10px">${WKEYS.map(w=>`<p>${WHEELS[w].e} <b>${WHEELS[w].n}</b>：${WHEELS[w].d}</p>`).join('')}</div>
+   <div class="row"><button class="pill green" id="mClose">好了</button></div>`;
+  showModal(h);
+  document.querySelectorAll('[data-buy]').forEach(bt=>bt.onclick=()=>{const[k,w]=bt.dataset.buy.split('|'),W=WHEELS[w];
+    if(save.money<W.price)return;save.money-=W.price;bike()[k]=w;persist();sfx(880,.15,'triangle',.06,400);
+    logRec(`🛒 買了${W.e}${W.n}裝在${SLOTS.find(x=>x[0]===k)[1]}`);toast(`裝好 ${W.e} ${W.n} 了！`);openWheelShop();});
+  $('mClose').onclick=()=>{hideModal();set3Keys();};
+}
+
+/* ---------- 開始一場表演 ---------- */
+function startShow(){
+  const st=stage3();if(st==='none')return;
+  b3.t=0;b3.fx=[];b3.claps=[];
+  if(st==='stunt'){
+    const list=[...TRICKS].sort(()=>Math.random()-.5).slice(0,5);
+    Object.assign(b3,{ph:'stunt',tricks:list,ti:0,miss:0,seq:null,gap:1.2,anim:0});
+    toast('🤹 照順序按箭頭！錯 3 次妖怪就會生氣',2200);
+  }else if(st==='drum'){
+    Object.assign(b3,{ph:'drum',ri:0,rounds:4,seq:null,gap:1.2,scores:[],anim:0,
+      rivals:PERFORMERS.map(p=>({...p,score:Math.round(rand(58,90))}))});
+    toast('🥁 打鼓比賽！照順序按鼓，打得又快又準',2200);
+  }else{
+    Object.assign(b3,{ph:'uni',ang:rand(-.05,.05),vel:0,wind:0,hold:0,left:UNI_TIME});
+    toast(`🛞 按住左右保持平衡 ${UNI_TIME} 秒！`,2200);
+  }
+  set3Keys();sfx(660,.12,'triangle',.05,300);
+}
+function newSeq(len,keys,time){b3.seq={k:[...Array(len)].map(()=>Math.floor(rand(0,keys))),i:0,t:time,T:time};}
+function key3(k){
+  if(b3.ph==='chase'){b3.lane=clamp(b3.lane+(k?1:-1),0,2);sfx(400,.04,'triangle',.03);return;}
+  const q=b3.seq;if(!q||b3.gap>0)return;
+  if(q.k[q.i]===k){q.i++;sfx(b3.ph==='drum'?[180,240,900][k]:520+q.i*60,.08,b3.ph==='drum'&&k===2?'square':'triangle',.06);
+    if(b3.ph==='drum')b3.fx.push({e:k<2?'🥁':'💥',x:k===0?-40:k===1?40:0,t:.4});
+    if(q.i>=q.k.length)seqDone(true);}
+  else{sfx(120,.2,'sawtooth',.06,-40);shake=6;seqDone(false);}
+}
+function seqDone(ok){
+  const q=b3.seq;
+  if(b3.ph==='stunt'){
+    const tr=b3.tricks[b3.ti];
+    if(ok){b3.anim=1.4;b3.claps=[0,1,2,3].map(i=>({i,t:1.4}));floatT3(`✨ ${tr[0]}成功！`,'#ffe066');sfx(784,.15,'triangle',.06,300);}
+    else{b3.miss++;floatT3(b3.miss>=2?'😠 妖怪們開始生氣了……':'😬 出錯了！','#ff8a7a');}
+    b3.ti++;b3.seq=null;b3.gap=1.3;
+  }else{
+    const part=q.i/q.k.length,speed=ok?q.t/q.T:0;b3.scores.push(Math.min(1,part)*80+speed*25);
+    floatT3(ok?(speed>.4?'🔥 超快！':'👍 打好了'):'💦 打錯了','#ffe066');
+    b3.ri++;b3.seq=null;b3.gap=1.1;
+  }
+}
+const f3txt=[];function floatT3(s,col){f3txt.push({s,col,t:1.4});}
+
+/* ---------- 每一幀 ---------- */
+function upd3(dt){
+  b3.t+=dt;
+  for(const f of f3txt)f.t-=dt;while(f3txt.length&&f3txt[0].t<=0)f3txt.shift();
+  for(const c of b3.claps||[])c.t-=dt;b3.claps=(b3.claps||[]).filter(c=>c.t>0);
+  for(const f of b3.fx||[])f.t-=dt;b3.fx=(b3.fx||[]).filter(f=>f.t>0);
+  if(b3.anim>0)b3.anim-=dt;
+  if(b3.ph==='stunt'){
+    if(b3.gap>0){b3.gap-=dt;if(b3.gap<=0){
+      if(b3.miss>=3){endStunt(false);return;}
+      if(b3.ti>=b3.tricks.length){endStunt(true);return;}
+      newSeq(3+Math.floor(rand(0,2))+Math.min(2,Math.floor(f3().wins/2)),4,1.0*(5+Math.min(2,Math.floor(f3().wins/2)))+1.4);}}
+    else if(b3.seq){b3.seq.t-=dt;if(b3.seq.t<=0){toast('⏰ 太慢了！');seqDone(false);}}
+  }else if(b3.ph==='drum'){
+    if(b3.gap>0){b3.gap-=dt;if(b3.gap<=0){if(b3.ri>=b3.rounds){endDrum();return;}const L=5+Math.floor(rand(0,3));newSeq(L,3,.85*L+1.6);}}
+    else if(b3.seq){b3.seq.t-=dt;if(b3.seq.t<=0){toast('⏰ 太慢了！');seqDone(false);}}
+  }else if(b3.ph==='uni'){
+    const w=bike().front||bike().back,wf=w==='iron'?.7:w==='bolt'?1.25:1;
+    b3.wind+=(rand(-1,1)*2.2-b3.wind*.6)*dt*wf;
+    b3.vel+=(b3.ang*2.0+b3.wind*.9+b3.hold*3.4)*dt;b3.vel*=Math.pow(.6,dt);b3.ang+=b3.vel*dt;
+    b3.left-=dt;
+    if(Math.abs(b3.ang)>1.0){endUni(false);return;}
+    if(b3.left<=0){endUni(true);return;}
+  }else if(b3.ph==='chase')updChase(dt);
+}
+
+/* ---------- 結果 ---------- */
+function winShow(money,msg){
+  const F=f3();F.wins++;save.money+=money;stat('shows');persist();
+  logRec(`🎪 3 樓表演成功：${msg}（💰+${money}）`);
+  b3.ph='menu';b3.seq=null;set3Keys();
+  sfx(523,.2,'triangle',.06);setTimeout(()=>sfx(784,.3,'triangle',.06),160);
+  if(F.wins>=SHOWS_TO_PASS){
+    scene='result';setLayers();const w=F.wins;save.f3={wins:0};persist();
+    clearFloor(`<h2>🎪🏆 馬戲團大成功！</h2><p>你在 3 樓成功表演了 <b>${w}</b> 場，妖怪觀眾全都站起來拍手！</p><p>最後的車子：${bikeText()}</p>`);
+    return;
+  }
+  showModal(`<h2>👏 ${msg}</h2><p>妖怪們乖乖坐在旁邊拍拍手！賺到 <b>💰 ${money}</b> 元。</p>
+   <p>🌟 成功 <b>${F.wins} / ${SHOWS_TO_PASS}</b> 場　💰 現在有 ${save.money} 元</p>
+   <div class="row"><button class="pill green" id="mGo">繼續</button></div>`);$('mGo').onclick=hideModal;
+}
+function endStunt(ok){
+  if(ok){winShow(15,'特技表演成功！');return;}
+  logRec('😠 特技表演出錯太多次，妖怪來吃輔助輪');
+  startChase(['auxL','auxR'],'😠 表演一直出錯，妖怪生氣了！','牠們要來吃你的<b>輔助輪</b>！');
+}
+function endDrum(){
+  const me=Math.round(b3.scores.reduce((a,x)=>a+x,0)/b3.rounds);
+  const all=[{n:'我',e:IDS[P.id].e,score:me},...b3.rivals],votes=all.map(()=>0);
+  for(let i=0;i<40;i++){const w=all.map(p=>Math.pow(Math.max(1,p.score),4)),tot=w.reduce((a,x)=>a+x,0);let r=Math.random()*tot,k=0;while(r>w[k]){r-=w[k];k++;}votes[k]++;}
+  const mx=Math.max(...votes),win=votes[0]===mx&&votes.filter(v=>v===mx).length===1;
+  b3.ph='result';set3Keys();
+  let h=`<h2>${win?'🥁🏆 打鼓比賽第一名！':'🥁 這次沒有贏……'}</h2><p>觀眾 40 人投票：</p>`;
+  all.map((p,i)=>({...p,v:votes[i]})).sort((a,b)=>b.v-a.v).forEach(p=>{h+=`<div class="rank ${p.v===mx?'win':''}"><span style="width:110px">${p.e} ${p.n}</span><span class="bar"><i style="width:${p.v/40*100}%"></i></span><span>${Math.round(p.v/40*100)}%</span></div>`;});
+  h+=`<p style="color:#7a6a4a;font-size:13px">你的表演分數 ${me} 分（越準越快分數越高）</p>`;
+  if(win){showModal(h+'<div class="row"><button class="pill green" id="mGo">太棒了！</button></div>');$('mGo').onclick=()=>{hideModal();winShow(20,'打鼓比賽得票率最高！');};}
+  else{showModal(h+(votes[0]===mx?'<p>平手不算贏喔……</p>':'')+'<div class="row"><button class="pill red" id="mGo">糟糕，妖怪來了！</button></div>');
+    $('mGo').onclick=()=>{hideModal();logRec('🥁 打鼓比賽輸了，妖怪來吃輪子');startChase(['front','back'],'🥁 比賽輸了，妖怪衝過來了！','牠們要吃掉你的<b>一個輪子</b>！',1);};}
+}
+function endUni(ok){
+  if(ok){winShow(25,`獨輪車撐了 ${UNI_TIME} 秒！`);return;}
+  b3.ph='result';set3Keys();shake=12;sfx(90,.5,'sawtooth',.08,-40);
+  const b=bike(),k=b.front?'front':'back',w=WHEELS[b[k]];b[k]=null;
+  logRec(`🛞 獨輪車倒下，最後的${w.n}被吃掉了`);
+  showModal(`<h2>😵 獨輪車倒下了！</h2><p>妖怪衝過來把你唯一的 ${w.e} ${w.n} 吃掉了……</p>`+'<div class="row"><button class="pill red" id="mGo">嗚嗚……</button></div>');
+  $('mGo').onclick=()=>{hideModal();fail3();};
+}
+function fail3(){
+  b3.ph='result';set3Keys();
+  const w=f3().wins;save.bike={...STARTER_BIKE};save.f3={wins:0};persist();
+  logRec('💔 3 樓失敗：輪子全部被吃光了');
+  showModal(`<h2>💔 輪子全部被吃光了</h2><p>沒有輪子就不能表演，這次 3 樓挑戰失敗（成功了 ${w} 場）。</p>
+   <p>再挑戰的話，會送你一台新的四輪車（⚫⚫ + 🪵🪵），成功場數從 0 開始。</p>
+   <div class="row"><button class="pill red" id="mAgain">🔁 再挑戰</button><button class="pill green" id="mHome">🏠 回家</button></div>`);
+  $('mAgain').onclick=()=>{hideModal();startBike3();};
+  $('mHome').onclick=()=>{hideModal();home.ring=false;enterHome();};
+}
+
+/* ---------- 逃跑：妖怪來吃輪子 ---------- */
+function startChase(slots,title,sub,maxEat){
+  const b=bike(),targets=slots.filter(k=>b[k]);
+  b3.ph='result';set3Keys();
+  showModal(`<h2>${title}</h2><p>${sub}</p><p>🔥 輪子著火了，速度變快！按 ◀ ▶ <b>換車道閃開妖怪</b>，撐過 <b>${CHASE_TIME} 秒</b>就賺到錢。</p>
+   ${targets.some(k=>b[k]==='bolt')?'<p>⚡ 小心！妖怪最想吃閃電輪，會一直追著你。</p>':''}
+   <div class="row"><button class="pill red" id="mGo">快逃！</button></div>`);
+  $('mGo').onclick=()=>{hideModal();
+    Object.assign(b3,{ph:'chase',left:CHASE_TIME,lane:1,x:0,dist:0,mons:[],spawn:.8,eaten:0,maxEat:maxEat||targets.length,
+      bites:Object.fromEntries(targets.map(k=>[k,WHEELS[b[k]].bites])),targets});
+    set3Keys();};
+}
+function chaseTarget(){const b=bike(),ts=b3.targets.filter(k=>b[k]);if(!ts.length)return null;return ts.find(k=>b[k]==='bolt')||ts[0];}
+function updChase(dt){
+  const sp=340*bikeSpeed();
+  b3.left-=dt;b3.dist+=sp*dt;
+  const tx=laneX(b3.lane);if(!b3.x)b3.x=tx;b3.x+=(tx-b3.x)*Math.min(1,dt*12);
+  const tgt=chaseTarget(),lure=tgt&&bike()[tgt]==='bolt';
+  b3.spawn-=dt;
+  if(b3.spawn<=0){b3.spawn=rand(.55,.9)/Math.sqrt(bikeSpeed())*(lure?.75:1);
+    const l=Math.floor(rand(0,3));b3.mons.push({l,x:laneX(l),y:-40,k:pick(MONSTER_KINDS),v:rand(.2,.45)*sp,home:lure||Math.random()<.25});}
+  const py=H*.74;
+  for(const m of b3.mons){m.y+=(sp*.55+m.v)*dt;
+    if(m.home&&m.y<py-120){const want=laneX(b3.lane);m.x+=(want-m.x)*Math.min(1,dt*1.6);}else m.x+=(laneX(m.l)-m.x)*Math.min(1,dt*4);
+    if(!m.hit&&Math.abs(m.y-py)<44&&Math.abs(m.x-b3.x)<40){m.hit=1;bite3();}}
+  b3.mons=b3.mons.filter(m=>!m.hit&&m.y<H+60);
+  if(b3.ph!=='chase')return;
+  if(b3.left<=0){
+    b3.ph='result';set3Keys();save.money+=10;stat('escapes');persist();logRec('🔥 逃跑成功，妖怪沒吃到輪子（💰+10）');
+    showModal(`<h2>🏁 逃走成功！</h2><p>${CHASE_TIME} 秒內妖怪沒把輪子吃光，賺到 <b>💰 10</b> 元！</p><p>現在的車子：${bikeText()}</p>
+     <div class="row"><button class="pill green" id="mGo">呼～</button></div>`);
+    $('mGo').onclick=()=>{hideModal();b3.ph='menu';set3Keys();};
+  }
+}
+function bite3(){
+  const k=chaseTarget();if(!k)return;const b=bike(),W=WHEELS[b[k]];
+  b3.bites[k]--;shake=8;sfx(160,.15,'sawtooth',.06,-80);
+  if(b3.bites[k]>0){floatT3(`🦷 咬了${W.n}一口！`,'#ffb3b3');return;}
+  b[k]=null;b3.eaten++;persist();floatT3(`😱 ${W.e}${W.n}被吃掉了！`,'#ff8a7a');
+  logRec(`🦷 ${W.n}（${SLOTS.find(x=>x[0]===k)[1]}）被妖怪吃掉了`);
+  if(b3.eaten>=b3.maxEat||!chaseTarget()){
+    b3.ph='result';set3Keys();
+    const st=stage3();
+    if(st==='none'){fail3();return;}
+    showModal(`<h2>😱 輪子被吃掉了</h2><p>現在變成 <b>${bikeText()}</b>。</p>
+     <p>${st==='drum'?'沒有輔助輪了，接下來改成 🥁 <b>打鼓比賽</b>！':st==='uni'?'只剩一個輪子，接下來要騎 🛞 <b>獨輪車</b>保持平衡！':'還有輪子，繼續表演！'}</p>
+     <p style="color:#7a6a4a">💡 可以去 🛒 輪子店買新輪子補回來。</p>
+     <div class="row"><button class="pill green" id="mGo">繼續表演</button></div>`);
+    $('mGo').onclick=()=>{hideModal();b3.ph='menu';set3Keys();};
+  }
+}
+
+/* ---------- 繪圖 ---------- */
+function drawWheel(x,y,r,w,spin,fire){
+  if(!w)return;const W=WHEELS[w];
+  if(fire){ctx.globalAlpha=.85;emo('🔥',x-r*.6,y-r*.2,r*1.4);ctx.globalAlpha=1;}
+  ctx.save();ctx.translate(x,y);ctx.rotate(spin);
+  ctx.fillStyle=W.col;ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fill();
+  ctx.fillStyle=w==='rubber'?'#9aa0ad':w==='wood'?'#d9a868':w==='bolt'?'#fff3a0':'#c9d0dc';ctx.beginPath();ctx.arc(0,0,r*.62,0,7);ctx.fill();
+  ctx.strokeStyle=w==='wood'?'#7a5230':'#3a3f4c';ctx.lineWidth=Math.max(1.5,r*.08);
+  for(let i=0;i<6;i++){const a=i/6*Math.PI*2;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*r*.62,Math.sin(a)*r*.62);ctx.stroke();}
+  if(w==='wood'){ctx.beginPath();ctx.arc(0,0,r*.85,0,7);ctx.stroke();}
+  if(w==='iron'){ctx.fillStyle='#5a6274';for(let i=0;i<8;i++){const a=i/8*Math.PI*2;ctx.beginPath();ctx.arc(Math.cos(a)*r*.82,Math.sin(a)*r*.82,r*.07,0,7);ctx.fill();}}
+  ctx.restore();
+  if(w==='bolt')emo('⚡',x,y,r*.8);
+}
+function drawBikeSide(x,gy,s,tilt,spin,fire){
+  const b=bike(),R=24*s,m=mainsN();
+  ctx.save();ctx.translate(x,gy);ctx.rotate(tilt||0);
+  if(m===1){const w=b.front||b.back;
+    ctx.strokeStyle='#e8483a';ctx.lineWidth=5*s;ctx.beginPath();ctx.moveTo(0,-R);ctx.lineTo(0,-R-46*s);ctx.stroke();
+    ctx.fillStyle='#2a2a30';rr(-12*s,-R-52*s,24*s,8*s,4*s);ctx.fill();
+    drawWheel(0,-R,R*1.15,w,spin,fire);
+    drawHero(0,-R-50*s,s*1.05,0,1,Math.PI/2,true);
+  }else{
+    const bx=-34*s,fx=34*s;
+    if(b.auxL)drawWheel(bx-18*s,-11*s,11*s,b.auxL,spin*2,fire);
+    ctx.strokeStyle='#e8483a';ctx.lineWidth=5*s;ctx.lineCap='round';ctx.beginPath();
+    ctx.moveTo(bx,-R);ctx.lineTo(-6*s,-R-30*s);ctx.lineTo(fx-6*s,-R-32*s);ctx.lineTo(fx,-R);ctx.moveTo(bx,-R);ctx.lineTo(4*s,-R);ctx.lineTo(-6*s,-R-30*s);ctx.moveTo(4*s,-R);ctx.lineTo(fx-6*s,-R-32*s);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(fx-6*s,-R-32*s);ctx.lineTo(fx-2*s,-R-44*s);ctx.lineTo(fx+8*s,-R-46*s);ctx.stroke();
+    ctx.fillStyle='#2a2a30';rr(-16*s,-R-36*s,22*s,7*s,3*s);ctx.fill();
+    drawWheel(bx,-R,R,b.back,spin,fire);drawWheel(fx,-R,R,b.front,spin,fire);
+    if(b.auxR)drawWheel(bx-14*s,-9*s,11*s,b.auxR,spin*2,fire);
+    drawHero(-2*s,-R-34*s,s*1.05,0,1,Math.PI/2,true);
+  }
+  ctx.restore();
+}
+function drawStage(){
+  // 馬戲團帳篷
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#3a1b3f');g.addColorStop(1,'#1b1030');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const n=Math.ceil(W/60)+1;for(let i=0;i<n;i++){ctx.fillStyle=i%2?'#c9302c':'#f4ead5';ctx.beginPath();ctx.moveTo(W/2,-60);ctx.lineTo(i*60,H*.32);ctx.lineTo(i*60+60,H*.32);ctx.closePath();ctx.fill();}
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.fillRect(0,H*.3,W,8);
+  const gy=H*.66;
+  ctx.fillStyle='rgba(255,240,170,.13)';ctx.beginPath();ctx.moveTo(W/2-40,0);ctx.lineTo(W/2-200,gy+30);ctx.lineTo(W/2+200,gy+30);ctx.lineTo(W/2+40,0);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#7a3b1d';ctx.beginPath();ctx.ellipse(W/2,gy+20,Math.min(W*.46,420),48,0,0,7);ctx.fill();
+  ctx.fillStyle='#a8572a';ctx.beginPath();ctx.ellipse(W/2,gy+12,Math.min(W*.44,400),40,0,0,7);ctx.fill();
+  ctx.fillStyle='#e8d6a8';ctx.beginPath();ctx.ellipse(W/2,gy+8,Math.min(W*.36,330),26,0,0,7);ctx.fill();
+  return gy;
+}
+function drawCrowd(gy){
+  const mood=b3.ph==='stunt'?b3.miss:0,ks=['zombie','slime','snake','banana'],y=gy+34;
+  ks.forEach((k,i)=>{const x=W*[.06,.16,.84,.94][i],clap=(b3.claps||[]).find(c=>c.i===i),angry=mood>=2;
+    const e={kind:k,x:x+(angry?Math.sin(T*20+i)*3:0),y:y-(clap?Math.abs(Math.sin(T*14))*8:0),r:18,hp:1,max:1,face:i<2?1:-1,bob:i,flash:0,frozen:0,wind:0};
+    drawEnemy(e);
+    if(clap)emo('👏',x+20,y-26,22);else if(angry)emo('💢',x+16,y-26,18);else if(mood===1)emo('😐',x+16,y-26,14);});
+}
+function lay3(){const land=W>H&&H<560;return land?{bx:W*.72,px:W*.36,py:Math.max(112,H*.3),land}:{bx:W/2,px:W/2,py:Math.max(120,H*.22),land};}
+function seqPanel(labels,title){
+  const q=b3.seq;if(!q)return;
+  const L=lay3(),bw=Math.min(64,(L.land?W*.62:W-40)/q.k.length-8,H*.12),tw=q.k.length*(bw+8)-8,x0=L.px-tw/2,y0=L.py;
+  ctx.fillStyle='rgba(10,8,20,.65)';rr(x0-16,y0-46,tw+32,bw+92,16);ctx.fill();
+  txt(title,L.px,y0-24,18,'#ffe066');
+  q.k.forEach((k,i)=>{const x=x0+i*(bw+8);ctx.fillStyle=i<q.i?'#5bc46a':i===q.i?'#ffd23f':'#f4ead5';rr(x,y0,bw,bw,12);ctx.fill();
+    txt(labels[k],x+bw/2,y0+bw/2+1,labels[k].length>1?16:bw*.55,'#2a2416');});
+  const f=clamp(q.t/q.T,0,1);ctx.fillStyle='rgba(255,255,255,.2)';rr(x0,y0+bw+14,tw,10,5);ctx.fill();ctx.fillStyle=f<.3?'#ff5a5a':'#7cc7ff';rr(x0,y0+bw+14,tw*f,10,5);ctx.fill();
+}
+function draw3(){
+  const gy=b3.ph==='chase'?0:drawStage();
+  if(b3.ph==='chase'){drawChase();}
+  else{
+    const L=lay3();let tilt=0,x=L.bx,s=clamp(Math.min(W,H)/360,1,2.1);
+    if(b3.ph==='uni'){tilt=b3.ang;}
+    if(b3.ph==='drum'){
+      const pos=L.land?[[.27,0],[.38,0],[.49,0]]:[[.13,0],[.87,0],[.13,1]];
+      b3.rivals.forEach((p,i)=>{const px=W*pos[i][0],py=(L.land?gy+6:gy-26)-pos[i][1]*96;
+        emo(p.e,px,py-30,34);emo('🥁',px,py,26);txt(p.n,px,py+22,12,'#fff');
+        if(Math.sin(T*8+i*2)>.5)emo('🎵',px+20,py-46,15);});
+      emo('🥁',x+50*s,gy-30*s,34*s);
+      for(const f of b3.fx){emo(f.e,x+f.x*s,gy-110*s-(1-f.t/.4)*30,30);}
+    }
+    drawBikeSide(x,gy,s,tilt,b3.ph==='menu'?0:T*6,false);
+    // 特技動畫
+    if(b3.ph==='stunt'&&b3.anim>0){const tr=b3.tricks[b3.ti-1];if(tr)for(let i=0;i<3;i++){const a=T*6+i*2.1;emo(tr[1],x+Math.cos(a)*50*s,gy-130*s+Math.sin(a)*24*s-Math.abs(Math.sin(a))*30,30*s);}}
+    drawCrowd(gy);
+    // HUD
+    const F=f3();
+    ctx.fillStyle='rgba(0,0,0,.55)';rr(10,10,250,58,12);ctx.fill();
+    txt(`🎪 3F 馬戲團　🌟 ${F.wins}/${SHOWS_TO_PASS} 場`,22,26,14,'#fff','left',900);
+    txt(`💰 ${save.money}　${bikeText()}`,22,50,13,'#ffe066','left',800);
+    if(b3.ph==='menu'){txt(stage3()==='stunt'?'🤹 準備好就按「表演特技」':stage3()==='drum'?'🥁 準備好就按「打鼓比賽」':'🛞 準備好就按「獨輪車平衡」',W/2,H*.36,18,'#fff');}
+    if(b3.ph==='stunt'){const tr=b3.tricks[Math.min(b3.ti,b3.tricks.length-1)];
+      txt(`特技 ${Math.min(b3.ti+1,5)}/5　出錯 ${'❌'.repeat(b3.miss)}${'⬜'.repeat(Math.max(0,3-b3.miss))}`,L.px,L.py+(b3.seq?Math.min(64,H*.12)+60:0),15,'#fff');
+      if(b3.seq)seqPanel(ARROWS4,`${tr[1]} ${tr[0]}`);}
+    if(b3.ph==='drum'){txt(`打鼓 ${Math.min(b3.ri+1,b3.rounds)}/${b3.rounds}`,L.px,L.py+(b3.seq?Math.min(64,H*.12)+60:0),15,'#fff');if(b3.seq)seqPanel(['左','右','鈸'],'🥁 照順序打鼓！');}
+    if(b3.ph==='uni'){const f=b3.left/UNI_TIME;txt(`⏱ 還要撐 ${Math.ceil(b3.left)} 秒`,W/2,H*.14+20,22,'#ffe066');
+      const bw=Math.min(W*.6,320),bx=W/2-bw/2,by=H*.2+16;ctx.fillStyle='rgba(255,255,255,.2)';rr(bx,by,bw,14,7);ctx.fill();
+      const a=clamp(b3.ang/1.0,-1,1);ctx.fillStyle=Math.abs(a)>.7?'#ff5a5a':Math.abs(a)>.4?'#ffd23f':'#5bc46a';ctx.beginPath();ctx.arc(W/2+a*bw/2,by+7,11,0,7);ctx.fill();
+      ctx.fillStyle='#fff';ctx.fillRect(W/2-1,by-4,2,22);txt(Math.abs(a)>.6?(a>0?'快往左！':'快往右！'):'保持平衡',W/2,by+34,14,'#fff');}
+    f3txt.forEach((f,i)=>{ctx.globalAlpha=Math.min(1,f.t*2);txt(f.s,W/2,H*.28-i*26-(1.4-f.t)*20,20,f.col);ctx.globalAlpha=1;});
+  }
+}
+function drawChase(){
+  const rw=Math.min(W*.62,330),rx=W/2-rw/2,py=H*.74,sc=b3.dist;
+  ctx.fillStyle='#3d2a4a';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#4a4f5c';ctx.fillRect(rx,0,rw,H);ctx.fillStyle='#e9e2c8';ctx.fillRect(rx-6,0,6,H);ctx.fillRect(rx+rw,0,6,H);
+  ctx.fillStyle='#fff';for(let l=1;l<3;l++){const x=rx+rw*l/3-2;for(let y=-60+(sc%60);y<H;y+=60)ctx.fillRect(x,y,4,30);}
+  for(let i=-1;i<H/90+1;i++){const y=(i*90+sc*.5%90);emo(i%2?'🎪':'🎈',rx-30,y,24);emo(i%2?'🎈':'🎡',rx+rw+30,y,24);}
+  for(const m of b3.mons){const e={kind:m.k,x:m.x,y:m.y,r:18,hp:1,max:1,face:1,bob:m.x,flash:0,frozen:0,wind:0};drawEnemy(e);if(m.home)emo('🤤',m.x+16,m.y-20,14);}
+  // 腳踏車（從上面看）
+  const x=b3.x,b=bike();
+  for(let i=0;i<3;i++)emo('🔥',x+rand(-14,14),py+46+i*14,22-i*4);
+  ctx.save();ctx.translate(x,py);
+  const wr=(w,X,Y,ww,hh)=>{if(!w)return;ctx.fillStyle=WHEELS[w].col;rr(X-ww/2,Y-hh/2,ww,hh,4);ctx.fill();if(w==='bolt')emo('⚡',X,Y,12);};
+  wr(b.front,0,-30,10,26);wr(b.back,0,30,10,26);wr(b.auxL,-22,30,8,18);wr(b.auxR,22,30,8,18);
+  ctx.strokeStyle='#e8483a';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(0,-30);ctx.lineTo(0,30);ctx.stroke();ctx.beginPath();ctx.moveTo(-16,-24);ctx.lineTo(16,-24);ctx.stroke();
+  if(b.auxL||b.auxR){ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-22,30);ctx.lineTo(22,30);ctx.stroke();}
+  ctx.restore();
+  drawHero(x,py+4,.9,0,0,Math.PI,true);
+  // HUD
+  ctx.fillStyle='rgba(0,0,0,.6)';rr(10,10,W-20,54,12);ctx.fill();
+  txt(`🔥 快逃！還要 ${Math.ceil(b3.left)} 秒`,22,28,16,'#ffe066','left',900);
+  let hx=22;b3.targets.forEach(k=>{const w=bike()[k],lb=SLOTS.find(s=>s[0]===k)[1];
+    const t=w?`${WHEELS[w].e}${lb} ${'❤️'.repeat(Math.max(0,b3.bites[k]))}`:`${lb} 💀`;txt(t,hx,50,12,'#fff','left',800);ctx.font='800 12px '+FONT;hx+=ctx.measureText(t).width+16;});
+  f3txt.forEach((f,i)=>{ctx.globalAlpha=Math.min(1,f.t*2);txt(f.s,W/2,H*.4-i*26-(1.4-f.t)*20,20,f.col);ctx.globalAlpha=1;});
+}
+
 /* ---------- 紀錄 ---------- */
 function stat(k,n){save.st=save.st||{};save.st[k]=(save.st[k]||0)+(n||1);}
 function logRec(t){save.st=save.st||{};const d=new Date(),L=save.st.log=save.st.log||[];
@@ -1396,7 +1846,7 @@ function openRecords(){
   const box=(v,l)=>`<div class="st"><b>${v}</b><span>${l}</span></div>`;
   let h=`<h2>📜 我的紀錄</h2><div class="stats">
     ${box(cur+' 樓','現在在')}${box(Math.max(save.best||1,cur)+' 樓','最高到過')}${box(save.clears||0,'過關次數')}${box(save.tops||0,'登上 100 樓')}
-    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.bestVotes||0,'畫畫最高分')}
+    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.shows||0,'馬戲團成功表演')}${box(st.escapes||0,'逃過妖怪')}${box(st.bestVotes||0,'畫畫最高分')}
     ${box('💰 '+save.money,'現在的錢')}${box((save.toys||[]).length+' / '+TOYS.length,'收集的玩具')}${box(fmtTime(st.time),'一共玩了')}${box(IDS[P.id].e+' '+IDS[P.id].n,'現在的身分')}
   </div>`;
   const now=c&&c.rounds&&c.rounds.length?c.rounds.map(r=>r.imgs[0]):null,pics=now||st.lastPics;
@@ -1411,13 +1861,14 @@ $('hRec').onclick=openRecords;
 $('bRec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
 
 /* ---------- 暫停 / 存檔 ---------- */
-function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
+function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
 function openPause(){
   if(!canPause())return;
   input.atk=false;input.keys={};joy.active=false;
   showModal(`<h2>⏸ 暫停</h2>
    <p>🏢 現在在 <b>${scene==='drive'?'開車去 '+(save.floor||1)+' 樓的路上':curFloor+' 樓'}</b>（最高紀錄 ${Math.max(save.best||1,curFloor)} 樓）</p>
    <p>💰 ${save.money} 元　🎖️ 過關 ${save.clears} 次</p>
+   ${scene==='bike3'?`<p>🚲 特技秀：成功 ${(save.f3&&save.f3.wins)||0} / ${SHOWS_TO_PASS} 場　車子：${bikeText()}</p>`:''}
    ${scene==='draw2'?`<p>🎨 畫畫比賽：已經畫了 ${(save.c2&&save.c2.rounds.length)||0} / 10 張（畫好的圖都有存起來）</p>`:''}
    <p style="color:#7a6a4a">💾 存檔會記住樓層、錢和玩具。回家後接電話，會從這一層的開頭繼續。</p>
    <div class="row"><button class="pill green" id="pRes">▶️ 繼續</button><button class="pill blue" id="pSave">💾 存檔回家</button><button class="pill red" id="pRec">📜 看紀錄</button></div>`);
@@ -1446,6 +1897,7 @@ function setLayers(){
   $('ctlFloor').classList.toggle('hidden',scene!=='floor'&&scene!=='draw2');
   ['bAtk','bSwap','bHeal','bRoll'].forEach(id=>$(id).style.visibility=scene==='draw2'?'hidden':'');
   $('ctlDrive').classList.toggle('hidden',scene!=='drive');
+  $('ctl3').classList.toggle('hidden',scene!=='bike3');
   $('ctlHome').classList.toggle('hidden',scene!=='home');
   joy.active=false;input.atk=false;lastBtn='';refreshButtons();
 }
@@ -1473,12 +1925,13 @@ let last=performance.now();
 function frame(now){
   let dt=Math.min(.033,(now-last)/1000);last=now;T+=dt;shake=Math.max(0,shake-dt*40);
   const paused=!$('modal').classList.contains('hidden');
-  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
+  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
   ctx.setTransform(DPR,0,0,DPR,0,0);
   if(scene==='home')drawHome(dt);
   else if(scene==='drive'){if(!paused)updDrive(dt);ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));drawDrive();ctx.restore();}
   else if(scene==='draw2'){if(!paused&&!dr.open)updDraw2(dt);drawDraw2();if(dr.open)updDrawUI(dt);}
-  else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else drawFloor();}
+  else if(scene==='bike3'){if(!paused)upd3(dt);draw3();}
+  else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else if(curFloor===3&&scene==='result')draw3();else drawFloor();}
   requestAnimationFrame(frame);
 }
 P.r=idk()==='kid'?11:14;
