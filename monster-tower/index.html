@@ -128,17 +128,17 @@
   .shopRow button{border:2px solid #3a2f1c;border-radius:12px;background:#fffaf0;padding:6px 8px;font-family:inherit;font-weight:800;font-size:13px;color:#2a2416}
   .shopRow button.cur{background:#effbe9;border-color:#4a9d3c}
   .shopRow button:disabled{opacity:.4}
-  /* 電梯 */
-  .card.elev{background:#c9ced8;border-color:#4a5263;color:#1f2430}
-  .elevTop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .elevLed{font:900 30px/1 ui-monospace,"Courier New",monospace;color:#ff5a3c;background:#140c0a;border-radius:10px;padding:8px 14px;min-width:100px;text-align:center;letter-spacing:2px;text-shadow:0 0 8px #ff5a3c}
-  .fgrid{display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin-top:10px}
-  .fb{aspect-ratio:1;border-radius:50%;border:2px solid #6b7385;background:linear-gradient(#f4f6fa,#b9bfcb);font:800 13px/1 inherit;font-family:inherit;color:#2a2f3a;position:relative;padding:0;touch-action:manipulation}
-  .fb.done{background:linear-gradient(#e6f7df,#a8d898);border-color:#4a9d3c}
-  .fb.next{box-shadow:0 0 0 3px #ffd23f;background:linear-gradient(#fff6c8,#ffd65c)}
-  .fb.sel{background:radial-gradient(#fff,#ff9a5a);border-color:#c4483a;box-shadow:0 0 10px #ff9a5a}
-  .fb i{position:absolute;top:-6px;right:-6px;font-style:normal;font-size:12px}
-  .elevInfo{min-height:44px;margin-top:10px;font-size:15px;font-weight:700}
+  /* 攀岩 */
+  #cvClimb{position:fixed;inset:0;width:100%;height:100%;display:none;z-index:2;touch-action:none}
+  #ctlClimb{z-index:6}
+  #ctlClimb .hud{position:absolute;left:calc(10px + env(safe-area-inset-left));top:calc(10px + env(safe-area-inset-top));background:rgba(10,14,26,.7);border-radius:14px;padding:8px 12px;color:#fff;font-weight:800;font-size:14px;pointer-events:none;min-width:200px}
+  #ctlClimb .sbar{height:14px;border-radius:7px;background:rgba(255,255,255,.2);overflow:hidden;margin-top:6px}
+  #ctlClimb .sbar i{display:block;height:100%;background:#5bc46a;transition:width .2s}
+  #clHint{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));background:rgba(10,14,26,.7);color:#fff;font-weight:800;font-size:14px;padding:8px 14px;border-radius:14px;pointer-events:none;text-align:center;max-width:90vw}
+  #clEnter{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(64px + env(safe-area-inset-bottom));font-size:20px;padding:14px 26px}
+  #clView{right:calc(118px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))}
+  #clPause{right:calc(66px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))}
+  #clRec{right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))}
   #toast{position:fixed;left:50%;top:calc(64px + env(safe-area-inset-top));transform:translateX(-50%);z-index:50;pointer-events:none;
     background:rgba(20,24,36,.86);border:2px solid #ffd65c;color:#fff;padding:8px 16px;border-radius:14px;font-weight:800;font-size:16px;
     text-align:center;max-width:90vw;opacity:0;transition:opacity .25s}
@@ -168,6 +168,17 @@
   <button class="btn" id="bId2" style="width:58px;height:58px;right:calc(16px + env(safe-area-inset-right));top:calc(70px + env(safe-area-inset-top))"><span class="em" id="idEm2">🏹</span><small>身分</small></button>
 </div>
 
+<!-- 攀岩 -->
+<canvas id="cvClimb"></canvas>
+<div id="ctlClimb" class="layer hidden">
+  <div class="hud"><div id="clFloor">🧗 1 樓高度</div><div class="sbar"><i id="clSta" style="width:100%"></i></div><div id="clStaT" style="font-size:12px;margin-top:3px">💪 體力 100</div></div>
+  <button class="btn pz" id="clView">🎥</button>
+  <button class="btn pz" id="clPause">⏸</button>
+  <button class="btn pz" id="clRec">📜</button>
+  <button class="pill red hidden" id="clEnter">🪟 進入 1 樓</button>
+  <div id="clHint">按住主角發亮的手或腳，拖到旁邊的抓點放開</div>
+</div>
+
 <!-- 3 樓操作 -->
 <div id="ctl3" class="layer hidden">
   <button class="btn pz" id="b3Pause">⏸</button>
@@ -195,6 +206,7 @@
     <button class="sz" id="dPauseBtn" style="width:44px">⏸</button></div>
   <div class="dMain"><canvas id="dCanvas" width="480" height="480"></canvas><div class="dRivals" id="dRivals"></div></div>
   <div class="dTools" id="dTools"></div>
+  <div id="dGhost" class="hidden" style="position:fixed;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px #3a2f1c,0 6px 14px rgba(0,0,0,.35);pointer-events:none;z-index:60"></div>
   <div id="dPauseBox" class="hidden">⏸ 暫停中<div style="font-size:14px;font-weight:600;color:#7a6a4a">（時間和妖怪都停下來了）</div>
     <div class="row" style="display:flex;gap:10px"><button class="pill green" id="dResume">▶️ 繼續畫</button><button class="pill blue" id="dSaveHome">💾 存檔回家</button></div>
     <div style="font-size:13px;font-weight:600;color:#7a6a4a">存檔回家的話，這一張還沒畫完的圖不算，之前畫好的都會保存。</div></div>
@@ -262,11 +274,13 @@ const ETYPE={
   snake:{hp:48,spd:80,r:15,e:'🐍',n:'蛇怪'},
   banana:{hp:38,spd:46,r:15,e:'🍌',n:'香蕉怪'},
   human:{hp:30,spd:74,r:14,n:'人類'},
+  boss:{hp:900,spd:62,r:34,e:'👹',n:'妖怪大王'},
 };
 const MONSTER_KINDS=['zombie','slime','snake','banana'];
 /* 100 層最高樓：每層一樣的妖怪，只是慢慢變強（2 樓是畫畫比賽） */
 const TOP=100;
-function fscale(f){const n=Math.max(0,f-1);return{hp:1+n*.03,dmg:1+n*.012,spd:1+n*.002};}
+// 1 樓起就比較硬：血 ×1.6、攻擊 ×1.35、速度 ×1.1，之後每層再慢慢變強
+function fscale(f){const n=Math.max(0,f-1);return{hp:1.6*(1+n*.03),dmg:1.35*(1+n*.012),spd:1.1*(1+n*.002)};}
 let curFloor=1,FS=fscale(1);
 const FACES=['🙂','😀','😊','😄','🥹','😃','🤗','😌'];
 const TOYS=[
@@ -623,8 +637,8 @@ function updDrive(dt){
       else{save.money++;drive.coins++;persist();sfx(1300,.06,'square',.03,300);}}
   }
   drive.objs=drive.objs.filter(o=>!(o.t==='coin'&&o.hit)&&o.d>drive.dist-200);
-  if(drive.dist>=drive.len&&!drive.done){drive.done=T;toast('🏢 到了！去搭電梯',1600);sfx(660,.3,'triangle',.06,300);}
-  if(drive.done&&T-drive.done>1.8&&!drive.elev){drive.elev=1;openElevator();}
+  if(drive.dist>=drive.len&&!drive.done){drive.done=T;toast('🏢 到了！準備從外牆爬上去',1600);sfx(660,.3,'triangle',.06,300);}
+  if(drive.done&&T-drive.done>1.8&&!drive.elev){drive.elev=1;startClimb();}
 }
 function drawDrive(){
   const rw=Math.min(W*.62,330),rx=W/2-rw/2,py=H*.78,sc=drive.dist;
@@ -676,8 +690,8 @@ function startFloor(){
   rescued=0;runCoins=0;swapPtr=0;converted=0;AED.used=false;
   Object.assign(P,{x:ELEV.x,y:ELEV.y-40,hp:100,max:100,weapon:'stick',cd:0,inv:1.5,roll:0,slow:0,fx:0,fy:-1});P.r=idk()==='kid'?11:14;
   ROOMS.forEach((r,i)=>{r.clear=false;const kinds=[...MONSTER_KINDS].sort(()=>Math.random()-.5);
-    for(let k=0;k<r.n;k++){const p=randInRoom(i,30);enemies.push(makeEnemy(kinds[k%4],p[0],p[1],i));}});
-  const pr=Math.floor(rand(0,ROOMS.length)),pp=randInRoom(pr,40);passage={room:pr,x:pp[0],y:pp[1],shown:false};
+    for(let k=0;k<r.n+1;k++){const p=randInRoom(i,30);enemies.push(makeEnemy(kinds[k%4],p[0],p[1],i));}});
+  const pr=Math.floor(rand(0,ROOMS.length)),pp=randInRoom(pr,40);passage={room:pr,x:pp[0],y:pp[1],shown:false,boss:0};
   flow(P.x,P.y);
   cam.z=clamp(Math.min(W,H)/440,.62,1.5);cam.x=P.x-W/2/cam.z;cam.y=P.y-H/2/cam.z;
   showModal(`<h2>🏢 最高樓 ${curFloor}F：妖怪辦公室</h2>
@@ -744,7 +758,8 @@ function hurtEnemy(e,d,kx,ky){
 function defeat(e){
   if(mode==='human'){
     e.dead=true;burst(e.x,e.y,'#ffe66d',16);sfx(880,.12,'triangle',.05,500);
-    const heal=idk()==='nurse'?12:6;P.hp=Math.min(P.max,P.hp+heal);floatT(P.x,P.y-30,'+'+heal+' ❤️','#ff8fb1',15);
+    if(e.kind==='boss'){bossDown(e);return;}
+    const heal=idk()==='nurse'?6:3;P.hp=Math.min(P.max,P.hp+heal);floatT(P.x,P.y-30,'+'+heal+' ❤️','#ff8fb1',15);
     rescued++;stat('rescued');
     if(followers.length<12){followers.push({x:e.x,y:e.y,hp:40,max:40,weapon:null,face:pick(FACES)});floatT(e.x,e.y-26,'謝謝你！我來幫你拿武器','#bff7c3',13);}
     else floatT(e.x,e.y-26,'謝謝！我先去避難了','#bff7c3',13);
@@ -880,6 +895,7 @@ function updEnemy(e,dt){
       if(!e.seen||d>270)chase(e,sp,dt);else if(d<170)away(e,sp,dt);
       if(e.seen&&d<360&&e.cd<=0){lobAt('bomb',e,P.x+rand(-10,10),P.y+rand(-10,10),.8);e.cd=2.4;}
       break;
+    case'boss':bossAI(e,dt,d,dx,dy,sp,pr);break;
     case'human':
       if(!e.seen||d>220)chase(e,sp,dt);else if(d<110)away(e,sp*.7,dt);
       if(e.seen&&d<320&&e.cd<=0){bullets.push({x:e.x,y:e.y,vx:dx/d*290,vy:dy/d*290,dmg:7,own:'e',life:1.4,r:6,col:'#cfd6e0',staple:1});e.cd=1.3;}
@@ -954,7 +970,8 @@ function updFloor(dt){
   // 房間清空、秘密通道
   checkT-=dt;if(checkT<=0){checkT=.4;
     ROOMS.forEach((r,i)=>{r.clear=!enemies.some(e=>!e.dead&&e.kind!=='human'&&pip(e.x,e.y,r.pts));});
-    if(mode==='human'&&!passage.shown&&ROOMS[passage.room].clear){passage.shown=true;toast(`✨ ${ROOMS[passage.room].name}裡好像有東西在發光……`,3000);sfx(1000,.4,'sine',.05,800);}
+    if(mode==='human'&&!passage.shown&&ROOMS[passage.room].clear&&!passage.boss)spawnBoss();
+    if(passage.boss===1&&!enemies.some(e=>!e.dead&&e.kind==='boss')&&mode==='human'){passage.boss=2;passage.shown=true;toast(`✨ 魔王倒下了！${ROOMS[passage.room].name}的秘密通道打開了`,3000);sfx(1000,.4,'sine',.05,800);}
     refreshButtons();}
   if(passage.shown&&mode==='human'&&hyp(P.x-passage.x,P.y-passage.y)<P.r+22){floorComplete();return;}
   enemies=enemies.filter(e=>!e.dead);
@@ -966,6 +983,36 @@ function updFloor(dt){
   for(const b of booms)b.t-=dt;booms=booms.filter(b=>b.t>0);
 }
 
+/* ---------- 魔王：守在秘密通道前 ---------- */
+function spawnBoss(){
+  passage.boss=1;const e=makeEnemy('boss',passage.x,passage.y,passage.room);e.aggro=true;e.cd=1.5;e.pat=0;e.touch=0;enemies.push(e);
+  shake=16;sfx(70,1,'sawtooth',.1,30);burst(passage.x,passage.y,'#a35cff',40);
+  toast(`👹 ${ROOMS[passage.room].name}的秘密通道前跳出了<b>妖怪大王</b>！打倒牠才能進通道`,3400);
+  logRec(`👹 ${curFloor} 樓的妖怪大王出現了`);
+}
+function bossAI(e,dt,d,dx,dy,sp,pr){
+  const rage=e.hp<e.max*.5;e.touch-=dt;
+  if(e.windB>0){e.windB-=dt;if(e.windB<=0){e.charge=.6;e.hitC=0;sfx(200,.3,'sawtooth',.08,-120);}return;}
+  if(e.charge>0){e.charge-=dt;e.x+=e.cdx*(rage?420:340)*dt;e.y+=e.cdy*(rage?420:340)*dt;collide(e);
+    if(!e.hitC&&d<pr+8){e.hitC=1;hurtPlayer(22);shake=12;}return;}
+  chase(e,sp*(rage?1.25:1),dt);
+  if(d<pr+4&&e.touch<=0){e.touch=.8;hurtPlayer(14);}
+  if(e.cd>0)return;
+  const pat=e.pat++%3;
+  if(pat===0){const n=rage?16:12,o=rand(0,1);for(let i=0;i<n;i++){const a=o+i/n*Math.PI*2;bullets.push({x:e.x,y:e.y,vx:Math.cos(a)*220,vy:Math.sin(a)*220,dmg:9,own:'e',life:2.4,r:8,col:'#c06bff'});}
+    sfx(150,.3,'square',.06,-60);e.cd=rage?1.3:1.9;}
+  else if(pat===1){e.cdx=dx/d;e.cdy=dy/d;e.windB=rage?.35:.55;e.cd=rage?1.4:2;}
+  else{for(let i=0;i<(rage?3:2);i++){const a=rand(0,6.28),m=makeEnemy(pick(MONSTER_KINDS),e.x+Math.cos(a)*60,e.y+Math.sin(a)*60,e.room);m.aggro=true;collide(m);enemies.push(m);}
+    floatT(e.x,e.y-e.r-20,'出來吧，小妖怪們！','#d9b3ff',15);sfx(300,.4,'sine',.05,-200);e.cd=rage?1.6:2.4;}
+}
+function bossDown(e){
+  e.dead=true;burst(e.x,e.y,'#ffe66d',50);burst(e.x,e.y,'#a35cff',40);shake=20;sfx(660,.6,'triangle',.08,400);
+  stat('bosses');logRec(`🏆 打倒 ${curFloor} 樓的妖怪大王！`);
+  for(let i=0;i<10;i++)items.push({kind:'coin',v:Math.floor(rand(3,8)),x:e.x+rand(-40,40),y:e.y+rand(-40,40),t:0,lock:0});
+  P.hp=Math.min(P.max,P.hp+30);floatT(P.x,P.y-30,'+30 ❤️','#ff8fb1',17);
+  floatT(e.x,e.y-50,'妖怪大王變回了大樓管理員！','#bff7c3',16);
+}
+
 /* ---------- 樓層繪圖 ---------- */
 function polyPath(pts){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath();}
 function drawEnemy(e){
@@ -975,6 +1022,9 @@ function drawEnemy(e){
     ctx.fillStyle='rgba(255,255,255,.5)';ctx.beginPath();ctx.ellipse(x-6,y-5,5,3,-.5,0,7);ctx.fill();
     ctx.fillStyle='#173d10';ctx.beginPath();ctx.arc(x-5+e.face*2,y,2.6,0,7);ctx.arc(x+5+e.face*2,y,2.6,0,7);ctx.fill();}
   else if(e.kind==='human'){ctx.fillStyle='#3d5a8a';ctx.beginPath();ctx.arc(x,y+3,e.r,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.fillRect(x-3,y-2,6,12);ctx.fillStyle='#d33';ctx.fillRect(x-1.5,y,3,9);emo('😠',x,y-8,20);}
+  else if(e.kind==='boss'){const rage=e.hp<e.max*.5;ctx.fillStyle=rage?'rgba(255,40,40,.28)':'rgba(160,60,255,.25)';ctx.beginPath();ctx.arc(x,y,e.r+10+Math.sin(T*6)*4,0,7);ctx.fill();
+    ctx.save();ctx.translate(x,y);ctx.scale(-e.face,1);emo('👹',0,0,e.r*2.4);ctx.restore();emo('👑',x,y-e.r-8,26);
+    if(e.windB>0){txt('!!',x,y-e.r-34,26,'#ff3b3b');ctx.strokeStyle='rgba(255,60,60,.7)';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+e.cdx*260,y+e.cdy*260);ctx.stroke();}}
   else{ctx.save();ctx.translate(x,y);ctx.scale(-e.face,1);if(e.kind==='snake'&&e.stab>0)ctx.rotate(.5);emo(ETYPE[e.kind].e,0,0,e.r*2.3);ctx.restore();
     if(e.kind==='banana'){ctx.fillStyle='#a3241b';ctx.fillRect(x-7,y-6,5,2);ctx.fillRect(x+2,y-6,5,2);}}
   if(e.flash>0){ctx.globalAlpha=.6;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,e.r,0,7);ctx.fill();ctx.globalAlpha=1;}
@@ -1063,7 +1113,9 @@ function drawHUD(){
   ctx.fillStyle='rgba(0,0,0,.45)';rr(L,top+(mon?28:48),170,24,12);ctx.fill();
   txt(mon?'👹 嘎嗚！':`${IDS[P.id].e} ${IDS[P.id].n} · ${WEAPONS[P.weapon].e} ${WEAPONS[P.weapon].n}`,L+10,top+(mon?40:60),12,'#fff','left',800);
   // 目標
-  let goal=mon?`把人類變成妖怪就能變回人！ ${converted}/${invTotal}`:(passage.shown?'✨ 秘密通道出現了！快走進去':`🔍 找秘密通道 · 已救 ${rescued} 人`);
+  const boss=enemies.find(e=>!e.dead&&e.kind==='boss');
+  let goal=mon?`把人類變成妖怪就能變回人！ ${converted}/${invTotal}`:(passage.shown?'✨ 秘密通道出現了！快走進去':boss?'👹 打倒守著通道的妖怪大王！':`🔍 找秘密通道 · 已救 ${rescued} 人`);
+  if(boss&&!mon){const bw=Math.min(W*.5,360),bx=W/2-bw/2,by=H-(H>W?220:150);bar(bx,by,bw,20,boss.hp/boss.max,boss.hp<boss.max*.5?'#ff3b3b':'#a35cff',`👹 妖怪大王 ${Math.ceil(boss.hp)}/${Math.ceil(boss.max)}${boss.hp<boss.max*.5?'　暴怒！':''}`);}
   ctx.font='900 13px '+FONT;const gw=ctx.measureText(goal).width+24,gx=W/2-gw/2;
   if(W>560){ctx.fillStyle=mon?'rgba(90,0,130,.7)':'rgba(0,0,0,.5)';rr(gx,top,gw,26,13);ctx.fill();txt(goal,W/2,top+13,13,'#fff','center',900);}
   else{ctx.fillStyle=mon?'rgba(90,0,130,.7)':'rgba(0,0,0,.5)';rr(L,top+(mon?56:76),Math.min(gw,W-24),24,12);ctx.fill();txt(goal,L+12,top+(mon?68:88),12,'#fff','left',900);}
@@ -1257,6 +1309,7 @@ function startDraw2(){
    <p>這層的妖怪不打架，他們要跟你<b>比畫畫</b>！</p>
    <p>🚪 走進<b>發亮的畫室</b> → 出現題目 → 你和 4 隻妖怪一起畫（${DRAW_TIME} 秒）</p>
    <p>✏️ 用手指（或滑鼠）在白紙上畫，下面可以換顏色、換粗細、用橡皮擦</p>
+   <p>🪣 <b>填色</b>：按住一個顏色，拖到畫上要塗的地方放開，那一塊就自動塗滿！也可以按「🪣 油漆桶」再點畫面。畫錯了按「↩️ 復原」</p>
    <p>🖼️ 一共要畫 <b>${ROUNDS} 張</b>，畫完去右邊的 <b>🗳️ 投票室</b></p>
    <p>🗳️ 每一題大家都要投票給<b>最好玩、最有創意</b>的圖，<b>不能投給自己</b></p>
    <p>🏆 最後分數最高的就是贏家！贏了才能上 3 樓</p>
@@ -1328,17 +1381,51 @@ function drawUIOpen(){return dr.open;}
   const tl=$('dTools');let h='';
   PALETTE.forEach((c,i)=>{h+=`<button class="sw ${i?'':'sel'}" data-c="${c}" style="background:${c}${c==='#ffffff'?';background-image:repeating-linear-gradient(45deg,#ddd 0 4px,#fff 4px 8px)':''}" title="${c==='#ffffff'?'橡皮擦':''}"></button>`;});
   [4,8,16].forEach((z,i)=>{h+=`<button class="sz ${i===1?'sel':''}" data-z="${z}"><i style="width:${z*.9+2}px;height:${z*.9+2}px"></i></button>`;});
+  h+='<button class="sz" id="dFill" style="width:auto;padding:0 10px;font-weight:800;font-family:inherit">🪣 油漆桶</button><button class="sz" id="dUndo" style="width:auto;padding:0 10px;font-weight:800;font-family:inherit">↩️ 復原</button>';
   h+='<button class="pill red" id="dClear" style="padding:8px 12px;font-size:14px">🗑️ 清掉</button><button class="pill green" id="dDone" style="padding:8px 14px;font-size:15px">✅ 畫好了</button>';
   tl.innerHTML=h;
-  tl.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{dr.col=b.dataset.c;tl.querySelectorAll('[data-c]').forEach(x=>x.classList.toggle('sel',x===b));});
+  const pickCol=b=>{dr.col=b.dataset.c;tl.querySelectorAll('[data-c]').forEach(x=>x.classList.toggle('sel',x===b));};
+  // 顏色：點一下＝選色；按住拖到畫上放開＝那一塊自動填滿（像 Procreate）
+  tl.querySelectorAll('[data-c]').forEach(b=>{
+    b.addEventListener('pointerdown',e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId);}catch(_){}dr.cdrag={b,id:e.pointerId,x:e.clientX,y:e.clientY,moved:false};});
+    b.addEventListener('pointermove',e=>{const d=dr.cdrag;if(!d||d.id!==e.pointerId)return;
+      if(!d.moved&&hyp(e.clientX-d.x,e.clientY-d.y)>10){d.moved=true;const g=$('dGhost');g.style.background=b.dataset.c;g.classList.remove('hidden');}
+      if(d.moved){const g=$('dGhost');g.style.left=e.clientX+'px';g.style.top=e.clientY+'px';}});
+    const up=e=>{const d=dr.cdrag;if(!d||d.id!==e.pointerId)return;dr.cdrag=null;$('dGhost').classList.add('hidden');pickCol(b);
+      if(!d.moved||!dr.open||dr.paused||dr.hurry)return;const r=DC.getBoundingClientRect();
+      if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom)fillAt((e.clientX-r.left)/r.width*480,(e.clientY-r.top)/r.height*480,b.dataset.c);};
+    b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);});
+  $('dFill').onclick=()=>{dr.tool=dr.tool==='fill'?'pen':'fill';$('dFill').classList.toggle('sel',dr.tool==='fill');toast(dr.tool==='fill'?'🪣 點畫面上的一塊，就會用現在的顏色填滿':'✏️ 換回畫筆',1400);};
+  $('dUndo').onclick=()=>{const u=dr.undo.pop();if(u)dctx.putImageData(u,0,0);else toast('沒有可以復原的了',1000);};
   tl.querySelectorAll('[data-z]').forEach(b=>b.onclick=()=>{dr.size=+b.dataset.z;tl.querySelectorAll('[data-z]').forEach(x=>x.classList.toggle('sel',x===b));});
-  $('dClear').onclick=()=>{dctx.fillStyle='#fff';dctx.fillRect(0,0,480,480);dr.strokes=0;dr.colors.clear();};
+  $('dClear').onclick=()=>{pushUndo();dctx.fillStyle='#fff';dctx.fillRect(0,0,480,480);dr.strokes=0;dr.colors.clear();};
   $('dDone').onclick=()=>{if(!dr.open||dr.paused)return;if(dr.strokes===0){toast('先畫一點東西吧！✏️');return;}finishDraw();};
   let rh='';RIVALS.forEach((rv,i)=>{rh+=`<div class="rv" id="rv${i}"><canvas width="160" height="160"></canvas>${rv.e} ${rv.n}</div>`;});
   $('dRivals').innerHTML=rh;dr.rc=RIVALS.map((_,i)=>$('rv'+i).querySelector('canvas'));
 })();
 function dPos(e){const b=DC.getBoundingClientRect();return[(e.clientX-b.left)/b.width*480,(e.clientY-b.top)/b.height*480];}
-DC.addEventListener('pointerdown',e=>{if(!dr.open||dr.paused||dr.hurry)return;e.preventDefault();dr.drawing=true;dr.pid=e.pointerId;try{DC.setPointerCapture(e.pointerId);}catch(_){}
+function pushUndo(){dr.undo=dr.undo||[];dr.undo.push(dctx.getImageData(0,0,480,480));if(dr.undo.length>8)dr.undo.shift();}
+/* 油漆桶：從點的位置往外找顏色差不多的地方，全部塗滿 */
+function fillAt(x,y,col){
+  x=Math.floor(clamp(x,0,479));y=Math.floor(clamp(y,0,479));
+  const img=dctx.getImageData(0,0,480,480),d=img.data,W0=480,i0=(y*W0+x)*4,sr=d[i0],sg=d[i0+1],sb=d[i0+2];
+  const n=parseInt(col.slice(1),16),cr=n>>16&255,cg=n>>8&255,cb=n&255;
+  if(Math.abs(sr-cr)+Math.abs(sg-cg)+Math.abs(sb-cb)<12)return;
+  pushUndo();
+  const tol=110,seen=new Uint8Array(W0*480),st=[x,y],same=i=>Math.abs(d[i]-sr)+Math.abs(d[i+1]-sg)+Math.abs(d[i+2]-sb)<=tol;
+  while(st.length){const yy=st.pop(),xx=st.pop();let l=xx;while(l>0&&!seen[yy*W0+l-1]&&same((yy*W0+l-1)*4))l--;
+    let up=false,dn=false;
+    for(let k=l;k<W0;k++){const p=yy*W0+k;if(seen[p]||!same(p*4))break;seen[p]=1;const q=p*4;d[q]=cr;d[q+1]=cg;d[q+2]=cb;d[q+3]=255;
+      if(yy>0){const u=p-W0;if(!seen[u]&&same(u*4)){if(!up){st.push(k,yy-1);up=true;}}else up=false;}
+      if(yy<479){const v=p+W0;if(!seen[v]&&same(v*4)){if(!dn){st.push(k,yy+1);dn=true;}}else dn=false;}}}
+  // 邊緣抗鋸齒的那一圈也塗上，看起來比較乾淨
+  for(let p=0;p<W0*480;p++){if(seen[p])continue;const px=p%W0,py=(p/W0)|0;
+    if((px>0&&seen[p-1])||(px<479&&seen[p+1])||(py>0&&seen[p-W0])||(py<479&&seen[p+W0])){const q=p*4,lum=d[q]+d[q+1]+d[q+2];if(lum>360){d[q]=cr;d[q+1]=cg;d[q+2]=cb;}}}
+  dctx.putImageData(img,0,0);dr.strokes++;if(col!=='#ffffff')dr.colors.add(col);sfx(520,.12,'sine',.05,300);
+}
+DC.addEventListener('pointerdown',e=>{if(!dr.open||dr.paused||dr.hurry)return;e.preventDefault();
+  if(dr.tool==='fill'){const[x,y]=dPos(e);fillAt(x,y,dr.col);return;}
+  pushUndo();dr.drawing=true;dr.pid=e.pointerId;try{DC.setPointerCapture(e.pointerId);}catch(_){}
   const[x,y]=dPos(e);dr.lx=x;dr.ly=y;dr.strokes++;if(dr.col!=='#ffffff')dr.colors.add(dr.col);
   dctx.fillStyle=dr.col;dctx.beginPath();dctx.arc(x,y,dr.size/2,0,7);dctx.fill();});
 DC.addEventListener('pointermove',e=>{if(!dr.drawing||e.pointerId!==dr.pid)return;const[x,y]=dPos(e);
@@ -1358,7 +1445,7 @@ function openDraw(room){
   // 這一場用過的、以前比賽畫過的題目都不要再出；全部出過一輪才重新來
   const used=new Set([...c2().rounds.map(r=>r.topic),...(save.usedTopics||[])]);let pool=TOPICS.map((_,i)=>i).filter(i=>!used.has(i));
   if(!pool.length){save.usedTopics=[];const cur=new Set(c2().rounds.map(r=>r.topic));pool=TOPICS.map((_,i)=>i).filter(i=>!cur.has(i));}
-  Object.assign(dr,{open:true,paused:false,room,topic:pick(pool),t:0,hurry:0,strokes:0,drawing:false});dr.colors.clear();
+  Object.assign(dr,{open:true,paused:false,room,topic:pick(pool),t:0,hurry:0,strokes:0,drawing:false,undo:[],tool:'pen'});if($('dFill'))$('dFill').classList.remove('sel');dr.colors.clear();
   dr.rivals=RIVALS.map((_,i)=>rivalDrawing(i,dr.topic));
   dctx.fillStyle='#fff';dctx.fillRect(0,0,480,480);
   $('dTopic').textContent='題目：'+TOPICS[dr.topic].n;$('dCount').textContent=`第 ${c2().rounds.length+1}/${ROUNDS} 張`;
@@ -1845,67 +1932,170 @@ function drawChase(){
 }
 
 /* =========================================================
-   電梯：抵達大樓後可以選任何一層
+   攀岩：從大樓外牆往上爬，爬到哪一層的窗戶就從那裡進去
+   拖拉主角的手腳到抓點；體力用完會滑下去一層
    ========================================================= */
-const FLOOR_TAG={1:['🧟','妖怪辦公室'],2:['🎨','畫畫比賽'],3:['🎪','馬戲團']};
-function floorInfo(f){const t=FLOOR_TAG[f];return t?`${t[0]} ${f} 樓：${t[1]}`:`🧟 ${f} 樓：妖怪辦公室（妖怪血 ×${fscale(f).hp.toFixed(2)}、攻擊 ×${fscale(f).dmg.toFixed(2)}）`;}
-const elev={sel:1,from:1,to:1,t:0,T:1};
-function openElevator(){
-  input.keys={};joy.active=false;
-  const nx=save.floor||1,best=save.best||1;elev.sel=nx;
-  let h=`<div class="elevTop"><h2 style="margin:0">🛗 電梯</h2><div class="elevLed" id="eLed">${nx}F</div></div>
-   <p style="margin-top:6px">想去哪一層都可以！按一下樓層，再按「出發」。</p>
-   <p style="font-size:13px">🟡 下一個要挑戰的樓層　🟢 已經到過　🎨🎪 特別樓層</p>
-   <div class="fgrid">`;
-  for(let f=1;f<=TOP;f++){const t=FLOOR_TAG[f];h+=`<button class="fb ${f===nx?'next sel':f<best?'done':''}" data-f="${f}">${f}${t&&f>1?`<i>${t[0]}</i>`:''}</button>`;}
-  h+=`</div><div class="elevInfo" id="eInfo">${floorInfo(nx)}</div>
-   <div class="row"><button class="pill red" id="eGo">🛗 出發！</button><button class="pill green" id="eNext">⏩ 直接去 ${nx} 樓</button></div>`;
-  showModal(h);$('modalCard').classList.add('elev');
-  document.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{elev.sel=+b.dataset.f;
-    document.querySelectorAll('[data-f]').forEach(x=>x.classList.toggle('sel',x===b));
-    $('eLed').textContent=elev.sel+'F';$('eInfo').textContent=floorInfo(elev.sel);sfx(880,.05,'sine',.04);});
-  $('eGo').onclick=()=>rideTo(elev.sel);
-  $('eNext').onclick=()=>rideTo(nx);
+const FH=2.6,BW=9,CL_REACH_H=1.7,CL_REACH_F=1.55;
+const CL={ready:false,limbs:null,B:{x:0,y:1},sta:100,drag:null,orbit:null,view:0,yaw:0,best:1,passed:0,camY:2};
+const CL_VIEWS=[{n:'正面',r:7.5,yaw:0,pitch:.12},{n:'斜側面',r:6,yaw:.7,pitch:.08},{n:'遠景',r:18,yaw:-.5,pitch:.32},{n:'俯瞰',r:9,yaw:.2,pitch:.75}];
+function srand(seed){let x=seed>>>0||1;return()=>{x^=x<<13;x>>>=0;x^=x>>17;x^=x<<5;x>>>=0;return x/4294967296;};}
+const winY=f=>(f-1)*FH+1.45;
+let CLH=null;
+function buildClimb(){
+  if(CL.ready||!window.THREE)return;
+  const R=new THREE.WebGLRenderer({canvas:$('cvClimb'),antialias:true});R.setPixelRatio(Math.min(1.5,window.devicePixelRatio||1));
+  const sc=new THREE.Scene();sc.background=new THREE.Color(0x9fd4ff);sc.fog=new THREE.Fog(0x9fd4ff,30,120);
+  const cam=new THREE.PerspectiveCamera(55,1,.1,400);
+  sc.add(new THREE.HemisphereLight(0xffffff,0x667755,.8));const sun=new THREE.DirectionalLight(0xffffff,.7);sun.position.set(6,12,10);sc.add(sun);
+  const M=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.8},o||{}));
+  const TH=TOP*FH+1.5;
+  // 大樓本體
+  const body=new THREE.Mesh(new THREE.BoxGeometry(BW,TH,7),M(0xd8cfc0));body.position.set(0,TH/2,-3.5);sc.add(body);
+  const slabs=new THREE.InstancedMesh(new THREE.BoxGeometry(BW+.3,.18,7.3),M(0xb9ad98),TOP);
+  const mtx=new THREE.Matrix4();for(let f=1;f<=TOP;f++){mtx.makeTranslation(0,(f-1)*FH,-3.5);slabs.setMatrixAt(f-1,mtx);}sc.add(slabs);
+  // 窗戶
+  const wins=new THREE.InstancedMesh(new THREE.BoxGeometry(1.3,1.2,.12),M(0x2f5f8f,{roughness:.2,metalness:.4,emissive:0x0a1a2a}),TOP*4);
+  let wi=0;for(let f=1;f<=TOP;f++)for(const x of [-3.6,-2.2,2.2,3.6]){mtx.makeTranslation(x,winY(f),.02);wins.setMatrixAt(wi++,mtx);}sc.add(wins);
+  // 每層的入口窗（中間，有樓層號碼）
+  const ent=new THREE.InstancedMesh(new THREE.BoxGeometry(1.5,1.5,.14),M(0xffc94a,{emissive:0x553300,roughness:.4}),TOP);
+  for(let f=1;f<=TOP;f++){mtx.makeTranslation(0,winY(f),.03);ent.setMatrixAt(f-1,mtx);}sc.add(ent);
+  const glass=new THREE.InstancedMesh(new THREE.BoxGeometry(1.2,1.2,.16),M(0x3a78b8,{roughness:.15,metalness:.5,emissive:0x0c2033}),TOP);
+  for(let f=1;f<=TOP;f++){mtx.makeTranslation(0,winY(f),.04);glass.setMatrixAt(f-1,mtx);}sc.add(glass);
+  const labels=new Map();
+  function label(f){if(labels.has(f))return;const c=document.createElement('canvas');c.width=160;c.height=72;const g=c.getContext('2d');
+    g.fillStyle='rgba(20,24,36,.85)';g.fillRect(0,0,160,72);g.fillStyle=f===2?'#ff9fc4':f===3?'#ffd23f':'#fff';g.font='900 40px sans-serif';g.textAlign='center';g.textBaseline='middle';
+    g.fillText(f+'F'+(f===2?'🎨':f===3?'🎪':''),80,38);
+    const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c)}));sp.scale.set(1.3,.6,1);sp.position.set(0,winY(f)+1.05,.3);sc.add(sp);labels.set(f,sp);}
+  // 抓點（固定亂數，每次一樣）
+  const rnd=srand(20261015),holds=[];
+  holds.push({x:-.35,y:.12},{x:.35,y:.12},{x:-1.1,y:1.95},{x:1.1,y:1.95});
+  // 每一排沿著四條路線放，左右亂偏一點；遇到窗戶就把中間的抓點挪到窗戶兩邊
+  for(let y=.75,row=0;y<TH-1;y+=.58,row++){
+    const lanes=row%2?[-1.9,-.75,.75,1.9]:[-1.35,0,1.35,2.4*(rnd()<.5?-1:1)];
+    for(const lx of lanes){let x=lx+(rnd()-.5)*.45;const yy=y+(rnd()-.5)*.18;
+      const f=Math.round((yy-winY(1))/FH)+1,wy=winY(f);if(Math.abs(x)<1&&Math.abs(yy-wy)<.8)x=x<0?-1.15:1.15;
+      if(rnd()<.12)continue;holds.push({x,y:yy});}}
+  const HC=[0xff5a5a,0xffb02e,0x5bc46a,0x4a9ee8,0xb06bff,0xff7eb6];
+  const hm=new THREE.InstancedMesh(new THREE.SphereGeometry(.12,10,8),M(0xffffff,{roughness:.5}),holds.length);
+  const col=new THREE.Color();
+  holds.forEach((h,i)=>{mtx.makeTranslation(h.x,h.y,.14);hm.setMatrixAt(i,mtx);h.c=HC[i%HC.length];hm.setColorAt(i,col.setHex(h.c));});
+  sc.add(hm);
+  // 地面與城市
+  const gr=new THREE.Mesh(new THREE.PlaneGeometry(300,300),M(0x7cc46a));gr.rotation.x=-Math.PI/2;sc.add(gr);
+  const road=new THREE.Mesh(new THREE.PlaneGeometry(300,6),M(0x4a4f5c));road.rotation.x=-Math.PI/2;road.position.set(0,.01,6);sc.add(road);
+  const cr=srand(7);for(let i=0;i<40;i++){const h=4+cr()*30,b=new THREE.Mesh(new THREE.BoxGeometry(4+cr()*4,h,4+cr()*4),M([0xa7b3c9,0xc9b28f,0xd79a8a,0x9fc0b0][i%4]));
+    const a=cr()*Math.PI*2,rr=25+cr()*50;b.position.set(Math.cos(a)*rr,h/2,Math.sin(a)*rr-10);sc.add(b);}
+  const roof=new THREE.Mesh(new THREE.BoxGeometry(BW+.6,.6,7.6),M(0xe8483a));roof.position.set(0,TH,-3.5);sc.add(roof);
+  // 攀岩的主角
+  const id=()=>IDS[P.id];
+  const fig=new THREE.Group();sc.add(fig);
+  const torso=new THREE.Mesh(new THREE.BoxGeometry(.62,.9,.36),M(0xffffff));fig.add(torso);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(.3,18,14),M(0xffd9b0));fig.add(head);
+  const hat=new THREE.Mesh(new THREE.SphereGeometry(.31,18,10,0,Math.PI*2,0,Math.PI/2),M(0xffffff));fig.add(hat);
+  const bag=new THREE.Mesh(new THREE.BoxGeometry(.42,.5,.18),M(0x8a5a30));fig.add(bag);
+  const seg=()=>{const m=new THREE.Mesh(new THREE.CylinderGeometry(.09,.08,1,10),M(0xffffff));fig.add(m);return m;};
+  const ends=[],segs=[];
+  for(let i=0;i<4;i++){segs.push([seg(),seg()]);const e=new THREE.Mesh(new THREE.SphereGeometry(i<2?.13:.14,12,10),M(i<2?0xffd9b0:0x2a2a30));fig.add(e);ends.push(e);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.24,.035,8,24),new THREE.MeshBasicMaterial({color:0xffe066}));fig.add(ring);e.ring=ring;}
+  const reachRing=new THREE.Mesh(new THREE.RingGeometry(1.3,1.38,48),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.5}));reachRing.visible=false;sc.add(reachRing);
+  CLH={R,sc,cam,holds,hm,col,label,fig,torso,head,hat,bag,segs,ends,reachRing,id};
+  CL.ready=true;
 }
-function rideTo(f){
-  $('modalCard').classList.remove('elev');hideModal();
-  Object.assign(elev,{from:1,to:f,t:0,T:f===1?1.2:1.6+Math.min(2.2,f/30),dinged:0});
-  scene='elev';setLayers();sfx(440,.2,'sine',.05);
-  if(f!==(save.floor||1))logRec(`🛗 搭電梯到 ${f} 樓`);
+function clLayout(){if(!CLH)return;const w=innerWidth,h=innerHeight;CLH.R.setSize(w,h,false);CLH.cam.aspect=w/h;CLH.cam.updateProjectionMatrix();}
+addEventListener('resize',()=>{if(scene==='climb')clLayout();});
+function clBody(L){const x=(L[0].x+L[1].x+L[2].x+L[3].x)/4,y=((L[0].y+L[1].y)/2-1.15+(L[2].y+L[3].y)/2+.95)/2;return{x,y};}
+function clRoot(i,B){return i<2?{x:B.x+(i?.32:-.32),y:B.y+.75}:{x:B.x+(i===3?.22:-.22),y:B.y-.05};}
+function clOK(L){const B=clBody(L);for(let i=0;i<4;i++){const r=clRoot(i,B),d=hyp(L[i].x-r.x,L[i].y-r.y);if(d>(i<2?CL_REACH_H:CL_REACH_F)+.05)return false;}
+  if(Math.min(L[0].y,L[1].y)<Math.max(L[2].y,L[3].y)-.2)return false;  // 手不能比腳低太多
+  return true;}
+function climbFloorNow(){return clamp(Math.round((CL.B.y+.6-winY(1))/FH)+1,1,TOP);}
+function startClimb(){
+  scene='climb';buildClimb();setLayers();
+  if(!CLH){toast('這台手機不能顯示 3D，直接從 1 樓進去');goFloor(1);return;}
+  const H0=CLH.holds;CL.limbs=[H0[2],H0[3],H0[0],H0[1]];CL.B=clBody(CL.limbs);CL.sta=100;CL.drag=null;CL.orbit=null;CL.passed=1;CL.camY=CL.B.y+.6;CL.yaw=0;
+  clLayout();clHud();
+  showModal(`<h2>🧗 從外牆爬上最高樓！</h2>
+   <div class="tips">
+   <p>✋🦶 <b>按住主角發亮的手或腳</b>，拖到旁邊彩色的<b>抓點</b>上放開。手腳要輪流往上，身體才會跟著上去。</p>
+   <p>🟡 每一層樓中間有一扇<b>黃色窗戶</b>，爬到窗戶旁邊就會出現「進入」按鈕。2 樓🎨、3 樓🎪，其他是妖怪辦公室。</p>
+   <p>💪 爬的時候體力會慢慢減少，每經過一層樓窗戶可以喘口氣補體力。體力用完會<b>滑下去一層</b>。</p>
+   <p>🎥 右上角換視角，也可以在空白的地方左右拖動來轉鏡頭。</p>
+   <p>你上次挑戰到 <b>${save.floor||1} 樓</b>（最高 ${save.best||1} 樓）。</p>
+   </div><div class="row"><button class="pill red" id="mGo">開始爬！</button></div>`);
+  $('mGo').onclick=hideModal;
 }
-function updElev(dt){
-  elev.t+=dt;
-  const doorsClose=.45,doorsOpen=elev.T-.5;
-  if(elev.t>doorsOpen&&!elev.dinged){elev.dinged=1;sfx(1320,.35,'sine',.07);setTimeout(()=>sfx(1046,.5,'sine',.06),180);}
-  if(elev.t>=elev.T){goFloor(elev.to);}
+function clHud(){
+  const f=climbFloorNow(),near=nearWindow();
+  $('clFloor').textContent=`🧗 ${f} 樓的高度（目標 ${save.floor||1} 樓）`;
+  $('clSta').style.width=CL.sta+'%';$('clSta').style.background=CL.sta<25?'#ff5a5a':CL.sta<50?'#ffd23f':'#5bc46a';
+  $('clStaT').textContent=`💪 體力 ${Math.ceil(CL.sta)}`;
+  const b=$('clEnter');if(near){b.classList.remove('hidden');b.textContent=`🪟 進入 ${near} 樓${near===2?' 🎨':near===3?' 🎪':''}`;}else b.classList.add('hidden');
 }
-function elevFloorNow(){const a=.5,b=elev.T-.55,p=clamp((elev.t-a)/(b-a),0,1),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;return Math.round(elev.from+(elev.to-elev.from)*e);}
-function drawElev(){
-  ctx.fillStyle='#2a2f3a';ctx.fillRect(0,0,W,H);
-  const w=Math.min(W*.8,520),h=Math.min(H*.86,560),x=W/2-w/2,y=H/2-h/2+10;
-  // 電梯內部
-  const g=ctx.createLinearGradient(x,0,x+w,0);g.addColorStop(0,'#8e96a6');g.addColorStop(.5,'#d9dee7');g.addColorStop(1,'#8e96a6');ctx.fillStyle=g;ctx.fillRect(x,y,w,h);
-  // 樓層顯示
-  const n=elevFloorNow(),up=elev.to>n;
-  ctx.fillStyle='#140c0a';rr(W/2-70,y-2,140,52,10);ctx.fill();
-  ctx.font='900 34px ui-monospace,"Courier New",monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ff5a3c';ctx.shadowColor='#ff5a3c';ctx.shadowBlur=10;
-  ctx.fillText((up&&elev.t<elev.T-.55?'▲':' ')+n+'F',W/2,y+25);ctx.shadowBlur=0;
-  // 門
-  const t=elev.t,open=t<.45?1-t/.45:t>elev.T-.5?(t-(elev.T-.5))/.5:0,dw=w*.36,dh=h*.72,dy=y+70,cx=W/2;
-  ctx.fillStyle='#1b2130';ctx.fillRect(cx-dw,dy,dw*2,dh);
-  if(open>0){ // 門外：目的地的樣子
-    const tag=FLOOR_TAG[elev.to];emo(t<.45?'🚗':(tag?tag[0]:'🧟'),cx,dy+dh*.5,Math.min(dw,90));}
-  const off=dw*open;
-  const dg=ctx.createLinearGradient(0,dy,0,dy+dh);dg.addColorStop(0,'#c3c9d4');dg.addColorStop(1,'#9aa2b1');ctx.fillStyle=dg;
-  ctx.fillRect(cx-dw-off+0,dy,dw,dh);ctx.fillRect(cx+off,dy,dw,dh);
-  ctx.strokeStyle='#6b7385';ctx.lineWidth=2;ctx.strokeRect(cx-dw-off,dy,dw,dh);ctx.strokeRect(cx+off,dy,dw,dh);
-  // 按鈕面板與主角
-  ctx.fillStyle='#4a5263';rr(x+w-46,dy+dh*.3,30,90,8);ctx.fill();
-  for(let i=0;i<4;i++){ctx.fillStyle=i===0?'#ffd23f':'#d9dee7';ctx.beginPath();ctx.arc(x+w-31,dy+dh*.3+16+i*20,6,0,7);ctx.fill();}
-  drawHero(cx,dy+dh-10,Math.max(1.6,Math.min(W,H)/300),0,0,0,false);
-  txt(elev.t<elev.T-.5?`往 ${elev.to} 樓……`:`叮！${elev.to} 樓到了`,W/2,y+h+(H-(y+h))/2-4,18,'#fff');
+function nearWindow(){const f=climbFloorNow();return Math.abs(CL.B.y+.6-winY(f))<1.2&&Math.abs(CL.B.x)<1.6?f:0;}
+$('clEnter').onclick=()=>{const f=nearWindow();if(!f)return;logRec(`🧗 爬外牆到 ${f} 樓，從窗戶進去`);stat('climbs');$('cvClimb').style.display='none';goFloor(f);};
+$('clView').addEventListener('pointerdown',e=>{e.preventDefault();CL.view=(CL.view+1)%CL_VIEWS.length;CL.yaw=0;toast('🎥 '+CL_VIEWS[CL.view].n);});
+$('clPause').addEventListener('pointerdown',e=>{e.preventDefault();openPause();});
+$('clRec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
+/* 觸控：拖手腳、拖背景轉鏡頭 */
+const clRay=new (window.THREE?THREE.Raycaster:Object)(),clPlane=window.THREE?new THREE.Plane(new THREE.Vector3(0,0,1),-.14):null;
+function clScreen(p){const v=new THREE.Vector3(p.x,p.y,.3).project(CLH.cam);return{x:(v.x+1)/2*innerWidth,y:(1-v.y)/2*innerHeight};}
+function clWorld(cx,cy){const v=new THREE.Vector2(cx/innerWidth*2-1,-(cy/innerHeight)*2+1);clRay.setFromCamera(v,CLH.cam);const o=new THREE.Vector3();return clRay.ray.intersectPlane(clPlane,o)?{x:o.x,y:o.y}:null;}
+const cvC=$('cvClimb');
+cvC.addEventListener('pointerdown',e=>{if(scene!=='climb'||!$('modal').classList.contains('hidden'))return;e.preventDefault();try{cvC.setPointerCapture(e.pointerId);}catch(_){}
+  let best=-1,bd=48;CL.limbs.forEach((l,i)=>{const s=clScreen(l),d=hyp(s.x-e.clientX,s.y-e.clientY);if(d<bd){bd=d;best=i;}});
+  if(best>=0){CL.drag={i:best,id:e.pointerId,p:{...CL.limbs[best]}};sfx(500,.05,'triangle',.04);}
+  else CL.orbit={id:e.pointerId,x:e.clientX,yaw:CL.yaw};});
+cvC.addEventListener('pointermove',e=>{
+  if(CL.drag&&e.pointerId===CL.drag.id){const w=clWorld(e.clientX,e.clientY);if(w)CL.drag.p=w;}
+  else if(CL.orbit&&e.pointerId===CL.orbit.id){CL.yaw=clamp(CL.orbit.yaw+(e.clientX-CL.orbit.x)/innerWidth*3,-1.3,1.3);}});
+const clUp=e=>{
+  if(CL.drag&&e.pointerId===CL.drag.id){const d=CL.drag;CL.drag=null;
+    let best=null,bd=.55;for(const h of CLH.holds){const dd=hyp(h.x-d.p.x,h.y-d.p.y);if(dd<bd&&!CL.limbs.includes(h)){bd=dd;best=h;}}
+    if(!best){toast('要放在彩色的抓點上喔！',1200);return;}
+    const L=CL.limbs.slice();L[d.i]=best;
+    if(!clOK(L)){toast('太遠了，抓不到！換近一點的抓點',1400);sfx(150,.12,'sawtooth',.04);return;}
+    CL.limbs=L;CL.B=clBody(L);CL.sta=Math.max(0,CL.sta-1.5);sfx(700,.06,'triangle',.05,200);
+    const f=climbFloorNow();if(f>CL.passed){CL.passed=f;CL.sta=Math.min(100,CL.sta+25);toast(`🎉 爬到 ${f} 樓了！喘口氣，體力 +25`,1500);}}
+  if(CL.orbit&&e.pointerId===CL.orbit.id)CL.orbit=null;};
+cvC.addEventListener('pointerup',clUp);cvC.addEventListener('pointercancel',clUp);
+function updClimb(dt){
+  if(!CLH)return;
+  CL.sta-=dt*(CL.B.y>1.5?.8:0);
+  if(CL.sta<=0){ // 滑下去一層
+    const L=CL.limbs.map(l=>{let best=CLH.holds[0],bd=1e9;for(const h of CLH.holds){const d=hyp(h.x-l.x,h.y-(l.y-FH));if(d<bd){bd=d;best=h;}}return best;});
+    const ok=new Set(L).size===4&&clOK(L);CL.limbs=ok&&L[0].y>.5?L:[CLH.holds[2],CLH.holds[3],CLH.holds[0],CLH.holds[1]];
+    CL.B=clBody(CL.limbs);CL.sta=60;CL.passed=climbFloorNow();shake=10;sfx(120,.5,'sawtooth',.07,-60);toast('😵 沒力氣了，滑下去一層！',1800);
+  }
+  clHud();
 }
-
+function cyl(m,a,b){const dx=b.x-a.x,dy=b.y-a.y,dz=b.z-a.z,l=Math.hypot(dx,dy,dz)||.001;m.position.set((a.x+b.x)/2,(a.y+b.y)/2,(a.z+b.z)/2);m.scale.set(1,l,1);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(dx/l,dy/l,dz/l));}
+function drawClimb(){
+  if(!CLH)return;const H_=CLH,B=CL.B,id=H_.id();
+  // 主角姿勢
+  const z=.42;H_.torso.material.color.set(id.c);H_.hat.material.color.set(id.hat);
+  H_.torso.position.set(B.x,B.y+.4,z);H_.bag.position.set(B.x,B.y+.45,z+.26);H_.bag.material.color.set(idk()==='kid'?id.hat:0x8a5a30);
+  H_.head.position.set(B.x,B.y+1.12,z+.05);H_.hat.position.set(B.x,B.y+1.18,z+.05);
+  const ex=CL.limbs.map((l,i)=>CL.drag&&CL.drag.i===i?CL.drag.p:l);
+  ex.forEach((t,i)=>{const r=clRoot(i,B),R3={x:r.x,y:r.y,z},T3={x:t.x,y:t.y,z:.2},a=i<2?.78:.72,bb=a;
+    let dx=T3.x-R3.x,dy=T3.y-R3.y;const d0=Math.hypot(dx,dy)||.001,d=Math.min(d0,a+bb-.01);dx/=d0;dy/=d0;
+    const ca=clamp((a*a+d*d-bb*bb)/(2*a*d),-1,1),sa=Math.sqrt(1-ca*ca),side=(i%2?1:-1)*(i<2?1:1);
+    let nx=-dy,ny=dx;if(nx*side<0){nx=-nx;ny=-ny;}
+    const J={x:R3.x+(dx*ca+nx*sa)*a,y:R3.y+(dy*ca+ny*sa)*a,z:z+.25},E={x:R3.x+dx*d,y:R3.y+dy*d,z:.2};
+    cyl(H_.segs[i][0],R3,J);cyl(H_.segs[i][1],J,E);H_.segs[i].forEach(m=>m.material.color.set(i<2?id.c:0x3d4258));
+    H_.ends[i].position.set(E.x,E.y,E.z);const rg=H_.ends[i].ring;rg.position.set(E.x,E.y,E.z+.05);
+    rg.material.color.set(CL.drag&&CL.drag.i===i?0xff5a3c:0xffe066);rg.scale.setScalar(1+.12*Math.sin(T*6+i));});
+  // 拖拉時顯示可以抓的範圍
+  if(CL.drag){const r=clRoot(CL.drag.i,B),rad=CL.drag.i<2?CL_REACH_H:CL_REACH_F;H_.reachRing.visible=true;H_.reachRing.position.set(r.x,r.y,.2);H_.reachRing.scale.setScalar(rad/1.34);}else H_.reachRing.visible=false;
+  // 樓層號碼（只做附近的）
+  const fN=climbFloorNow();for(let f=Math.max(1,fN-3);f<=Math.min(TOP,fN+4);f++)H_.label(f);
+  // 相機
+  CL.camY+=(B.y+.6-CL.camY)*.08;const v=CL_VIEWS[CL.view],yaw=v.yaw+CL.yaw;
+  const sh=shake>0?rand(-shake,shake)*.01:0;
+  H_.cam.position.set(B.x*.5+Math.sin(yaw)*v.r*Math.cos(v.pitch)+sh,CL.camY+Math.sin(v.pitch)*v.r,Math.cos(yaw)*v.r*Math.cos(v.pitch)+.3);
+  H_.cam.lookAt(B.x*.5,CL.camY,0);
+  H_.R.render(H_.sc,H_.cam);
+}
 /* ---------- 紀錄 ---------- */
 function stat(k,n){save.st=save.st||{};save.st[k]=(save.st[k]||0)+(n||1);}
 function logRec(t){save.st=save.st||{};const d=new Date(),L=save.st.log=save.st.log||[];
@@ -1919,7 +2109,7 @@ function openRecords(){
   const box=(v,l)=>`<div class="st"><b>${v}</b><span>${l}</span></div>`;
   let h=`<h2>📜 我的紀錄</h2><div class="stats">
     ${box(cur+' 樓','現在在')}${box(Math.max(save.best||1,cur)+' 樓','最高到過')}${box(save.clears||0,'過關次數')}${box(save.tops||0,'登上 100 樓')}
-    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.shows||0,'馬戲團成功表演')}${box(st.escapes||0,'逃過妖怪')}${box(st.bestVotes||0,'畫畫最高分')}
+    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box(st.bosses||0,'打倒魔王')}${box(st.climbs||0,'攀岩進大樓')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.shows||0,'馬戲團成功表演')}${box(st.escapes||0,'逃過妖怪')}${box(st.bestVotes||0,'畫畫最高分')}
     ${box('💰 '+save.money,'現在的錢')}${box((save.toys||[]).length+' / '+TOYS.length,'收集的玩具')}${box(fmtTime(st.time),'一共玩了')}${box(IDS[P.id].e+' '+IDS[P.id].n,'現在的身分')}
   </div>`;
   const now=c&&c.rounds&&c.rounds.length?c.rounds.map(r=>r.imgs[0]):null,pics=now||st.lastPics;
@@ -1934,12 +2124,12 @@ $('hRec').onclick=openRecords;
 $('bRec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
 
 /* ---------- 暫停 / 存檔 ---------- */
-function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
+function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
 function openPause(){
   if(!canPause())return;
   input.atk=false;input.keys={};joy.active=false;
   showModal(`<h2>⏸ 暫停</h2>
-   <p>🏢 現在在 <b>${scene==='drive'?'開車去 '+(save.floor||1)+' 樓的路上':curFloor+' 樓'}</b>（最高紀錄 ${Math.max(save.best||1,curFloor)} 樓）</p>
+   <p>🏢 現在在 <b>${scene==='drive'?'開車去最高樓的路上':scene==='climb'?'大樓外牆，'+climbFloorNow()+' 樓的高度':curFloor+' 樓'}</b>（最高紀錄 ${Math.max(save.best||1,curFloor)} 樓）</p>
    <p>💰 ${save.money} 元　🎖️ 過關 ${save.clears} 次</p>
    ${scene==='bike3'?`<p>🚲 特技秀：成功 ${(save.f3&&save.f3.wins)||0} / ${SHOWS_TO_PASS} 場　車子：${bikeText()}</p>`:''}
    ${scene==='draw2'?`<p>🎨 畫畫比賽：已經畫了 ${(save.c2&&save.c2.rounds.length)||0} / 10 張（畫好的圖都有存起來）</p>`:''}
@@ -1971,6 +2161,7 @@ function setLayers(){
   ['bAtk','bSwap','bHeal','bRoll'].forEach(id=>$(id).style.visibility=scene==='draw2'?'hidden':'');
   $('ctlDrive').classList.toggle('hidden',scene!=='drive');
   $('ctl3').classList.toggle('hidden',scene!=='bike3');
+  $('ctlClimb').classList.toggle('hidden',scene!=='climb');$('cvClimb').style.display=scene==='climb'?'block':'none';
   $('ctlHome').classList.toggle('hidden',scene!=='home');
   joy.active=false;input.atk=false;lastBtn='';refreshButtons();
 }
@@ -1998,13 +2189,13 @@ let last=performance.now();
 function frame(now){
   let dt=Math.min(.033,(now-last)/1000);last=now;T+=dt;shake=Math.max(0,shake-dt*40);
   const paused=!$('modal').classList.contains('hidden');
-  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
+  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
   ctx.setTransform(DPR,0,0,DPR,0,0);
   if(scene==='home')drawHome(dt);
   else if(scene==='drive'){if(!paused)updDrive(dt);ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));drawDrive();ctx.restore();}
   else if(scene==='draw2'){if(!paused&&!dr.open)updDraw2(dt);drawDraw2();if(dr.open)updDrawUI(dt);}
   else if(scene==='bike3'){if(!paused)upd3(dt);draw3();}
-  else if(scene==='elev'){updElev(dt);drawElev();}
+  else if(scene==='climb'){if(!paused)updClimb(dt);drawClimb();}
   else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else if(curFloor===3&&scene==='result')draw3();else drawFloor();}
   requestAnimationFrame(frame);
 }
