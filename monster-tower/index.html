@@ -176,7 +176,7 @@
   <button class="btn pz" id="clPause">⏸</button>
   <button class="btn pz" id="clRec">📜</button>
   <button class="pill red hidden" id="clEnter">🪟 進入 1 樓</button>
-  <div id="clHint">按住發亮的手或腳拖到抓點放開，手腳可以無限伸長！拖到畫面最上面鏡頭會往上捲</div>
+  <div id="clHint">拖手腳到抓點，可以無限伸長！拖到最上面會往上捲</div>
 </div>
 
 <!-- 3 樓操作 -->
@@ -2032,6 +2032,7 @@ function clHud(){
   $('clFloor').textContent=`🧗 ${f} 樓的高度（目標 ${save.floor||1} 樓）`;
   $('clSta').style.width=CL.sta+'%';$('clSta').style.background=CL.sta<25?'#ff5a5a':CL.sta<50?'#ffd23f':'#5bc46a';
   $('clStaT').textContent=`💪 體力 ${Math.ceil(CL.sta)}`;
+  $('clHint').style.display=near?'none':'';
   const b=$('clEnter');if(near){b.classList.remove('hidden');b.textContent=`🪟 進入 ${near} 樓${near===2?' 🎨':near===3?' 🎪':''}`;}else b.classList.add('hidden');
 }
 function nearWindow(){const f=climbFloorNow();return Math.abs(CL.B.y+.6-winY(f))<1.2&&Math.abs(CL.B.x)<1.6?f:0;}
@@ -2095,7 +2096,8 @@ function drawClimb(){
     const J={x:R3.x+(dx*ca+nx*sa2)*aa,y:R3.y+(dy*ca+ny*sa2)*aa,z:z+(d>=a+bb?.1:.25)},E={x:R3.x+dx*d,y:R3.y+dy*d,z:.2};
     cyl(H_.segs[i][0],R3,J);cyl(H_.segs[i][1],J,E);H_.segs[i].forEach(m=>m.material.color.set(i<2?id.c:0x3d4258));
     H_.ends[i].position.set(E.x,E.y,E.z);const rg=H_.ends[i].ring;rg.position.set(E.x,E.y,E.z+.05);
-    rg.material.color.set(CL.drag&&CL.drag.i===i?0xff5a3c:0xffe066);rg.scale.setScalar(1+.12*Math.sin(T*6+i));});
+    const zs=Math.max(1,(CL.zoom||1)*.55);H_.ends[i].scale.setScalar(zs);H_.segs[i].forEach(m=>{m.scale.x=m.scale.z=Math.max(1,zs*.7);});
+    rg.material.color.set(CL.drag&&CL.drag.i===i?0xff5a3c:0xffe066);rg.scale.setScalar(zs*(1+.12*Math.sin(T*6+i)));});
   // 拖拉時顯示可以抓的範圍
   H_.reachRing.visible=false;
   // 樓層號碼（只做附近的）
