@@ -2103,7 +2103,8 @@ function drawClimb(){
   if(CL.drag)$('clFloor').textContent=`🧗 手伸到 ${clamp(Math.round((CL.drag.p.y-winY(1))/FH)+1,1,TOP)} 樓的高度`;
   // 相機
   CL.midY=clMid();const tgtY=CL.midY+(CL.camOff||0);CL.camY+=(tgtY-CL.camY)*(CL.drag||CL.orbit?.5:.08);const v0=CL_VIEWS[CL.view],yaw=v0.yaw+CL.yaw;
-  const zoom=clamp((clSpread()+2.2)/4.6,1,4.5);CL.zoom=(CL.zoom||1)+(zoom-(CL.zoom||1))*(CL.drag?0:.06);const v={r:v0.r*CL.zoom,pitch:v0.pitch};
+  // 依照螢幕看得到的高度算出要拉多遠，四肢（加上一點邊）都要在畫面裡；最遠大約看 20 層樓，再遠就上下拖背景看
+  const need=(clSpread()+3.2)/(2*Math.tan(27.5*Math.PI/180)*.78);const zoom=clamp(need/v0.r,1,55/v0.r);CL.zoom=(CL.zoom||1)+(zoom-(CL.zoom||1))*(CL.drag?0:.12);const v={r:v0.r*CL.zoom,pitch:v0.pitch};
   CL.viewH=2*v.r*Math.tan(27.5*Math.PI/180);
   const sh=shake>0?rand(-shake,shake)*.01:0;
   H_.cam.position.set(B.x*.5+Math.sin(yaw)*v.r*Math.cos(v.pitch)+sh,CL.camY+Math.sin(v.pitch)*v.r,Math.cos(yaw)*v.r*Math.cos(v.pitch)+.3);
