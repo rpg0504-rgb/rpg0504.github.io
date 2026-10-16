@@ -176,7 +176,7 @@
   <button class="btn pz" id="clPause">⏸</button>
   <button class="btn pz" id="clRec">📜</button>
   <button class="pill red hidden" id="clEnter">🪟 進入 1 樓</button>
-  <div id="clHint">按住主角發亮的手或腳，拖到旁邊的抓點放開</div>
+  <div id="clHint">按住發亮的手或腳拖到抓點放開，手腳可以無限伸長！拖到畫面最上面鏡頭會往上捲</div>
 </div>
 
 <!-- 3 樓操作 -->
@@ -2003,20 +2003,23 @@ function buildClimb(){
 }
 function clLayout(){if(!CLH)return;const w=innerWidth,h=innerHeight;CLH.R.setSize(w,h,false);CLH.cam.aspect=w/h;CLH.cam.updateProjectionMatrix();}
 addEventListener('resize',()=>{if(scene==='climb')clLayout();});
-function clBody(L){const x=(L[0].x+L[1].x+L[2].x+L[3].x)/4,y=((L[0].y+L[1].y)/2-1.15+(L[2].y+L[3].y)/2+.95)/2;return{x,y};}
+// 手腳可以無限伸長：身體跟著兩隻手，掛在手的下面
+function clBody(L){return{x:(L[0].x+L[1].x)/2,y:(L[0].y+L[1].y)/2-1.05};}
+// 鏡頭對準四肢的中間，並且拉遠到四肢都看得到
+function clMid(){const ys=CL.limbs.map(l=>l.y).concat(CL.B.y+1.2);return(Math.max(...ys)+Math.min(...ys))/2;}
+function clSpread(){const ys=CL.limbs.map(l=>l.y).concat(CL.B.y+1.2);return Math.max(...ys)-Math.min(...ys);}
 function clRoot(i,B){return i<2?{x:B.x+(i?.32:-.32),y:B.y+.75}:{x:B.x+(i===3?.22:-.22),y:B.y-.05};}
-function clOK(L){const B=clBody(L);for(let i=0;i<4;i++){const r=clRoot(i,B),d=hyp(L[i].x-r.x,L[i].y-r.y);if(d>(i<2?CL_REACH_H:CL_REACH_F)+.05)return false;}
-  if(Math.min(L[0].y,L[1].y)<Math.max(L[2].y,L[3].y)-.2)return false;  // 手不能比腳低太多
-  return true;}
+function clOK(L){return new Set(L).size===4;}
 function climbFloorNow(){return clamp(Math.round((CL.B.y+.6-winY(1))/FH)+1,1,TOP);}
 function startClimb(){
   scene='climb';buildClimb();setLayers();
   if(!CLH){toast('這台手機不能顯示 3D，直接從 1 樓進去');goFloor(1);return;}
-  const H0=CLH.holds;CL.limbs=[H0[2],H0[3],H0[0],H0[1]];CL.B=clBody(CL.limbs);CL.sta=100;CL.drag=null;CL.orbit=null;CL.passed=1;CL.camY=CL.B.y+.6;CL.yaw=0;
+  const H0=CLH.holds;CL.limbs=[H0[2],H0[3],H0[0],H0[1]];CL.B=clBody(CL.limbs);CL.sta=100;CL.drag=null;CL.orbit=null;CL.passed=1;CL.camOff=0;CL.manual=false;CL.zoom=1;CL.viewH=8;CL.midY=clMid();CL.camY=CL.midY;CL.yaw=0;
   clLayout();clHud();
   showModal(`<h2>🧗 從外牆爬上最高樓！</h2>
    <div class="tips">
-   <p>✋🦶 <b>按住主角發亮的手或腳</b>，拖到旁邊彩色的<b>抓點</b>上放開。手腳要輪流往上，身體才會跟著上去。</p>
+   <p>✋🦶 <b>按住主角發亮的手或腳</b>，拖到任何一個彩色的<b>抓點</b>上放開。手腳可以<b>無限伸長</b>！把兩隻手都拉到高樓的抓點，身體就會跟著上去。</p>
+   <p>⬆️ 拖著手腳碰到畫面最上面（或最下面），鏡頭會一直往上（往下）捲，想拉到 100 樓都可以。</p>
    <p>🟡 每一層樓中間有一扇<b>黃色窗戶</b>，爬到窗戶旁邊就會出現「進入」按鈕。2 樓🎨、3 樓🎪，其他是妖怪辦公室。</p>
    <p>💪 爬的時候體力會慢慢減少，每經過一層樓窗戶可以喘口氣補體力。體力用完會<b>滑下去一層</b>。</p>
    <p>🎥 右上角換視角，也可以在空白的地方左右拖動來轉鏡頭。</p>
@@ -2043,27 +2046,35 @@ function clWorld(cx,cy){const v=new THREE.Vector2(cx/innerWidth*2-1,-(cy/innerHe
 const cvC=$('cvClimb');
 cvC.addEventListener('pointerdown',e=>{if(scene!=='climb'||!$('modal').classList.contains('hidden'))return;e.preventDefault();try{cvC.setPointerCapture(e.pointerId);}catch(_){}
   let best=-1,bd=48;CL.limbs.forEach((l,i)=>{const s=clScreen(l),d=hyp(s.x-e.clientX,s.y-e.clientY);if(d<bd){bd=d;best=i;}});
-  if(best>=0){CL.drag={i:best,id:e.pointerId,p:{...CL.limbs[best]}};sfx(500,.05,'triangle',.04);}
-  else CL.orbit={id:e.pointerId,x:e.clientX,yaw:CL.yaw};});
+  if(best>=0){CL.drag={i:best,id:e.pointerId,p:{...CL.limbs[best]},sx:e.clientX,sy:e.clientY};sfx(500,.05,'triangle',.04);}
+  else CL.orbit={id:e.pointerId,x:e.clientX,y:e.clientY,yaw:CL.yaw,off:CL.camOff||0};});
 cvC.addEventListener('pointermove',e=>{
-  if(CL.drag&&e.pointerId===CL.drag.id){const w=clWorld(e.clientX,e.clientY);if(w)CL.drag.p=w;}
-  else if(CL.orbit&&e.pointerId===CL.orbit.id){CL.yaw=clamp(CL.orbit.yaw+(e.clientX-CL.orbit.x)/innerWidth*3,-1.3,1.3);}});
+  if(CL.drag&&e.pointerId===CL.drag.id){CL.drag.sx=e.clientX;CL.drag.sy=e.clientY;const w=clWorld(e.clientX,e.clientY);if(w)CL.drag.p=w;}
+  else if(CL.orbit&&e.pointerId===CL.orbit.id){CL.yaw=clamp(CL.orbit.yaw+(e.clientX-CL.orbit.x)/innerWidth*3,-1.3,1.3);
+    CL.camOff=clamp(CL.orbit.off+(e.clientY-CL.orbit.y)/innerHeight*CL.viewH,-CL.midY,TOP*FH-CL.midY);CL.manual=true;}});
 const clUp=e=>{
   if(CL.drag&&e.pointerId===CL.drag.id){const d=CL.drag;CL.drag=null;
     let best=null,bd=.55;for(const h of CLH.holds){const dd=hyp(h.x-d.p.x,h.y-d.p.y);if(dd<bd&&!CL.limbs.includes(h)){bd=dd;best=h;}}
     if(!best){toast('要放在彩色的抓點上喔！',1200);return;}
     const L=CL.limbs.slice();L[d.i]=best;
-    if(!clOK(L)){toast('太遠了，抓不到！換近一點的抓點',1400);sfx(150,.12,'sawtooth',.04);return;}
-    CL.limbs=L;CL.B=clBody(L);CL.sta=Math.max(0,CL.sta-1.5);sfx(700,.06,'triangle',.05,200);
+
+    CL.limbs=L;CL.B=clBody(L);CL.manual=false;CL.camOff=CL.camY-clMid();CL.sta=Math.max(0,CL.sta-1.5);sfx(700,.06,'triangle',.05,200);
     const f=climbFloorNow();if(f>CL.passed){CL.passed=f;CL.sta=Math.min(100,CL.sta+25);toast(`🎉 爬到 ${f} 樓了！喘口氣，體力 +25`,1500);}}
   if(CL.orbit&&e.pointerId===CL.orbit.id)CL.orbit=null;};
 cvC.addEventListener('pointerup',clUp);cvC.addEventListener('pointercancel',clUp);
 function updClimb(dt){
   if(!CLH)return;
+  // 拖著手腳碰到畫面上下邊緣：鏡頭跟著捲，越靠邊越快
+  CL.camOff=CL.camOff||0;
+  if(CL.drag){const e=innerHeight*.2,y=CL.drag.sy;let v=0;
+    if(y<e)v=(1-y/e);else if(y>innerHeight-e)v=-(1-(innerHeight-y)/e);
+    if(v){CL.camOff+=v*v*Math.sign(v)*dt*(14+Math.abs(CL.camOff)*.6);CL.camOff=clamp(CL.camOff,-clMid(),TOP*FH-clMid());
+      CL.camY=clMid()+CL.camOff;const w=clWorld(CL.drag.sx,CL.drag.sy);if(w)CL.drag.p=w;}}
+  else if(!CL.orbit&&!CL.manual)CL.camOff*=Math.pow(.05,dt);
   CL.sta-=dt*(CL.B.y>1.5?.8:0);
   if(CL.sta<=0){ // 滑下去一層
     const L=CL.limbs.map(l=>{let best=CLH.holds[0],bd=1e9;for(const h of CLH.holds){const d=hyp(h.x-l.x,h.y-(l.y-FH));if(d<bd){bd=d;best=h;}}return best;});
-    const ok=new Set(L).size===4&&clOK(L);CL.limbs=ok&&L[0].y>.5?L:[CLH.holds[2],CLH.holds[3],CLH.holds[0],CLH.holds[1]];
+    CL.limbs=new Set(L).size===4&&L[0].y>.5?L:[CLH.holds[2],CLH.holds[3],CLH.holds[0],CLH.holds[1]];
     CL.B=clBody(CL.limbs);CL.sta=60;CL.passed=climbFloorNow();shake=10;sfx(120,.5,'sawtooth',.07,-60);toast('😵 沒力氣了，滑下去一層！',1800);
   }
   clHud();
@@ -2078,19 +2089,22 @@ function drawClimb(){
   H_.head.position.set(B.x,B.y+1.12,z+.05);H_.hat.position.set(B.x,B.y+1.18,z+.05);
   const ex=CL.limbs.map((l,i)=>CL.drag&&CL.drag.i===i?CL.drag.p:l);
   ex.forEach((t,i)=>{const r=clRoot(i,B),R3={x:r.x,y:r.y,z},T3={x:t.x,y:t.y,z:.2},a=i<2?.78:.72,bb=a;
-    let dx=T3.x-R3.x,dy=T3.y-R3.y;const d0=Math.hypot(dx,dy)||.001,d=Math.min(d0,a+bb-.01);dx/=d0;dy/=d0;
-    const ca=clamp((a*a+d*d-bb*bb)/(2*a*d),-1,1),sa=Math.sqrt(1-ca*ca),side=(i%2?1:-1)*(i<2?1:1);
+    let dx=T3.x-R3.x,dy=T3.y-R3.y;const d0=Math.hypot(dx,dy)||.001,d=d0;dx/=d0;dy/=d0;
+    const ca=d>=a+bb?1:clamp((a*a+d*d-bb*bb)/(2*a*d),-1,1),sa=Math.sqrt(1-ca*ca),side=(i%2?1:-1)*(i<2?1:1),sa2=d>=a+bb?0:sa,aa=d>=a+bb?d/2:a;
     let nx=-dy,ny=dx;if(nx*side<0){nx=-nx;ny=-ny;}
-    const J={x:R3.x+(dx*ca+nx*sa)*a,y:R3.y+(dy*ca+ny*sa)*a,z:z+.25},E={x:R3.x+dx*d,y:R3.y+dy*d,z:.2};
+    const J={x:R3.x+(dx*ca+nx*sa2)*aa,y:R3.y+(dy*ca+ny*sa2)*aa,z:z+(d>=a+bb?.1:.25)},E={x:R3.x+dx*d,y:R3.y+dy*d,z:.2};
     cyl(H_.segs[i][0],R3,J);cyl(H_.segs[i][1],J,E);H_.segs[i].forEach(m=>m.material.color.set(i<2?id.c:0x3d4258));
     H_.ends[i].position.set(E.x,E.y,E.z);const rg=H_.ends[i].ring;rg.position.set(E.x,E.y,E.z+.05);
     rg.material.color.set(CL.drag&&CL.drag.i===i?0xff5a3c:0xffe066);rg.scale.setScalar(1+.12*Math.sin(T*6+i));});
   // 拖拉時顯示可以抓的範圍
-  if(CL.drag){const r=clRoot(CL.drag.i,B),rad=CL.drag.i<2?CL_REACH_H:CL_REACH_F;H_.reachRing.visible=true;H_.reachRing.position.set(r.x,r.y,.2);H_.reachRing.scale.setScalar(rad/1.34);}else H_.reachRing.visible=false;
+  H_.reachRing.visible=false;
   // 樓層號碼（只做附近的）
-  const fN=climbFloorNow();for(let f=Math.max(1,fN-3);f<=Math.min(TOP,fN+4);f++)H_.label(f);
+  const fN=clamp(Math.round((CL.camY-winY(1))/FH)+1,1,TOP);for(let f=Math.max(1,fN-4);f<=Math.min(TOP,fN+5);f++)H_.label(f);
+  if(CL.drag)$('clFloor').textContent=`🧗 手伸到 ${clamp(Math.round((CL.drag.p.y-winY(1))/FH)+1,1,TOP)} 樓的高度`;
   // 相機
-  CL.camY+=(B.y+.6-CL.camY)*.08;const v=CL_VIEWS[CL.view],yaw=v.yaw+CL.yaw;
+  CL.midY=clMid();const tgtY=CL.midY+(CL.camOff||0);CL.camY+=(tgtY-CL.camY)*(CL.drag||CL.orbit?.5:.08);const v0=CL_VIEWS[CL.view],yaw=v0.yaw+CL.yaw;
+  const zoom=clamp((clSpread()+2.2)/4.6,1,4.5);CL.zoom=(CL.zoom||1)+(zoom-(CL.zoom||1))*(CL.drag?0:.06);const v={r:v0.r*CL.zoom,pitch:v0.pitch};
+  CL.viewH=2*v.r*Math.tan(27.5*Math.PI/180);
   const sh=shake>0?rand(-shake,shake)*.01:0;
   H_.cam.position.set(B.x*.5+Math.sin(yaw)*v.r*Math.cos(v.pitch)+sh,CL.camY+Math.sin(v.pitch)*v.r,Math.cos(yaw)*v.r*Math.cos(v.pitch)+.3);
   H_.cam.lookAt(B.x*.5,CL.camY,0);
