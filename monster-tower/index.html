@@ -1609,7 +1609,7 @@ function startBike3(){
    <p>🛞 <b>獨輪車</b>：用左右按鈕保持平衡 ${UNI_TIME} 秒。倒下的話最後一個輪子會被吃掉，這層就失敗了。</p>
    <p>🔥 妖怪來吃輪子時快逃！輪子會著火變快，<b>左右換車道</b>閃開妖怪，撐過 ${CHASE_TIME} 秒就賺到錢。</p>
    <p>🛒 表演之間可以去<b>輪子店</b>：🪵木頭輪（一口就被吃）→ ⚫橡皮輪 → ⚡閃電輪（最快，但妖怪最想吃）→ ⚙️鐵輪（最硬）</p>
-   <p>🌟 成功表演 <b>${SHOWS_TO_PASS} 場</b>就能上 4 樓！（現在 ${f3().wins} 場）</p>
+   <p>🌟 隨時都可以按「⬆️ 上 4 樓」上樓，不用贏、輪子壞了也沒關係！成功表演 ${SHOWS_TO_PASS} 場會自動過關。（現在 ${f3().wins} 場）</p>
    </div><div class="row"><button class="pill red" id="mGo">上台！</button></div>`);
   $('mGo').onclick=hideModal;
 }
@@ -1619,7 +1619,7 @@ function set3Keys(){
   const k=$('k3');let h='';
   if(b3.ph==='menu'){
     const st=stage3(),lbl={stunt:'🤹 表演特技',drum:'🥁 打鼓比賽',uni:'🛞 獨輪車平衡'}[st]||'';
-    h=`<button class="pill red" id="k3Go" style="font-size:18px;padding:14px 22px">${lbl}</button><button class="pill" id="k3Shop" style="font-size:18px;padding:14px 22px">🛒 輪子店</button>`;
+    h=`<button class="pill red" id="k3Go" style="font-size:18px;padding:14px 22px">${lbl}</button><button class="pill" id="k3Shop" style="font-size:18px;padding:14px 22px">🛒 輪子店</button><button class="pill green" id="k3Up" style="font-size:18px;padding:14px 22px">⬆️ 上 4 樓</button>`;
   }else if(b3.ph==='stunt')h=ARROWS4.map((a,i)=>`<button class="btn kb" data-k="${i}">${a}</button>`).join('');
   else if(b3.ph==='drum')h=DRUMS.map((a,i)=>`<button class="btn kb wide" data-k="${i}"><span class="em">${i<2?'🥁':'🔔'}</span><small>${a}</small></button>`).join('');
   else if(b3.ph==='chase')h=`<button class="btn kb wide" data-k="0">◀</button><div style="flex:1"></div><button class="btn kb wide" data-k="1">▶</button>`;
@@ -1627,6 +1627,7 @@ function set3Keys(){
   k.innerHTML=h;
   if($('k3Go'))$('k3Go').onclick=()=>startShow();
   if($('k3Shop'))$('k3Shop').onclick=openWheelShop;
+  if($('k3Up'))$('k3Up').onclick=()=>leave3();
   k.querySelectorAll('[data-k]').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();key3(+b.dataset.k);b.classList.add('on');setTimeout(()=>b.classList.remove('on'),120);}));
   k.querySelectorAll('[data-h]').forEach(b=>{const d=+b.dataset.h;
     b.addEventListener('pointerdown',e=>{e.preventDefault();b3.hold=d;b.classList.add('on');try{b.setPointerCapture(e.pointerId);}catch(_){}});
@@ -1772,14 +1773,20 @@ function endUni(ok){
   showModal(`<h2>😵 獨輪車倒下了！</h2><p>妖怪衝過來把你唯一的 ${w.e} ${w.n} 吃掉了……</p>`+'<div class="row"><button class="pill red" id="mGo">嗚嗚……</button></div>');
   $('mGo').onclick=()=>{hideModal();fail3();};
 }
+// 不管有沒有贏、輪子好不好，都可以上樓
+function leave3(wins){
+  const w=wins===undefined?f3().wins:wins;b3.ph='result';scene='result';setLayers();save.f3={wins:0};persist();
+  clearFloor(`<h2>🎪 馬戲團表演結束</h2><p>你在 3 樓成功表演了 <b>${w}</b> 場${w>=SHOWS_TO_PASS?'，太厲害了！':'。不管表演得怎樣，都可以繼續往上爬！'}</p><p>現在的車子：${bikeText()}</p>`);
+}
 function fail3(){
   b3.ph='result';set3Keys();
   const w=f3().wins;save.bike={...STARTER_BIKE};save.f3={wins:0};persist();
   logRec('💔 3 樓失敗：輪子全部被吃光了');
-  showModal(`<h2>💔 輪子全部被吃光了</h2><p>沒有輪子就不能表演，這次 3 樓挑戰失敗（成功了 ${w} 場）。</p>
-   <p>再挑戰的話，會送你一台新的四輪車（⚫⚫ + 🪵🪵），成功場數從 0 開始。</p>
-   <div class="row"><button class="pill red" id="mAgain">🔁 再挑戰</button><button class="pill green" id="mHome">🏠 回家</button></div>`);
+  showModal(`<h2>💔 輪子全部被吃光了</h2><p>沒有輪子就不能表演了（成功了 ${w} 場）。沒關係，一樣可以上 4 樓！</p>
+   <p>再挑戰的話，會送你一台新的四輪車（⚫⚫ + 🪵🪵），成功場數從 0 開始。之後上樓也會送你這台新車。</p>
+   <div class="row"><button class="pill green" id="mUp4">⬆️ 上 4 樓</button><button class="pill red" id="mAgain">🔁 再挑戰</button><button class="pill" id="mHome">🏠 回家</button></div>`);
   $('mAgain').onclick=()=>{hideModal();startBike3();};
+  $('mUp4').onclick=()=>{hideModal();leave3(w);};
   $('mHome').onclick=()=>{hideModal();home.ring=false;enterHome();};
 }
 
