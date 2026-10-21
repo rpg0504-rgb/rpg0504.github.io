@@ -128,6 +128,24 @@
   .shopRow button{border:2px solid #3a2f1c;border-radius:12px;background:#fffaf0;padding:6px 8px;font-family:inherit;font-weight:800;font-size:13px;color:#2a2416}
   .shopRow button.cur{background:#effbe9;border-color:#4a9d3c}
   .shopRow button:disabled{opacity:.4}
+  /* 4 樓村莊與對戰 */
+  #ctl4 .act{position:absolute;right:calc(22px + env(safe-area-inset-right));bottom:calc(26px + env(safe-area-inset-bottom));font-size:18px;padding:16px 20px}
+  #ctl4 .act.hidden{display:none}
+  #v4Pet{right:calc(118px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top));width:54px;height:54px}
+  #v4Pause{right:calc(66px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))}
+  #v4Rec{right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))}
+  #bt4{position:fixed;left:0;right:0;bottom:0;z-index:8;padding:8px calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:stretch}
+  #bt4 .msg{flex:1 1 100%;background:#fffaf0;color:#2a2416;border:3px solid #3a2f1c;border-radius:14px;padding:8px 12px;font-weight:800;font-size:15px;min-height:42px}
+  #bt4 .mv{flex:1 1 40%;max-width:220px;border:3px solid #3a2f1c;border-radius:14px;padding:8px 6px;font-family:inherit;font-weight:900;font-size:15px;color:#2a2416;text-align:center;touch-action:manipulation}
+  #bt4 .mv small{display:block;font-size:11px;font-weight:700;opacity:.8}
+  #bt4 .mv:disabled{opacity:.45}
+  #bt4 .dodge{background:#d9ecff}
+  .petCard{display:flex;gap:10px;align-items:center;background:#fff;border:3px solid #e2d3b0;border-radius:14px;padding:8px;margin-top:8px}
+  .petCard.on{border-color:#ff9f1c;background:#fff2d6}
+  .petCard canvas{flex:none;background:#f3ecdc;border-radius:10px}
+  .petCard .info{flex:1;min-width:0;font-size:13px;line-height:1.5}
+  .petCard .info b{font-size:15px}
+  .xpb{height:8px;border-radius:4px;background:#eee;overflow:hidden}.xpb i{display:block;height:100%;background:#8be07b}
   /* 攀岩 */
   #cvClimb{position:fixed;inset:0;width:100%;height:100%;display:none;z-index:2;touch-action:none}
   #ctlClimb{z-index:6}
@@ -167,6 +185,16 @@
   <button class="btn pz" id="bPause2">⏸</button>
   <button class="btn" id="bId2" style="width:58px;height:58px;right:calc(16px + env(safe-area-inset-right));top:calc(70px + env(safe-area-inset-top))"><span class="em" id="idEm2">🏹</span><small>身分</small></button>
 </div>
+
+<!-- 4 樓：村莊 -->
+<div id="ctl4" class="layer hidden">
+  <div id="joyZone4" style="position:absolute;left:0;top:70px;bottom:0;width:60%"></div>
+  <button class="btn pz" id="v4Pet">🐾</button>
+  <button class="btn pz" id="v4Pause">⏸</button>
+  <button class="btn pz" id="v4Rec">📜</button>
+  <button class="pill red act hidden" id="v4Act">打開</button>
+</div>
+<div id="bt4" class="hidden"></div>
 
 <!-- 攀岩 -->
 <canvas id="cvClimb"></canvas>
@@ -681,7 +709,7 @@ $('bId2').addEventListener('pointerdown',e=>{e.preventDefault();openIdentity();}
 function makeEnemy(kind,x,y,room){const t=ETYPE[kind];return{kind,x,y,r:t.r,hp:t.hp*FS.hp,max:t.hp*FS.hp,spd:t.spd*FS.spd,room,cd:rand(.6,1.6),aggro:false,flash:0,frozen:0,wind:0,stab:0,wdx:0,wdy:0,wt:0,losT:0,seen:false,face:1,bob:Math.random()*6,dead:false};}
 function goFloor(f){
   curFloor=clamp(f,1,TOP);FS=fscale(curFloor);
-  if(curFloor===2)startDraw2();else if(curFloor===3)startBike3();else startFloor();
+  if(curFloor===2)startDraw2();else if(curFloor===3)startBike3();else if(curFloor===4)startVillage();else startFloor();
 }
 function startFloor(){
   useWalls(WALLS1);
@@ -1963,8 +1991,8 @@ function buildClimb(){
   for(let f=1;f<=TOP;f++){mtx.makeTranslation(0,winY(f),.04);glass.setMatrixAt(f-1,mtx);}sc.add(glass);
   const labels=new Map();
   function label(f){if(labels.has(f))return;const c=document.createElement('canvas');c.width=160;c.height=72;const g=c.getContext('2d');
-    g.fillStyle='rgba(20,24,36,.85)';g.fillRect(0,0,160,72);g.fillStyle=f===2?'#ff9fc4':f===3?'#ffd23f':'#fff';g.font='900 40px sans-serif';g.textAlign='center';g.textBaseline='middle';
-    g.fillText(f+'F'+(f===2?'🎨':f===3?'🎪':''),80,38);
+    g.fillStyle='rgba(20,24,36,.85)';g.fillRect(0,0,160,72);g.fillStyle=f===2?'#ff9fc4':f===3?'#ffd23f':f===4?'#8be07b':'#fff';g.font='900 40px sans-serif';g.textAlign='center';g.textBaseline='middle';
+    g.fillText(f+'F'+(f===2?'🎨':f===3?'🎪':f===4?'🥚':''),80,38);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c)}));sp.scale.set(1.3,.6,1);sp.position.set(0,winY(f)+1.05,.3);sc.add(sp);labels.set(f,sp);}
   // 抓點（固定亂數，每次一樣）
   const rnd=srand(20261015),holds=[];
@@ -2033,7 +2061,7 @@ function clHud(){
   $('clSta').style.width=CL.sta+'%';$('clSta').style.background=CL.sta<25?'#ff5a5a':CL.sta<50?'#ffd23f':'#5bc46a';
   $('clStaT').textContent=`💪 體力 ${Math.ceil(CL.sta)}`;
   $('clHint').style.display=near?'none':'';
-  const b=$('clEnter');if(near){b.classList.remove('hidden');b.textContent=`🪟 進入 ${near} 樓${near===2?' 🎨':near===3?' 🎪':''}`;}else b.classList.add('hidden');
+  const b=$('clEnter');if(near){b.classList.remove('hidden');b.textContent=`🪟 進入 ${near} 樓${near===2?' 🎨':near===3?' 🎪':near===4?' 🥚':''}`;}else b.classList.add('hidden');
 }
 function nearWindow(){const f=climbFloorNow();return Math.abs(CL.B.y+.6-winY(f))<1.2&&Math.abs(CL.B.x)<1.6?f:0;}
 $('clEnter').onclick=()=>{const f=nearWindow();if(!f)return;logRec(`🧗 爬外牆到 ${f} 樓，從窗戶進去`);stat('climbs');$('cvClimb').style.display='none';goFloor(f);};
@@ -2113,6 +2141,365 @@ function drawClimb(){
   H_.cam.lookAt(B.x*.5,CL.camY,0);
   H_.R.render(H_.sc,H_.cam);
 }
+/* =========================================================
+   4 樓：怪獸村莊
+   開箱子拿蛋 → 孵出強敵／弱敵／寵物；寵物吃香蕉芒果長大
+   碰到路上的敵人進入回合制對戰（寵物上場），被推出場地或沒血就輸
+   打倒路上所有敵人過關
+   ========================================================= */
+const STAGE_IMG=new Image();STAGE_IMG.src='battle-stage.jpg';
+const ELS={
+  fire:{n:'火',e:'🔥',c:'#ff6a3c'},water:{n:'水',e:'💧',c:'#3c9bff'},grass:{n:'草',e:'🌿',c:'#4cc35a'},
+  elec:{n:'電',e:'⚡',c:'#ffd23f'},ice:{n:'冰',e:'❄️',c:'#8fe3ff'},ghost:{n:'鬼',e:'👻',c:'#a77bff'},
+};
+const ELK=Object.keys(ELS);
+// 攻擊方屬性 → 被打方屬性：2 = 效果絕佳，0.5 = 效果不好
+const EFF={fire:{grass:2,ice:2,water:.5,fire:.5},water:{fire:2,water:.5,grass:.5,elec:.5},grass:{water:2,fire:.5,grass:.5,ice:.5},
+  elec:{water:2,ice:2,grass:.5,elec:.5},ice:{grass:2,ghost:2,fire:.5,ice:.5},ghost:{ghost:2,elec:2,ice:.5}};
+function eff(a,d){return(EFF[a]&&EFF[a][d])||1;}
+const MOVES={
+  tackle:{n:'衝撞',el:null,pw:14,push:.17,acc:.95},
+  fire1:{n:'火花',el:'fire',pw:18,push:.08,acc:.95},fire2:{n:'火焰衝擊',el:'fire',pw:30,push:.15,acc:.85},fire3:{n:'爆炎龍捲',el:'fire',pw:44,push:.24,acc:.8},
+  water1:{n:'水槍',el:'water',pw:18,push:.1,acc:.95},water2:{n:'浪潮衝擊',el:'water',pw:30,push:.18,acc:.85},water3:{n:'大海嘯',el:'water',pw:44,push:.28,acc:.8},
+  grass1:{n:'飛葉快刀',el:'grass',pw:18,push:.07,acc:.95},grass2:{n:'藤鞭橫掃',el:'grass',pw:30,push:.16,acc:.85},grass3:{n:'森林怒吼',el:'grass',pw:44,push:.24,acc:.8},
+  elec1:{n:'電擊',el:'elec',pw:18,push:.08,acc:.95},elec2:{n:'十萬伏特',el:'elec',pw:32,push:.13,acc:.85},elec3:{n:'雷神之鎚',el:'elec',pw:46,push:.22,acc:.8},
+  ice1:{n:'冰礫',el:'ice',pw:18,push:.09,acc:.95},ice2:{n:'冰凍光束',el:'ice',pw:30,push:.15,acc:.85},ice3:{n:'暴風雪',el:'ice',pw:44,push:.26,acc:.8},
+  ghost1:{n:'驚嚇',el:'ghost',pw:16,push:.12,acc:.95},ghost2:{n:'暗影球',el:'ghost',pw:30,push:.15,acc:.85},ghost3:{n:'幽靈大遊行',el:'ghost',pw:44,push:.25,acc:.8},
+};
+const FOES={
+  fire:{n:'火焰蜥蜴',e:'🦎'},water:{n:'泡泡章魚',e:'🐙'},grass:{n:'葉子毛毛蟲',e:'🐛'},
+  elec:{n:'電電蜂',e:'🐝'},ice:{n:'雪球人',e:'⛄'},ghost:{n:'幽靈燈',e:'👻'},
+};
+const PET_NAMES={fire:['小焰','火球球','炎炎'],water:['波波','水滴滴','泡泡'],grass:['葉葉','嫩芽','草糰'],elec:['電電','霹靂','閃閃'],ice:['冰冰','雪寶','凍凍'],ghost:['黑黑','幽幽','嘿嘿']};
+const STAGE_XP=[0,60,180];   // 到第 2、3 階段要的經驗
+function petStage(p){return p.xp>=STAGE_XP[2]?3:p.xp>=STAGE_XP[1]?2:1;}
+function petMax(p){return 50+petStage(p)*30+Math.floor(p.xp/6);}
+function petMoves(p){const st=petStage(p),el=p.el;return['tackle',el+'1',...(st>=2?[el+'2']:[]),...(st>=3?[el+'3']:[])];}
+function petAtk(p){return 1+petStage(p)*.2+p.xp/600;}
+
+/* 寵物畫法：像耿鬼一樣黑黑圓圓、眼睛大大，頭上的刺和肚子是屬性顏色 */
+function drawPet(c,x,y,size,el,stage,face,t,mood){
+  const E=ELS[el],r=size*(.38+stage*.06),bob=Math.sin(t*4)*size*.03;
+  c.save();c.translate(x,y+bob);c.scale(face||1,1);
+  c.fillStyle='rgba(0,0,0,.25)';c.beginPath();c.ellipse(0,r*.95-bob,r*.9,r*.25,0,0,7);c.fill();
+  // 刺
+  c.fillStyle='#2b2140';const sp=3+stage;
+  for(let i=0;i<sp;i++){const a=-Math.PI*.85+i*(Math.PI*.7)/(sp-1),bx=Math.cos(a)*r*.8,by=Math.sin(a)*r*.8;
+    c.beginPath();c.moveTo(bx-r*.16,by+r*.05);c.lineTo(Math.cos(a)*r*(1.25+stage*.05),Math.sin(a)*r*(1.25+stage*.05));c.lineTo(bx+r*.16,by+r*.05);c.fill();
+    c.fillStyle=E.c;c.beginPath();c.arc(Math.cos(a)*r*1.18,Math.sin(a)*r*1.18,r*.07,0,7);c.fill();c.fillStyle='#2b2140';}
+  // 身體
+  const g=c.createRadialGradient(-r*.3,-r*.35,r*.1,0,0,r*1.05);g.addColorStop(0,'#5a4782');g.addColorStop(1,'#1d1530');
+  c.fillStyle=g;c.beginPath();c.ellipse(0,0,r,r*.95,0,0,7);c.fill();
+  // 手腳
+  c.fillStyle='#241a3a';c.beginPath();c.ellipse(-r*.55,r*.85,r*.26,r*.16,0,0,7);c.ellipse(r*.55,r*.85,r*.26,r*.16,0,0,7);c.fill();
+  c.beginPath();c.ellipse(-r*.98,r*.15,r*.16,r*.26,.4,0,7);c.ellipse(r*.98,r*.15,r*.16,r*.26,-.4,0,7);c.fill();
+  // 肚子
+  c.fillStyle=E.c;c.globalAlpha=.35;c.beginPath();c.ellipse(0,r*.42,r*.5,r*.32,0,0,7);c.fill();c.globalAlpha=1;
+  // 大眼睛
+  const blink=Math.sin(t*1.7)>.97;
+  for(const sx of [-1,1]){const ex=sx*r*.34,ey=-r*.18;
+    c.fillStyle='#fff';c.beginPath();c.ellipse(ex,ey,r*.27,blink?r*.04:r*.31,0,0,7);c.fill();
+    if(!blink){c.fillStyle=mood==='hurt'?'#555':E.c;c.beginPath();c.arc(ex+r*.06,ey+r*.04,r*.17,0,7);c.fill();
+      c.fillStyle='#111';c.beginPath();c.arc(ex+r*.07,ey+r*.05,r*.09,0,7);c.fill();
+      c.fillStyle='#fff';c.beginPath();c.arc(ex+r*.01,ey-r*.05,r*.06,0,7);c.fill();}}
+  // 嘴巴
+  c.fillStyle='#fff';c.beginPath();c.moveTo(-r*.42,r*.2);c.quadraticCurveTo(0,mood==='hurt'?r*.3:r*.62,r*.42,r*.2);c.quadraticCurveTo(0,r*.36,-r*.42,r*.2);c.fill();
+  c.strokeStyle='#2b2140';c.lineWidth=Math.max(1,r*.04);for(let i=-2;i<=2;i++){c.beginPath();c.moveTo(i*r*.14,r*.24);c.lineTo(i*r*.14,r*.36);c.stroke();}
+  c.restore();
+}
+
+/* ---------- 村莊地圖 ---------- */
+const VW4=1900,VH4=1400;
+const V_BUILD=[
+  {k:'shop',n:'村莊商店',x:820,y:140,w:260,h:170,col:'#e8a05c',roof:'#c4483a',e:'🏪'},
+  {k:'inn',n:'旅館（睡覺補血）',x:1440,y:880,w:260,h:180,col:'#9fc0e8',roof:'#3b6fb0',e:'🛏️'},
+  {k:'house',n:'',x:180,y:150,w:200,h:150,col:'#f2d27a',roof:'#a8572a'},{k:'house',n:'',x:1460,y:150,w:220,h:150,col:'#d79a8a',roof:'#7a3b1d'},
+  {k:'house',n:'',x:200,y:960,w:210,h:150,col:'#cfe3b0',roof:'#5a7a2a'},{k:'house',n:'',x:820,y:1060,w:220,h:150,col:'#e8c7f2',roof:'#7a4a8a'},
+];
+const V_TREES=[[90,620],[560,120],[1250,90],[1800,560],[620,880],[1150,1250],[300,1300],[1750,1300],[1300,560],[470,520]];
+const V_BOX_POS=[[330,420],[600,300],[1150,330],[1700,420],[420,720],[760,560],[1080,760],[1350,700],[1680,700],[520,1200],[1250,1050],[960,420]];
+const V_FOE_POS=[[300,560,'fire'],[700,700,'water'],[1000,560,'grass'],[1300,420,'elec'],[1600,560,'ice'],[900,880,'ghost'],[400,850,'grass'],[1150,900,'fire'],[1550,1150,'water'],[700,1250,'ice']];
+function f4(){if(!save.f4)save.f4={pets:[],active:0,inv:{banana:0,mango:0},opened:[],beaten:[],hp:100};return save.f4;}
+function petOf(){const F=f4();return F.pets[F.active]||null;}
+const V={x:950,y:640,fx:0,fy:1,moving:false,trail:[],near:null,foes:[],petPos:{x:950,y:680},cool:0};
+function vBlocked(x,y,r){if(x<r||y<r||x>VW4-r||y>VH4-r)return true;for(const b of V_BUILD){if(x>b.x-r&&x<b.x+b.w+r&&y>b.y-r&&y<b.y+b.h+r)return true;}return false;}
+function startVillage(){
+  scene='village';setLayers();const F=f4();persist();
+  V.x=950;V.y=640;V.trail=[];V.cool=1.5;V.petPos={x:V.x,y:V.y+40};
+  V.foes=V_FOE_POS.map((p,i)=>({id:i,x:p[0],y:p[1],hx:p[0],hy:p[1],el:p[2],lv:1+(i%4),dead:F.beaten.includes(i),ang:rand(0,6.28),t:rand(0,3)}));
+  showModal(`<h2>🏘️ 最高樓 4F：怪獸村莊</h2>
+   <div class="tips">
+   <p>📦 村莊裡有很多<b>箱子</b>，打開會拿到不同的<b>蛋</b>：有的孵出<b>寵物</b>🐾、有的孵出<b>很弱的怪獸</b>、有的孵出<b>很強的怪獸</b>（要打敗牠）！第一個箱子一定是寵物蛋。</p>
+   <p>🍌🥭 去<b>商店</b>買香蕉、芒果餵寵物，寵物會慢慢長大（3 個階段），長大會學會更厲害的招式。</p>
+   <p>⚔️ 路上的敵人頭上有血條，<b>碰到牠就開始對戰</b>，由寵物上場。對戰是<b>回合制</b>：選招式，或按「🛡️ 躲避」。</p>
+   <p>🔥💧🌿⚡❄️👻 6 種屬性，用敵人<b>怕的屬性</b>打會「效果絕佳」！被<b>推出場地外</b>或<b>沒血</b>就輸了。</p>
+   <p>🛏️ 到<b>旅館</b>睡覺可以把寵物的血補滿。</p>
+   <p>🏆 把路上的 <b>${V_FOE_POS.length} 隻敵人</b>全部打倒就過關！（已打倒 ${F.beaten.length} 隻）</p>
+   </div><div class="row"><button class="pill red" id="mGo">出發！</button></div>`);
+  $('mGo').onclick=hideModal;
+}
+function updVillage(dt){
+  const F=f4();V.cool-=dt;
+  let mx=0,my=0;const K=input.keys;
+  if(K.KeyA||K.ArrowLeft)mx--;if(K.KeyD||K.ArrowRight)mx++;if(K.KeyW||K.ArrowUp)my--;if(K.KeyS||K.ArrowDown)my++;
+  if(joy.active){const jx=joy.x-joy.bx,jy=joy.y-joy.by,l=hyp(jx,jy);if(l>8){const m=Math.min(1,l/55);mx+=jx/l*m;my+=jy/l*m;}}
+  const ml=hyp(mx,my);if(ml>1){mx/=ml;my/=ml;}
+  const sp=idk()==='racer'?230:180;
+  if(!vBlocked(V.x+mx*sp*dt,V.y,14))V.x+=mx*sp*dt;if(!vBlocked(V.x,V.y+my*sp*dt,14))V.y+=my*sp*dt;
+  V.moving=ml>.1;if(V.moving){V.fx=mx/ml;V.fy=my/ml;}
+  if(!V.trail.length||hyp(V.x-V.trail[0].x,V.y-V.trail[0].y)>6){V.trail.unshift({x:V.x,y:V.y});if(V.trail.length>60)V.trail.pop();}
+  const tp=V.trail[Math.min(V.trail.length-1,8)]||V;V.petPos.x+=(tp.x-V.petPos.x)*Math.min(1,dt*6);V.petPos.y+=(tp.y-V.petPos.y)*Math.min(1,dt*6);
+  // 敵人在家附近晃
+  for(const f of V.foes){if(f.dead)continue;f.t-=dt;if(f.t<=0){f.t=rand(1,3);f.ang=rand(0,6.28);}
+    const nx=f.x+Math.cos(f.ang)*30*dt,ny=f.y+Math.sin(f.ang)*30*dt;if(hyp(nx-f.hx,ny-f.hy)<70&&!vBlocked(nx,ny,18)){f.x=nx;f.y=ny;}else f.ang+=Math.PI;
+    if(V.cool<=0&&hyp(f.x-V.x,f.y-V.y)<38){V.cool=1.2;touchFoe(f);return;}}
+  // 附近可以做的事
+  let near=null;
+  F.opened.length<V_BOX_POS.length&&V_BOX_POS.forEach((b,i)=>{if(!F.opened.includes(i)&&hyp(b[0]-V.x,b[1]-V.y)<60)near={k:'box',i};});
+  for(const b of V_BUILD){if(b.k==='house')continue;const cx=b.x+b.w/2,cy=b.y+b.h;if(hyp(cx-V.x,cy+20-V.y)<80)near={k:b.k};}
+  V.near=near;const a=$('v4Act');
+  if(near){a.classList.remove('hidden');a.textContent=near.k==='box'?'📦 打開箱子':near.k==='shop'?'🏪 進商店':'🛏️ 睡覺補血';}else a.classList.add('hidden');
+  for(const f of floats){f.t-=dt;f.y-=30*dt;}floats=floats.filter(f=>f.t>0);
+  for(const p of parts){p.t-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.9;p.vy*=.9;}parts=parts.filter(p=>p.t>0);
+}
+function drawVillage(){
+  const z=cam.z=clamp(Math.min(W,H)/460,.6,1.4);
+  cam.x+=(V.x-W/2/z-cam.x)*.18;cam.y+=(V.y-H/2/z-cam.y)*.18;
+  ctx.fillStyle='#5aa850';ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.scale(z,z);ctx.translate(-cam.x,-cam.y);
+  ctx.fillStyle='#7cc46a';ctx.fillRect(0,0,VW4,VH4);
+  for(let i=0;i<120;i++){const x=(i*397)%VW4,y=(i*631)%VH4;ctx.fillStyle='rgba(60,140,60,.5)';ctx.fillRect(x,y,4,9);}
+  // 路
+  ctx.fillStyle='#d9c79e';ctx.fillRect(0,600,VW4,90);ctx.fillRect(900,0,100,VH4);ctx.fillRect(0,360,VW4,60);ctx.fillRect(250,0,70,VH4);ctx.fillRect(1500,300,70,1100);ctx.fillRect(0,1150,VW4,60);
+  ctx.strokeStyle='#b9a77e';ctx.lineWidth=2;ctx.setLineDash([16,14]);ctx.beginPath();ctx.moveTo(0,645);ctx.lineTo(VW4,645);ctx.moveTo(950,0);ctx.lineTo(950,VH4);ctx.stroke();ctx.setLineDash([]);
+  V_TREES.forEach(t=>emo('🌳',t[0],t[1],56));
+  // 房子
+  for(const b of V_BUILD){ctx.fillStyle='rgba(0,0,0,.18)';ctx.fillRect(b.x+8,b.y+b.h-4,b.w,14);
+    ctx.fillStyle=b.col;ctx.fillRect(b.x,b.y+b.h*.35,b.w,b.h*.65);
+    ctx.fillStyle=b.roof;ctx.beginPath();ctx.moveTo(b.x-14,b.y+b.h*.4);ctx.lineTo(b.x+b.w/2,b.y);ctx.lineTo(b.x+b.w+14,b.y+b.h*.4);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#6b4a2b';ctx.fillRect(b.x+b.w/2-18,b.y+b.h-46,36,46);
+    ctx.fillStyle='#bfe6ff';ctx.fillRect(b.x+18,b.y+b.h*.5,32,26);ctx.fillRect(b.x+b.w-50,b.y+b.h*.5,32,26);
+    if(b.e){emo(b.e,b.x+b.w/2,b.y+b.h*.3,38);txt(b.n,b.x+b.w/2,b.y+b.h+22,16,'#2a2416');}}
+  // 箱子
+  const F=f4();
+  V_BOX_POS.forEach((b,i)=>{if(F.opened.includes(i)){ctx.globalAlpha=.4;emo('🗃️',b[0],b[1],30);ctx.globalAlpha=1;return;}
+    const bob=Math.sin(T*3+i)*2;ctx.fillStyle=['#c9741a','#7c5cff','#3c9bff','#4cc35a'][i%4];rr(b[0]-18,b[1]-16+bob,36,30,6);ctx.fill();
+    ctx.fillStyle='#ffd23f';ctx.fillRect(b[0]-18,b[1]-5+bob,36,6);ctx.fillRect(b[0]-3,b[1]-16+bob,6,30);emo('✨',b[0]+18,b[1]-20,14);});
+  // 敵人
+  for(const f of V.foes){if(f.dead)continue;const E=ELS[f.el],bob=Math.sin(T*5+f.id)*3;
+    ctx.fillStyle='rgba(0,0,0,.2)';ctx.beginPath();ctx.ellipse(f.x,f.y+18,18,6,0,0,7);ctx.fill();
+    ctx.fillStyle=E.c;ctx.globalAlpha=.35;ctx.beginPath();ctx.arc(f.x,f.y+bob,24,0,7);ctx.fill();ctx.globalAlpha=1;
+    emo(FOES[f.el].e,f.x,f.y+bob,36);
+    const hp=foeMax(f),bw=46;ctx.fillStyle='rgba(0,0,0,.6)';rr(f.x-bw/2-2,f.y-42,bw+4,12,6);ctx.fill();ctx.fillStyle='#ff4d5e';rr(f.x-bw/2,f.y-40,bw,8,4);ctx.fill();
+    txt(`${E.e}Lv${f.lv}`,f.x,f.y-52,12,'#fff');}
+  // 寵物跟著
+  const pet=petOf();if(pet)drawPet(ctx,V.petPos.x,V.petPos.y,40,pet.el,petStage(pet),V.petPos.x>V.x?-1:1,T,pet.hp<=0?'hurt':'');
+  drawHero(V.x,V.y,1,0,V.fx<0?-1:1,Math.atan2(V.fx,V.fy),V.moving);
+  for(const p of parts){ctx.fillStyle=p.col;ctx.globalAlpha=Math.min(1,p.t*2);ctx.fillRect(p.x-3,p.y-3,6,6);}ctx.globalAlpha=1;
+  for(const f of floats){ctx.globalAlpha=Math.min(1,f.t*1.5);txt(f.s,f.x,f.y,f.size,f.col,'center',900);}ctx.globalAlpha=1;
+  ctx.restore();
+  // HUD
+  const left=V.foes.filter(f=>!f.dead).length;
+  ctx.fillStyle='rgba(0,0,0,.55)';rr(10,10,Math.min(300,W-190),pet?70:52,12);ctx.fill();
+  txt(`🏘️ 4F 村莊　⚔️ 敵人剩 ${left}/${V_FOE_POS.length}`,22,26,14,'#fff','left',900);
+  txt(`💰 ${save.money}　🍌${F.inv.banana} 🥭${F.inv.mango}　📦 ${F.opened.length}/${V_BOX_POS.length}`,22,48,13,'#ffe066','left',800);
+  if(pet)txt(`${ELS[pet.el].e} ${pet.name}  ❤️ ${Math.max(0,Math.ceil(pet.hp))}/${petMax(pet)}　第 ${petStage(pet)} 階段`,22,68,12,pet.hp<=0?'#ff8a7a':'#bff7c3','left',800);
+  if(joy.active){ctx.strokeStyle='rgba(255,255,255,.45)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(joy.bx,joy.by,55,0,7);ctx.stroke();
+    const jx=joy.x-joy.bx,jy=joy.y-joy.by,l=hyp(jx,jy),m=Math.min(l,55)/(l||1);ctx.fillStyle='rgba(255,255,255,.5)';ctx.beginPath();ctx.arc(joy.bx+jx*m,joy.by+jy*m,24,0,7);ctx.fill();}
+}
+function foeMax(f){return Math.round((40+f.lv*16)*FS.hp/1.6);}
+
+/* ---------- 箱子與蛋 ---------- */
+function openBox(i){
+  const F=f4();if(F.opened.includes(i))return;F.opened.push(i);
+  const el=pick(ELK);let kind;
+  if(!F.pets.length)kind='pet';else{const r=Math.random();kind=r<.3?'pet':r<.65?'weak':'strong';}
+  if(kind==='pet'&&F.pets.length>=3)kind='weak';
+  persist();sfx(520,.1,'triangle',.05,300);
+  showModal(`<h2>📦 打開箱子……</h2><div style="text-align:center;font-size:80px;line-height:1.2" id="eggBig">🥚</div>
+   <p style="text-align:center">裡面有一顆 <b style="color:${ELS[el].c}">${ELS[el].e} ${ELS[el].n}屬性</b>的蛋！蛋在動了……</p>
+   <div class="row"><button class="pill red" id="mGo">孵出來！</button></div>`);
+  $('mGo').onclick=()=>{
+    $('eggBig').textContent='🐣';sfx(880,.2,'triangle',.06,400);
+    setTimeout(()=>{
+      if(kind==='pet'){const pet={el,name:pick(PET_NAMES[el]),xp:0,hp:0};pet.hp=petMax(pet);F.pets.push(pet);if(F.pets.length===1)F.active=0;persist();stat('pets');
+        logRec(`🐣 孵出了寵物 ${ELS[el].e}${pet.name}`);
+        const cv=`<canvas id="petPrev" width="160" height="160" style="display:block;margin:0 auto;background:#f3ecdc;border-radius:14px"></canvas>`;
+        showModal(`<h2>🐾 孵出寵物了！</h2>${cv}<p style="text-align:center">牠叫做 <b>${pet.name}</b>（${ELS[el].e}${ELS[el].n}屬性）。牠會一直跟著你！</p>
+         <p style="text-align:center;font-size:13px;color:#7a6a4a">去商店買香蕉🍌和芒果🥭給牠吃，牠就會長大。</p>
+         <div class="row"><button class="pill green" id="mGo">好可愛！</button></div>`);
+        drawPet($('petPrev').getContext('2d'),80,86,120,el,1,1,0,'');$('mGo').onclick=hideModal;}
+      else{const strong=kind==='strong';
+        showModal(`<h2>${strong?'😱 孵出很強的怪獸！':'😮 孵出一隻小怪獸'}</h2><div style="text-align:center;font-size:72px">${FOES[el].e}</div>
+         <p style="text-align:center">${strong?'牠看起來很兇，要打敗牠！':'牠看起來弱弱的，打倒牠吧！'}</p>
+         <div class="row"><button class="pill red" id="mGo">⚔️ 對戰！</button></div>`);
+        $('mGo').onclick=()=>{hideModal();startBattle({id:-1,el,lv:strong?6:1,strong,egg:true});};}
+    },500);};
+}
+/* ---------- 商店、旅館、寵物 ---------- */
+function openShop4(){
+  const F=f4();
+  showModal(`<h2>🏪 村莊商店</h2><p>你有 <b>💰 ${save.money}</b> 元。</p>
+   <div class="grid"><button class="item" data-buy="banana" ${save.money<5?'disabled':''}><div class="big">🍌</div><div class="nm">香蕉</div><div class="ds">💰 5　寵物經驗 +15、回血 10<br>背包裡有 ${F.inv.banana} 根</div></button>
+   <button class="item" data-buy="mango" ${save.money<12?'disabled':''}><div class="big">🥭</div><div class="nm">芒果</div><div class="ds">💰 12　寵物經驗 +40、回血 25<br>背包裡有 ${F.inv.mango} 顆</div></button></div>
+   <div class="row"><button class="pill green" id="mClose">離開</button><button class="pill" id="mFeed">🐾 去餵寵物</button></div>`);
+  document.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const k=b.dataset.buy,pr=k==='banana'?5:12;if(save.money<pr)return;save.money-=pr;F.inv[k]++;persist();sfx(880,.12,'triangle',.05,300);openShop4();});
+  $('mClose').onclick=hideModal;$('mFeed').onclick=openPets;
+}
+function sleepInn(){
+  const F=f4();F.pets.forEach(p=>p.hp=petMax(p));persist();stat('sleeps');
+  showModal(`<h2>🛏️ 呼～呼～</h2><div style="text-align:center;font-size:64px">😴💤</div><p style="text-align:center">你和寵物在旅館好好睡了一覺，<b>血都補滿了</b>！</p><div class="row"><button class="pill green" id="mGo">起床！</button></div>`);
+  sfx(330,.6,'sine',.05,-100);$('mGo').onclick=hideModal;
+}
+function openPets(){
+  const F=f4();if(!F.pets.length){showModal('<h2>🐾 寵物</h2><p>你還沒有寵物，去打開箱子吧！</p><div class="row"><button class="pill green" id="mClose">好</button></div>');$('mClose').onclick=hideModal;return;}
+  let h=`<h2>🐾 我的寵物</h2><p style="font-size:13px">點「上場」選一隻跟著你、幫你對戰。🍌${F.inv.banana} 🥭${F.inv.mango}</p>`;
+  F.pets.forEach((p,i)=>{const st=petStage(p),nx=STAGE_XP[st]||null;
+    h+=`<div class="petCard ${i===F.active?'on':''}"><canvas width="84" height="84" data-pc="${i}"></canvas><div class="info"><b>${ELS[p.el].e} ${p.name}</b>　第 ${st} 階段${st===3?'（長大了！）':''}<br>
+      ❤️ ${Math.ceil(p.hp)}/${petMax(p)}　經驗 ${p.xp}${nx?' / '+nx:''}<div class="xpb"><i style="width:${nx?clamp((p.xp-STAGE_XP[st-1])/(nx-STAGE_XP[st-1])*100,0,100):100}%"></i></div>
+      招式：${petMoves(p).map(k=>MOVES[k].n).join('、')}<br>
+      <button class="pill" style="padding:6px 10px;font-size:13px" data-feed="${i}|banana" ${F.inv.banana?'':'disabled'}>🍌 餵香蕉</button>
+      <button class="pill" style="padding:6px 10px;font-size:13px" data-feed="${i}|mango" ${F.inv.mango?'':'disabled'}>🥭 餵芒果</button>
+      ${i===F.active?'':`<button class="pill green" style="padding:6px 10px;font-size:13px" data-act="${i}">上場</button>`}</div></div>`;});
+  h+='<div class="row"><button class="pill green" id="mClose">關閉</button></div>';
+  showModal(h);
+  document.querySelectorAll('[data-pc]').forEach(c=>{const p=F.pets[+c.dataset.pc];drawPet(c.getContext('2d'),42,46,62,p.el,petStage(p),1,T,'');});
+  document.querySelectorAll('[data-feed]').forEach(b=>b.onclick=()=>{const[i,k]=b.dataset.feed.split('|'),p=F.pets[+i];if(!F.inv[k])return;F.inv[k]--;
+    const st0=petStage(p);p.xp+=k==='banana'?15:40;p.hp=Math.min(petMax(p),Math.max(0,p.hp)+(k==='banana'?10:25));persist();sfx(700,.12,'triangle',.05,300);
+    if(petStage(p)>st0){logRec(`🌟 ${p.name}長大到第 ${petStage(p)} 階段`);toast(`🌟 ${p.name}長大了！學會「${MOVES[petMoves(p).slice(-1)[0]].n}」`,2600);}
+    else toast(`${p.name}：好好吃！${k==='banana'?'🍌':'🥭'}`,1200);openPets();});
+  document.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>{F.active=+b.dataset.act;persist();openPets();});
+  $('mClose').onclick=hideModal;
+}
+$('v4Act').onclick=()=>{const n=V.near;if(!n||!$('modal').classList.contains('hidden'))return;if(n.k==='box')openBox(n.i);else if(n.k==='shop')openShop4();else sleepInn();};
+$('v4Pet').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openPets();});
+$('v4Pause').addEventListener('pointerdown',e=>{e.preventDefault();openPause();});
+$('v4Rec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
+(function(){const z=$('joyZone4');
+  z.addEventListener('pointerdown',e=>{e.preventDefault();if(joy.active)return;joy.active=true;joy.id=e.pointerId;joy.bx=joy.x=e.clientX;joy.by=joy.y=e.clientY;try{z.setPointerCapture(e.pointerId);}catch(_){}});
+  z.addEventListener('pointermove',e=>{if(joy.active&&e.pointerId===joy.id){joy.x=e.clientX;joy.y=e.clientY;}});
+  const end=e=>{if(e.pointerId===joy.id)joy.active=false;};z.addEventListener('pointerup',end);z.addEventListener('pointercancel',end);})();
+function touchFoe(f){
+  const pet=petOf();
+  if(!pet){toast('😨 你還沒有寵物！先去打開箱子孵一隻寵物',2200);V.x+=(V.x-f.x)*.8;V.y+=(V.y-f.y)*.8;return;}
+  if(pet.hp<=0){toast(`😵 ${pet.name}沒力氣了，先去旅館🛏️睡覺`,2200);V.x+=(V.x-f.x)*.8;V.y+=(V.y-f.y)*.8;return;}
+  startBattle(f);
+}
+
+/* ---------- 回合制對戰 ---------- */
+// 位置：0 = 場地正中間，1 = 自己這一邊的邊緣；超過 1 就掉出場地
+const B4={};
+// 對戰的下一步：暫停（有對話框）時先等著，不偷跑
+function btLater(fn,ms){setTimeout(function tick(){if(scene==='battle'&&!$('modal').classList.contains('hidden')&&!B4.over)return setTimeout(tick,200);fn();},ms);}
+function startBattle(f){
+  const pet=petOf();if(!pet){toast('沒有寵物不能對戰！');return;}
+  const strong=!!f.strong,lv=f.lv,max=Math.round((strong?160:f.egg?30:40+lv*16)*FS.hp/1.6);
+  Object.assign(B4,{foe:f,fel:f.el,fname:(strong?'超強':'')+FOES[f.el].n,fe:FOES[f.el].e,fhp:max,fmax:max,flv:lv,fatk:(strong?1.5:f.egg?.6:.8+lv*.12)*FS.dmg/1.35,
+    pos:[.35,.35],turn:'me',busy:0,anim:null,dodge:false,fdodge:false,log:'',over:false,txt:[],shake:0,moves:['tackle',f.el+'1',f.el+'2',...(strong||lv>=4?[f.el+'3']:[])]});
+  scene='battle';setLayers();
+  btLog(`${f.egg?'':'野生的'}${B4.fe} ${B4.fname}（${ELS[B4.fel].e}${ELS[B4.fel].n}屬性 Lv${lv}）出現了！上吧，${pet.name}！`);
+  btButtons();sfx(220,.3,'square',.05,200);
+}
+function btLog(s){B4.log=s;const m=document.querySelector('#bt4 .msg');if(m)m.innerHTML=s;}
+function btButtons(){
+  const pet=petOf(),el=$('bt4');let h=`<div class="msg">${B4.log}</div>`;
+  petMoves(pet).forEach(k=>{const m=MOVES[k],E=m.el?ELS[m.el]:null,ef=m.el?eff(m.el,B4.fel):1;
+    h+=`<button class="mv" data-mv="${k}" style="background:${E?E.c+'55':'#eee'}" ${B4.turn!=='me'||B4.busy>0||B4.over?'disabled':''}>${E?E.e:'💥'} ${m.n}<small>威力 ${m.pw}　推 ${Math.round(m.push*100)}${ef>1?'　👍效果絕佳':ef<1?'　效果不好':''}</small></button>`;});
+  h+=`<button class="mv dodge" data-mv="dodge" ${B4.turn!=='me'||B4.busy>0||B4.over?'disabled':''}>🛡️ 躲避<small>下一招很可能閃過，還會往中間站一點</small></button>`;
+  el.innerHTML=h;
+  el.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{if(B4.turn!=='me'||B4.busy>0||B4.over)return;doMove('me',b.dataset.mv);});
+}
+function doMove(who,k){
+  const pet=petOf(),me=who==='me';B4.busy=1.3;
+  if(k==='dodge'){if(me){B4.dodge=true;B4.pos[0]=Math.max(0,B4.pos[0]-.1);}else{B4.fdodge=true;B4.pos[1]=Math.max(0,B4.pos[1]-.1);}
+    btLog(`${me?pet.name:B4.fname}擺好姿勢準備<b>🛡️ 躲避</b>！`);B4.txt.push({s:'🛡️ 躲避！',me,t:1.1});sfx(600,.1,'sine',.05,200);}
+  else{
+    const m=MOVES[k],tgt=me?1:0,dodging=me?B4.fdodge:B4.dodge;
+    B4.anim={who,k,t:.9};B4.txt.push({s:m.n+'！',me,t:1.2,big:true,col:m.el?ELS[m.el].c:'#fff'});
+    if(me)B4.fdodge=false;else B4.dodge=false;
+    const miss=Math.random()>(dodging?.25:m.acc);
+    if(miss){btLog(`${me?pet.name:B4.fname}使出「<b>${m.n}</b>」！……${dodging?'被躲開了！':'沒打中！'}`);sfx(300,.1,'sine',.04,-200);}
+    else{
+      const aEl=m.el||(me?pet.el:B4.fel),dEl=me?B4.fel:pet.el,ef=m.el?eff(m.el,dEl):1;
+      const atk=me?petAtk(pet):B4.fatk,dmg=Math.max(1,Math.round(m.pw*atk*ef*rand(.85,1.15)));
+      const hpFrac=me?B4.fhp/B4.fmax:pet.hp/petMax(pet);
+      const push=m.push*(ef>1?1.4:ef<1?.7:1)*(1+(1-clamp(hpFrac,0,1))*.9);
+      if(me)B4.fhp-=dmg;else pet.hp-=dmg;B4.pos[tgt]+=push;B4.shake=ef>1?14:8;
+      sfx(ef>1?140:200,.2,'sawtooth',.07,-80);
+      btLog(`${me?pet.name:B4.fname}使出「<b>${m.n}</b>」！${ef>1?'<b style="color:#c4483a">效果絕佳！</b>':ef<1?'效果不太好……':''}造成 ${dmg} 傷害，${me?B4.fname:pet.name}被推開了！`);
+      B4.txt.push({s:`-${dmg}`+(ef>1?' 效果絕佳！':ef<1?' 效果不好':''),me:!me,t:1.2,col:ef>1?'#ffd23f':'#fff'});}
+  }
+  btLater(()=>btAfter(who),1300);btButtons();
+}
+function btAfter(who){
+  const pet=petOf();B4.busy=0;
+  const out=i=>B4.pos[i]>1;
+  if(B4.fhp<=0||out(1)){btEnd(true,out(1)?`${B4.fname}被推出場地了！`:`${B4.fname}倒下了！`);return;}
+  if(pet.hp<=0||out(0)){btEnd(false,out(0)?`${pet.name}被推出場地了！`:`${pet.name}沒力氣了……`);return;}
+  if(who==='me'){B4.turn='foe';btButtons();btLater(()=>{if(scene!=='battle'||B4.over)return;
+    // 敵人選招：危險時偶爾躲避，其他時候挑最痛的招
+    let k;if(B4.pos[1]>.75&&Math.random()<.35)k='dodge';else{const ms=B4.moves.slice();k=Math.random()<.6?ms.sort((a,b)=>MOVES[b].pw*eff(MOVES[b].el||'x',pet.el)-MOVES[a].pw*eff(MOVES[a].el||'x',pet.el))[0]:pick(ms);}
+    doMove('foe',k);},700);}
+  else{B4.turn='me';btLog(`輪到你了！要用什麼招式？`);btButtons();}
+}
+function btEnd(win,why){
+  B4.over=true;btButtons();const pet=petOf(),F=f4(),f=B4.foe;
+  if(win){const money=f.strong?30:f.egg?5:8+f.lv*3,xp=f.strong?60:f.egg?10:15+f.lv*5,st0=petStage(pet);pet.xp+=xp;save.money+=money;stat('battles');
+    if(f.id>=0&&!F.beaten.includes(f.id))F.beaten.push(f.id);persist();sfx(660,.4,'triangle',.07,400);
+    logRec(`⚔️ ${pet.name}打贏了${B4.fname}`);
+    const grew=petStage(pet)>st0;
+    showModal(`<h2>🏆 打贏了！</h2><p>${why}</p><p>獲得 <b>💰 ${money}</b> 元，${pet.name} 經驗 +${xp}${grew?`，<b>長大到第 ${petStage(pet)} 階段</b>！`:'。'}</p>
+     <div class="row"><button class="pill green" id="mGo">太棒了！</button></div>`);
+    $('mGo').onclick=()=>{hideModal();scene='village';setLayers();V.cool=1.5;const v=V.foes.find(x=>x.id===f.id);if(v)v.dead=true;
+      if(F.beaten.length>=V_FOE_POS.length){scene='result';setLayers();const n=F.beaten.length;save.f4=Object.assign(F,{beaten:[],opened:[]});persist();
+        clearFloor(`<h2>🏘️🏆 村莊恢復和平！</h2><p>你和 ${ELS[pet.el].e}${pet.name} 打倒了村莊路上全部 ${n} 隻敵人！</p>`);}};}
+  else{pet.hp=Math.max(0,pet.hp);if(B4.pos[0]>1)pet.hp=Math.min(pet.hp,Math.round(petMax(pet)*.2));persist();sfx(150,.5,'sawtooth',.07,-60);
+    logRec(`💦 ${pet.name}輸給了${B4.fname}`);
+    showModal(`<h2>💦 輸了……</h2><p>${why}</p><p>${pet.hp<=0?`${pet.name}沒力氣了，去<b>旅館🛏️睡覺</b>把血補滿再來挑戰！`:'先休息一下，想想用什麼屬性打牠比較好。'}</p>
+     <div class="row"><button class="pill green" id="mGo">回村莊</button></div>`);
+    $('mGo').onclick=()=>{hideModal();scene='village';setLayers();V.cool=2.5;const fx=f.x||V.x;V.x=clamp(V.x+(V.x-fx)*1.5,40,VW4-40);};}
+}
+function updBattle(dt){
+  if(B4.anim){B4.anim.t-=dt;if(B4.anim.t<=0)B4.anim=null;}
+  for(const t of B4.txt)t.t-=dt;B4.txt=B4.txt.filter(t=>t.t>0);
+  B4.shake=Math.max(0,B4.shake-dt*30);
+}
+function drawBattle(){
+  const pet=petOf();
+  // 背景：照片的場地
+  ctx.fillStyle='#4a4f5c';ctx.fillRect(0,0,W,H);
+  if(STAGE_IMG.complete&&STAGE_IMG.naturalWidth){const iw=STAGE_IMG.naturalWidth,ih=STAGE_IMG.naturalHeight,s=Math.max(W/iw,H/ih);ctx.drawImage(STAGE_IMG,(W-iw*s)/2,(H-ih*s)/2,iw*s,ih*s);}
+  ctx.fillStyle='rgba(0,0,0,.12)';ctx.fillRect(0,0,W,H);
+  const sh=B4.shake?rand(-B4.shake,B4.shake):0;
+  const btH=document.getElementById('bt4').offsetHeight||170,gy=Math.min(H-btH-20,H*.7),cx=W/2+sh,half=Math.min(W*.42,380);
+  // 場地邊界
+  ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.ellipse(cx,gy+10,half,34,0,0,7);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.85)';ctx.setLineDash([12,8]);ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(cx,gy+10,half,34,0,0,7);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#ff5a5a';ctx.fillRect(cx-half-3,gy-20,6,50);ctx.fillRect(cx+half-3,gy-20,6,50);
+  // 角色
+  const lunge=(w)=>B4.anim&&B4.anim.who===w?Math.sin((1-B4.anim.t/.9)*Math.PI)*half*.35:0;
+  const px=cx-B4.pos[0]*half+lunge('me'),fx=cx+B4.pos[1]*half-lunge('foe');
+  drawPet(ctx,px,gy-28,Math.min(130,H*.24),pet.el,petStage(pet),1,T,pet.hp<petMax(pet)*.3?'hurt':'');
+  ctx.fillStyle='rgba(0,0,0,.25)';ctx.beginPath();ctx.ellipse(fx,gy+8,40,10,0,0,7);ctx.fill();
+  ctx.fillStyle=ELS[B4.fel].c;ctx.globalAlpha=.3;ctx.beginPath();ctx.arc(fx,gy-30,B4.foe.strong?62:46,0,7);ctx.fill();ctx.globalAlpha=1;
+  ctx.save();ctx.translate(fx,gy-30);ctx.scale(-1,1);emo(B4.fe,0,0,B4.foe.strong?96:72);ctx.restore();
+  if(B4.dodge)emo('🛡️',px+40,gy-90,26);if(B4.fdodge)emo('🛡️',fx-40,gy-90,26);
+  // 招式特效
+  if(B4.anim&&B4.anim.k!=='dodge'){const m=MOVES[B4.anim.k],p=1-B4.anim.t/.9,me=B4.anim.who==='me',x0=me?px:fx,x1=me?fx:px;
+    const e=m.el?ELS[m.el].e:'💥';for(let i=0;i<5;i++){const q=clamp(p*1.4-i*.08,0,1);emo(e,x0+(x1-x0)*q,gy-40-Math.sin(q*Math.PI)*60+i*6,30);}}
+  // 血條
+  const bw=Math.min(W*.4,260);
+  const box=(x,y,name,hp,max,el,lv,pos,stage)=>{ctx.fillStyle='rgba(255,250,240,.93)';rr(x,y,bw,58,12);ctx.fill();ctx.strokeStyle='#3a2f1c';ctx.lineWidth=3;ctx.stroke();
+    txt(`${ELS[el].e} ${name}`,x+10,y+16,14,'#2a2416','left',900);txt(lv,x+bw-10,y+16,12,'#7a6a4a','right',800);
+    const f=clamp(hp/max,0,1);ctx.fillStyle='#ddd';rr(x+10,y+28,bw-20,10,5);ctx.fill();ctx.fillStyle=f>.5?'#4cc35a':f>.2?'#ffd23f':'#ff4d5e';rr(x+10,y+28,(bw-20)*f,10,5);ctx.fill();
+    txt(`${Math.max(0,Math.ceil(hp))}/${max}　離邊緣 ${Math.max(0,Math.round((1-pos)*100))}%`,x+10,y+48,11,pos>.75?'#c4483a':'#2a2416','left',800);};
+  box(12,12,pet.name,pet.hp,petMax(pet),pet.el,`第${petStage(pet)}階段`,B4.pos[0]);
+  box(W-bw-12,12,B4.fname,B4.fhp,B4.fmax,B4.fel,`Lv${B4.flv}`,B4.pos[1]);
+  // 招式名稱大字
+  B4.txt.forEach((t,i)=>{const x=t.me?px:fx;ctx.globalAlpha=Math.min(1,t.t*2);ctx.lineWidth=5;ctx.strokeStyle='rgba(0,0,0,.7)';
+    ctx.font=`900 ${t.big?28:20}px ${FONT}`;ctx.textAlign='center';const y=gy-140-(1.2-t.t)*30-i*4;ctx.strokeText(t.s,x,y);txt(t.s,x,y,t.big?28:20,t.col||'#fff','center',900);ctx.globalAlpha=1;});
+}
+
 /* ---------- 紀錄 ---------- */
 function stat(k,n){save.st=save.st||{};save.st[k]=(save.st[k]||0)+(n||1);}
 function logRec(t){save.st=save.st||{};const d=new Date(),L=save.st.log=save.st.log||[];
@@ -2126,7 +2513,7 @@ function openRecords(){
   const box=(v,l)=>`<div class="st"><b>${v}</b><span>${l}</span></div>`;
   let h=`<h2>📜 我的紀錄</h2><div class="stats">
     ${box(cur+' 樓','現在在')}${box(Math.max(save.best||1,cur)+' 樓','最高到過')}${box(save.clears||0,'過關次數')}${box(save.tops||0,'登上 100 樓')}
-    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box(st.bosses||0,'打倒魔王')}${box(st.climbs||0,'攀岩進大樓')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.shows||0,'馬戲團成功表演')}${box(st.escapes||0,'逃過妖怪')}${box(st.bestVotes||0,'畫畫最高分')}
+    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box(st.bosses||0,'打倒魔王')}${box(st.climbs||0,'攀岩進大樓')}${box(st.pets||0,'孵出寵物')}${box(st.battles||0,'寵物對戰勝利')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.shows||0,'馬戲團成功表演')}${box(st.escapes||0,'逃過妖怪')}${box(st.bestVotes||0,'畫畫最高分')}
     ${box('💰 '+save.money,'現在的錢')}${box((save.toys||[]).length+' / '+TOYS.length,'收集的玩具')}${box(fmtTime(st.time),'一共玩了')}${box(IDS[P.id].e+' '+IDS[P.id].n,'現在的身分')}
   </div>`;
   const now=c&&c.rounds&&c.rounds.length?c.rounds.map(r=>r.imgs[0]):null,pics=now||st.lastPics;
@@ -2141,7 +2528,7 @@ $('hRec').onclick=openRecords;
 $('bRec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
 
 /* ---------- 暫停 / 存檔 ---------- */
-function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
+function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
 function openPause(){
   if(!canPause())return;
   input.atk=false;input.keys={};joy.active=false;
@@ -2178,6 +2565,7 @@ function setLayers(){
   ['bAtk','bSwap','bHeal','bRoll'].forEach(id=>$(id).style.visibility=scene==='draw2'?'hidden':'');
   $('ctlDrive').classList.toggle('hidden',scene!=='drive');
   $('ctl3').classList.toggle('hidden',scene!=='bike3');
+  $('ctl4').classList.toggle('hidden',scene!=='village');$('bt4').classList.toggle('hidden',scene!=='battle');
   $('ctlClimb').classList.toggle('hidden',scene!=='climb');$('cvClimb').style.display=scene==='climb'?'block':'none';
   $('ctlHome').classList.toggle('hidden',scene!=='home');
   joy.active=false;input.atk=false;lastBtn='';refreshButtons();
@@ -2206,14 +2594,16 @@ let last=performance.now();
 function frame(now){
   let dt=Math.min(.033,(now-last)/1000);last=now;T+=dt;shake=Math.max(0,shake-dt*40);
   const paused=!$('modal').classList.contains('hidden');
-  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
+  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
   ctx.setTransform(DPR,0,0,DPR,0,0);
   if(scene==='home')drawHome(dt);
   else if(scene==='drive'){if(!paused)updDrive(dt);ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));drawDrive();ctx.restore();}
   else if(scene==='draw2'){if(!paused&&!dr.open)updDraw2(dt);drawDraw2();if(dr.open)updDrawUI(dt);}
   else if(scene==='bike3'){if(!paused)upd3(dt);draw3();}
+  else if(scene==='village'){if(!paused)updVillage(dt);drawVillage();}
+  else if(scene==='battle'){if(!paused)updBattle(dt);drawBattle();}
   else if(scene==='climb'){if(!paused)updClimb(dt);drawClimb();}
-  else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else if(curFloor===3&&scene==='result')draw3();else drawFloor();}
+  else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else if(curFloor===3&&scene==='result')draw3();else if(curFloor===4&&scene==='result')drawVillage();else drawFloor();}
   requestAnimationFrame(frame);
 }
 P.r=idk()==='kid'?11:14;
