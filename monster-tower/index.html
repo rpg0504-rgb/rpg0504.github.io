@@ -1340,7 +1340,7 @@ function startDraw2(){
    <p>🪣 <b>填色</b>：按住一個顏色，拖到畫上要塗的地方放開，那一塊就自動塗滿！也可以按「🪣 油漆桶」再點畫面。畫錯了按「↩️ 復原」</p>
    <p>🖼️ 一共要畫 <b>${ROUNDS} 張</b>，畫完去右邊的 <b>🗳️ 投票室</b></p>
    <p>🗳️ 每一題大家都要投票給<b>最好玩、最有創意</b>的圖，<b>不能投給自己</b></p>
-   <p>🏆 最後分數最高的就是贏家！贏了才能上 3 樓</p>
+   <p>🏆 最後分數最高的就是贏家！就算沒贏，畫完、投完票也能上 3 樓</p>
    ${n?`<p style="color:#2f8a3a">📝 讀取存檔：已經畫好 ${n} 張了！</p>`:''}
    </div><div class="row"><button class="pill red" id="mGo">開始比賽！</button></div>`);
   $('mGo').onclick=hideModal;
@@ -1563,11 +1563,11 @@ function voteResult(){
     hideModal();scene='result';
     clearFloor(`${h}<p>${tie?'平手也算贏家！':'你是畫畫冠軍！'}獎金 <b>💰 ${prize}</b> 元，樓梯打開了！</p>`);
   }else{
-    h+=`<p>最高分是 ${mx} 分，你拿到 ${sc[0]} 分。多用幾種顏色、畫大一點、加一些好玩的東西，妖怪會比較喜歡喔！</p>
-     <div class="row"><button class="pill red" id="vAgain">🔁 再比一次</button><button class="pill green" id="vHome">🏠 回家</button></div>`;
-    save.c2=null;persist();showModal(h);
-    $('vAgain').onclick=()=>{hideModal();startDraw2();};
-    $('vHome').onclick=()=>{hideModal();home.ring=false;enterHome();};
+    // 沒贏也可以過關：畫完 10 張、投完票就算完成比賽
+    const prize=10;save.money+=prize;save.c2=null;persist();
+    hideModal();scene='result';
+    clearFloor(`${h}<p>最高分是 ${mx} 分，你拿到 ${sc[0]} 分。多用幾種顏色、畫大一點、加一些好玩的東西，妖怪會比較喜歡喔！</p>
+     <p>沒有拿第一也沒關係，你完成了比賽！參加獎 <b>💰 ${prize}</b> 元，樓梯一樣打開了。</p>`);
   }
 }
 
