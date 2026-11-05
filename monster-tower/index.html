@@ -30,8 +30,15 @@
   #bSwap{width:62px;height:62px;right:calc(128px + env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom))}
   #bHeal{width:62px;height:62px;right:calc(118px + env(safe-area-inset-right));bottom:calc(94px + env(safe-area-inset-bottom));background:rgba(220,60,110,.5)}
   #bId{width:62px;height:62px;right:calc(46px + env(safe-area-inset-right));bottom:calc(132px + env(safe-area-inset-bottom));background:rgba(60,110,220,.5)}
-  #bRoll{width:56px;height:56px;right:calc(196px + env(safe-area-inset-right));bottom:calc(66px + env(safe-area-inset-bottom));background:rgba(230,140,40,.55)}
-  #joyZone{position:absolute;left:0;top:70px;bottom:0;width:55%}
+  #bRoll{width:56px;height:56px;right:calc(196px + env(safe-area-inset-right));bottom:calc(160px + env(safe-area-inset-bottom));background:rgba(230,140,40,.55)}
+  #joyZone,#joyZone4,#joyZone5{display:none!important}
+  /* 左下角固定的小圓形搖桿 */
+  #joyPad{position:fixed;left:calc(22px + env(safe-area-inset-left));bottom:calc(22px + env(safe-area-inset-bottom));width:124px;height:124px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,.12) 0 55%,rgba(255,255,255,.22) 56% 100%);border:3px solid rgba(255,255,255,.55);z-index:7;touch-action:none;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+  #joyPad.hidden{display:none}
+  #joyPad .arr{position:absolute;color:rgba(255,255,255,.7);font-size:14px;font-weight:900;pointer-events:none;transform:translate(-50%,-50%)}
+  #joyKnob{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#d6dbe6 60%,#9aa3b5);
+    border:3px solid rgba(255,255,255,.9);box-shadow:0 3px 8px rgba(0,0,0,.35);pointer-events:none}
 
   /* 開車 */
   .arrow{position:absolute;bottom:calc(24px + env(safe-area-inset-bottom));width:110px;height:110px;border-radius:24px;font-size:46px}
@@ -281,6 +288,7 @@
 
 <div id="dialog" class="hidden"><div class="who" id="dlgWho"></div><div class="txt" id="dlgTxt"></div><div class="next">點一下繼續 ▶</div></div>
 <div id="modal" class="modal hidden"><div class="card" id="modalCard"></div></div>
+<div id="joyPad" class="hidden"><span class="arr" style="left:50%;top:13%">▲</span><span class="arr" style="left:50%;top:87%">▼</span><span class="arr" style="left:13%;top:50%">◀</span><span class="arr" style="left:87%;top:50%">▶</span><div id="joyKnob"></div></div>
 <div id="toast"></div>
 
 <!-- 2 樓畫畫比賽：畫圖畫面 -->
@@ -780,7 +788,7 @@ function startFloor(){
   showModal(`<h2>🏢 最高樓 ${curFloor}F：妖怪辦公室</h2>
    ${curFloor>1?`<p style="color:#c4483a"><b>${curFloor} 樓的妖怪比 1 樓強：</b>血 ×${FS.hp.toFixed(2)}、攻擊 ×${FS.dmg.toFixed(2)}、速度 ×${FS.spd.toFixed(2)}</p>`:''}
    <div class="tips">
-   <p>🕹️ <b>左半邊螢幕</b>拖曳＝走路</p>
+   <p>🕹️ <b>左下角的圓形搖桿</b>：拖動中間的小圓＝走路</p>
    <p>🔴 <b>按住攻擊</b>＝自動瞄準最近的妖怪</p>
    <p>🔄 <b>換武器</b>：武器由後面的跟班幫你拿（一人拿一把）</p>
    <p>❤️ <b>補血</b>：跟後面的人類借血</p>
@@ -1184,8 +1192,6 @@ function drawFloor(){
   ctx.restore();
   if(mode==='monster'){ctx.fillStyle='rgba(90,0,130,.16)';ctx.fillRect(0,0,W,H);}
   drawHUD();
-  if(joy.active){ctx.strokeStyle='rgba(255,255,255,.45)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(joy.bx,joy.by,55,0,7);ctx.stroke();
-    const jx=joy.x-joy.bx,jy=joy.y-joy.by,l=hyp(jx,jy),m=Math.min(l,55)/(l||1);ctx.fillStyle='rgba(255,255,255,.5)';ctx.beginPath();ctx.arc(joy.bx+jx*m,joy.by+jy*m,24,0,7);ctx.fill();}
 }
 function bar(x,y,w,h,v,col,label){ctx.fillStyle='rgba(0,0,0,.55)';rr(x,y,w,h,h/2);ctx.fill();ctx.fillStyle=col;rr(x+2,y+2,Math.max(0,(w-4)*clamp(v,0,1)),h-4,(h-4)/2);ctx.fill();txt(label,x+10,y+h/2+1,12,'#fff','left',900);}
 function drawHUD(){
@@ -1451,8 +1457,6 @@ function drawDraw2(){
   ctx.fillStyle='#fff';ctx.strokeStyle='#000';ctx.lineWidth=12;ctx.beginPath();ctx.arc(P.x,P.y,45,0,7);ctx.fill();ctx.stroke();
   ctx.restore();
   txt(`🏢 2F / ${TOP}　💰 ${save.money}`,W-12,my+mh+20,14,'#fff','right',900);
-  if(joy.active){ctx.strokeStyle='rgba(255,255,255,.45)';ctx.lineWidth=3;ctx.beginPath();ctx.arc(joy.bx,joy.by,55,0,7);ctx.stroke();
-    const jx=joy.x-joy.bx,jy=joy.y-joy.by,l=hyp(jx,jy),m=Math.min(l,55)/(l||1);ctx.fillStyle='rgba(255,255,255,.5)';ctx.beginPath();ctx.arc(joy.bx+jx*m,joy.by+jy*m,24,0,7);ctx.fill();}
 }
 
 /* ---------- 畫圖畫面 ---------- */
@@ -2488,7 +2492,7 @@ function startVillage(){
    <p>🍼 寵物一開始是小寶寶（Lv1）。去<b>商店</b>買🍌香蕉、🥭芒果餵牠，帶牠<b>打仗</b>拿經驗，升到 <b>Lv${EVO_LV[0]}、Lv${EVO_LV[1]}</b> 會<b>進化</b>變成更厲害的樣子，還會學會新招式。</p>
    <p>⚔️ 碰到路上的敵人就開始對戰，寵物上場。每回合選招式：攻擊、回血、變強、讓對手燒傷／麻痺／冰凍……或按「🛡️ 躲避」。</p>
    <p>🔥💧🌿⚡❄️👻 用敵人<b>怕的屬性</b>打會「效果絕佳」！被<b>推出場地外</b>或<b>沒血</b>就輸了。🛏️ 旅館睡覺可以補滿血。</p>
-   <p>🕹️ 左邊拖曳走路，右邊空白處左右拖可以轉鏡頭。</p>
+   <p>🕹️ 左下角的圓形搖桿走路，畫面空白處左右拖可以轉鏡頭。</p>
    <p>🏆 打倒路上 <b>${V_FOE_POS.length} 隻敵人</b>就過關！（已打倒 ${F.beaten.length} 隻）</p>
    </div><div class="row"><button class="pill red" id="mGo">出發！</button></div>`);
   $('mGo').onclick=hideModal;
@@ -3361,8 +3365,19 @@ function setLayers(){
   ['cbVid','cbCv','cbTop','cbPanel','cbMsg'].forEach(id=>$(id).classList.toggle('hidden',scene!=='beycam'));
   $('ctlClimb').classList.toggle('hidden',scene!=='climb');$('cvClimb').style.display=scene==='climb'?'block':'none';
   $('ctlHome').classList.toggle('hidden',scene!=='home');
+  $('joyPad').classList.toggle('hidden',!['floor','draw2','village','zoo'].includes(scene));resetKnob();
   joy.active=false;input.atk=false;lastBtn='';refreshButtons();
 }
+/* 固定搖桿：圓心就是起點，拖動中間的小圓決定走的方向 */
+const JP=$('joyPad'),JK=$('joyKnob');
+function resetKnob(){JK.style.transform='';}
+function jpMove(e){const r=JP.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,R=r.width/2-14;
+  joy.bx=cx;joy.by=cy;let dx=e.clientX-cx,dy=e.clientY-cy;const l=Math.hypot(dx,dy);if(l>R){dx*=R/l;dy*=R/l;}
+  // 遊戲用 55 當最大推力，換算成同樣比例
+  joy.x=cx+dx/R*55;joy.y=cy+dy/R*55;JK.style.transform=`translate(${dx}px,${dy}px)`;}
+JP.addEventListener('pointerdown',e=>{e.preventDefault();joy.active=true;joy.id=e.pointerId;try{JP.setPointerCapture(e.pointerId);}catch(_){}jpMove(e);});
+JP.addEventListener('pointermove',e=>{if(joy.active&&e.pointerId===joy.id)jpMove(e);});
+const jpEnd=e=>{if(e.pointerId===joy.id){joy.active=false;resetKnob();}};JP.addEventListener('pointerup',jpEnd);JP.addEventListener('pointercancel',jpEnd);
 
 /* ---------- 輸入 ---------- */
 const jz=$('joyZone');
