@@ -159,6 +159,24 @@
   .petCard .info{flex:1;min-width:0;font-size:13px;line-height:1.5}
   .petCard .info b{font-size:15px}
   .xpb{height:8px;border-radius:4px;background:#eee;overflow:hidden}.xpb i{display:block;height:100%;background:#8be07b}
+  /* 5 樓 */
+  .v4hud{position:absolute;left:calc(10px + env(safe-area-inset-left));top:calc(10px + env(safe-area-inset-top));background:rgba(10,14,26,.65);border-radius:12px;padding:8px 12px;color:#fff;font-weight:800;font-size:13px;line-height:1.6;pointer-events:none;max-width:calc(100vw - 200px)}
+  .hpRow{position:fixed;left:0;right:0;top:calc(8px + env(safe-area-inset-top));z-index:9;display:flex;justify-content:space-between;gap:8px;padding:0 calc(10px + env(safe-area-inset-right)) 0 calc(10px + env(safe-area-inset-left));pointer-events:none}
+  .hpRow .hp{background:rgba(255,250,240,.94);border:3px solid #3a2f1c;border-radius:12px;padding:6px 10px;color:#2a2416;width:min(46vw,280px);font-size:13px}
+  .hpRow .bar{height:12px;border-radius:6px;background:#ddd;overflow:hidden;margin-top:4px}.hpRow .bar i{display:block;height:100%;transition:width .2s}
+  .bigMsg{position:fixed;left:50%;top:24%;transform:translate(-50%,-50%);z-index:9;font-weight:900;font-size:48px;color:#fff;text-shadow:0 0 8px #000,0 3px 0 #c4483a;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+  #bey5Pull{position:absolute;left:0;right:0;bottom:0;top:40%;display:flex;flex-direction:column;align-items:center;pointer-events:auto}
+  #bey5Pull.hidden{display:none}
+  .pullTip{background:rgba(10,14,26,.75);color:#ffe066;font-weight:900;padding:6px 14px;border-radius:12px;font-size:16px}
+  #bey5Rip{flex:1;width:min(70vw,260px);display:flex;flex-direction:column;align-items:center;touch-action:none;cursor:grab;padding-top:8px}
+  .launcher{background:#e8483a;color:#fff;font-weight:900;padding:10px 18px;border-radius:14px;border:3px solid #fff;box-shadow:0 4px 0 #8a2018}
+  #bey5Cord{width:14px;height:40px;background:repeating-linear-gradient(0deg,#ffd23f 0 10px,#3a2f1c 10px 20px);border-radius:7px;border:2px solid #fff;position:relative}
+  #bey5Cord::after{content:'';position:absolute;left:50%;bottom:-26px;transform:translateX(-50%);width:54px;height:26px;border-radius:13px;background:#3a2f1c;border:3px solid #ffd23f}
+  #cbVid{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;background:#000}
+  #cbCv{position:fixed;inset:0;width:100%;height:100%;z-index:3;touch-action:none}
+  #cbPanel{position:fixed;left:0;right:0;bottom:0;z-index:8;padding:8px calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  #cbPanel .msg{flex:1 1 100%;background:#fffaf0;color:#2a2416;border:3px solid #3a2f1c;border-radius:14px;padding:8px 12px;font-weight:800;font-size:14px}
+  #cbPanel .mv{flex:1 1 30%;max-width:220px;border:3px solid #3a2f1c;border-radius:14px;padding:10px 6px;font-family:inherit;font-weight:900;font-size:14px;color:#2a2416;background:#fff}
   /* 攀岩 */
   #cvClimb{position:fixed;inset:0;width:100%;height:100%;display:none;z-index:2;touch-action:none}
   #ctlClimb{z-index:6}
@@ -212,6 +230,26 @@
 <div id="bt4Top" class="hidden"></div>
 <div id="bt4Fx" class="hidden"></div>
 <div id="bt4" class="hidden"></div>
+
+<!-- 5 樓：動物園 -->
+<div id="ctl5" class="layer hidden">
+  <div id="joyZone5" style="position:absolute;left:0;top:70px;bottom:0;width:60%"></div>
+  <div id="z5Hud" class="v4hud"></div>
+  <button class="btn pz" id="z5Bey" style="right:calc(118px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top));width:54px;height:54px">🌀</button>
+  <button class="btn pz" id="z5Pause" style="right:calc(66px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">⏸</button>
+  <button class="btn pz" id="z5Rec" style="right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">📜</button>
+  <button class="pill red act hidden" id="z5Act" style="position:absolute;right:calc(22px + env(safe-area-inset-right));bottom:calc(26px + env(safe-area-inset-bottom));font-size:18px;padding:16px 20px">比陀螺</button>
+</div>
+<div id="bey5" class="layer hidden">
+  <div id="bey5Top" class="hpRow"></div>
+  <div id="bey5Msg" class="bigMsg"></div>
+  <div id="bey5Pull" class="hidden"><div class="pullTip">⬇️ 按住拉繩，用力往下拉再放開！</div><div id="bey5Rip"><div class="launcher">🌀 發射器</div><div id="bey5Cord"></div></div></div>
+</div>
+<video id="cbVid" class="hidden" playsinline muted autoplay></video>
+<canvas id="cbCv" class="hidden"></canvas>
+<div id="cbTop" class="hpRow hidden"></div>
+<div id="cbMsg" class="bigMsg hidden"></div>
+<div id="cbPanel" class="hidden"></div>
 
 <!-- 攀岩 -->
 <canvas id="cvClimb"></canvas>
@@ -726,7 +764,7 @@ $('bId2').addEventListener('pointerdown',e=>{e.preventDefault();openIdentity();}
 function makeEnemy(kind,x,y,room){const t=ETYPE[kind];return{kind,x,y,r:t.r,hp:t.hp*FS.hp,max:t.hp*FS.hp,spd:t.spd*FS.spd,room,cd:rand(.6,1.6),aggro:false,flash:0,frozen:0,wind:0,stab:0,wdx:0,wdy:0,wt:0,losT:0,seen:false,face:1,bob:Math.random()*6,dead:false};}
 function goFloor(f){
   curFloor=clamp(f,1,TOP);FS=fscale(curFloor);
-  if(curFloor===2)startDraw2();else if(curFloor===3)startBike3();else if(curFloor===4)startVillage();else startFloor();
+  if(curFloor===2)startDraw2();else if(curFloor===3)startBike3();else if(curFloor===4)startVillage();else if(curFloor===5)startZoo();else startFloor();
 }
 function startFloor(){
   useWalls(WALLS1);
@@ -2015,8 +2053,8 @@ function buildClimb(){
   for(let f=1;f<=TOP;f++){mtx.makeTranslation(0,winY(f),.04);glass.setMatrixAt(f-1,mtx);}sc.add(glass);
   const labels=new Map();
   function label(f){if(labels.has(f))return;const c=document.createElement('canvas');c.width=160;c.height=72;const g=c.getContext('2d');
-    g.fillStyle='rgba(20,24,36,.85)';g.fillRect(0,0,160,72);g.fillStyle=f===2?'#ff9fc4':f===3?'#ffd23f':f===4?'#8be07b':'#fff';g.font='900 40px sans-serif';g.textAlign='center';g.textBaseline='middle';
-    g.fillText(f+'F'+(f===2?'🎨':f===3?'🎪':f===4?'🥚':''),80,38);
+    g.fillStyle='rgba(20,24,36,.85)';g.fillRect(0,0,160,72);g.fillStyle=f===2?'#ff9fc4':f===3?'#ffd23f':f===4?'#8be07b':f===5?'#ffb02e':'#fff';g.font='900 40px sans-serif';g.textAlign='center';g.textBaseline='middle';
+    g.fillText(f+'F'+(f===2?'🎨':f===3?'🎪':f===4?'🥚':f===5?'🦁':''),80,38);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c)}));sp.scale.set(1.3,.6,1);sp.position.set(0,winY(f)+1.05,.3);sc.add(sp);labels.set(f,sp);}
   // 抓點（固定亂數，每次一樣）
   const rnd=srand(20261015),holds=[];
@@ -2091,7 +2129,7 @@ function clHud(){
   $('clSta').style.width=CL.sta+'%';$('clSta').style.background=CL.sta<25?'#ff5a5a':CL.sta<50?'#ffd23f':'#5bc46a';
   $('clStaT').textContent=`💪 體力 ${Math.ceil(CL.sta)}`;
   $('clHint').style.display=near?'none':'';
-  const b=$('clEnter');if(near){b.classList.remove('hidden');b.textContent=`🪟 進入 ${near} 樓${near===2?' 🎨':near===3?' 🎪':near===4?' 🥚':''}`;}else b.classList.add('hidden');
+  const b=$('clEnter');if(near){b.classList.remove('hidden');b.textContent=`🪟 進入 ${near} 樓${near===2?' 🎨':near===3?' 🎪':near===4?' 🥚':near===5?' 🦁':''}`;}else b.classList.add('hidden');
 }
 function nearWindow(){const f=climbFloorNow();return Math.abs(CL.B.y+.6-winY(f))<1.2&&Math.abs(CL.B.x)<1.6?f:0;}
 $('clEnter').onclick=()=>{const f=nearWindow();if(!f)return;logRec(`🧗 爬外牆到 ${f} 樓，從窗戶進去`);stat('climbs');$('cvClimb').style.display='none';goFloor(f);};
@@ -2763,6 +2801,493 @@ function drawBattle(){
   $('bt4Fx').innerHTML=h;
 }
 
+/* =========================================================
+   5 樓：3D 動物園陀螺大賽（依照動物園地圖）
+   在園區自由走動，碰到動物或人類就用戰鬥陀螺對戰：
+   🎮 虛擬發射：用手指拉發射繩，兩顆 3D 陀螺在戰鬥盤裡對戰
+   📷 攝影機：手機從上面拍真的戰鬥盤，程式追蹤真陀螺，跟虛擬對手陀螺一起轉
+   轉得最久的贏；被擠出場、極限線飛出、爆裂都算輸。出口有扭蛋商店（寵物、陀螺）
+   ========================================================= */
+const U5=1/50;
+const BEYS={
+  start:{n:'旋風一號',t:'平衡',r:'N',atk:5,def:5,sta:5,wt:5,c:0x4a9ee8,c2:0xdfe8f5},
+  rock:{n:'小石頭',t:'防禦',r:'N',atk:3,def:7,sta:5,wt:7,c:0x8a8f98,c2:0x5a5f68},
+  leaf:{n:'綠葉陀',t:'持久',r:'N',atk:3,def:4,sta:7,wt:5,c:0x4cc35a,c2:0xd8f6c8},
+  spark:{n:'火花刀',t:'攻擊',r:'N',atk:7,def:3,sta:4,wt:5,c:0xff6a3c,c2:0xffd23f},
+  cheetah:{n:'疾風獵豹',t:'攻擊',r:'R',atk:8,def:4,sta:4,wt:5,c:0xffb02e,c2:0x3a2f1c},
+  rhino:{n:'鋼鐵犀牛',t:'防禦',r:'R',atk:4,def:8,sta:5,wt:8,c:0x9aa3b1,c2:0x3d4258},
+  penguin:{n:'冰霜企鵝',t:'持久',r:'R',atk:4,def:5,sta:8,wt:5,c:0x8fe3ff,c2:0x1f2a44},
+  zebra:{n:'雷霆斑馬',t:'平衡',r:'R',atk:6,def:6,sta:6,wt:6,c:0xffd23f,c2:0x222222},
+  phoenix:{n:'火焰鳳凰',t:'攻擊',r:'SR',atk:9,def:5,sta:6,wt:6,c:0xff3c3c,c2:0xffb02e},
+  bear:{n:'黑熊堡壘',t:'防禦',r:'SR',atk:5,def:9,sta:6,wt:9,c:0x2a2a30,c2:0xf2f2f2},
+  panda:{n:'月光貓熊',t:'持久',r:'SR',atk:5,def:6,sta:9,wt:6,c:0xf4f4f4,c2:0x222222},
+  fox:{n:'幻影狐狸',t:'平衡',r:'SR',atk:7,def:7,sta:7,wt:6,c:0xa77bff,c2:0xff7eb6},
+  dragon:{n:'龍捲飛龍',t:'攻擊',r:'SSR',atk:10,def:7,sta:7,wt:7,c:0x2ec4b6,c2:0xffd23f},
+  lion:{n:'黃金獅王',t:'平衡',r:'SSR',atk:9,def:9,sta:9,wt:8,c:0xffcf1f,c2:0xc4483a},
+};
+const BEY_KEYS=Object.keys(BEYS).filter(k=>k!=='start');
+const RARE_COL={N:'#9aa3b1',R:'#3c9bff',SR:'#a77bff',SSR:'#ffb02e'};
+// 對手：位置照地圖（圖上的 px），kind 決定 3D 模型
+const ZOO_FOES=[
+  {n:'灰狼',e:'🐺',x:420,y:250,k:'quad',c:0x8a8f98,b:'cheetah'},{n:'棕熊',e:'🐻',x:370,y:330,k:'quad',c:0x8a5a30,b:'rock',big:1.2},
+  {n:'小熊貓',e:'🦊',x:490,y:350,k:'quad',c:0xc9541a,c2:0xffffff,b:'spark',small:1},{n:'企鵝館館長',e:'🐧',x:700,y:210,k:'bird',c:0x222233,c2:0xffffff,b:'penguin',bld:'dome'},
+  {n:'昆蟲館館長',e:'🐞',x:880,y:200,k:'human',c:0x4cc35a,b:'leaf',bld:'box'},{n:'長頸鹿',e:'🦒',x:975,y:330,k:'quad',c:0xf2c84b,c2:0x8a5a30,b:'zebra',neck:1},
+  {n:'大猩猩',e:'🦍',x:800,y:370,k:'ape',c:0x2a2a30,b:'bear'},{n:'白犀牛',e:'🦏',x:1100,y:370,k:'quad',c:0xb9b9c4,b:'rhino',horn:1,big:1.3},
+  {n:'大象',e:'🐘',x:850,y:500,k:'quad',c:0x9fa8b8,b:'rhino',trunk:1,big:1.6},{n:'斑馬',e:'🦓',x:1000,y:470,k:'quad',c:0xffffff,c2:0x222222,b:'zebra',stripes:1},
+  {n:'獅子',e:'🦁',x:1130,y:480,k:'quad',c:0xe0a35a,c2:0x8a5a30,b:'lion',mane:1,big:1.15},{n:'爬蟲館館長',e:'🐍',x:230,y:500,k:'human',c:0x6b8e23,b:'fox',bld:'tower'},
+  {n:'鳥園園長',e:'🦜',x:470,y:560,k:'human',c:0x3c9bff,b:'phoenix',bld:'cage'},{n:'紅鶴',e:'🦩',x:330,y:610,k:'bird',c:0xff8fb1,b:'spark',tall:1},
+  {n:'蜥蜴',e:'🦎',x:170,y:635,k:'rept',c:0x5bc46a,b:'leaf'},{n:'花豹',e:'🐆',x:1080,y:630,k:'quad',c:0xe8b04a,c2:0x3a2f1c,b:'cheetah',spots:1},
+  {n:'水獺',e:'🦦',x:820,y:650,k:'quad',c:0x6b4a2b,b:'leaf',small:1},{n:'烏龜',e:'🐢',x:1010,y:700,k:'turtle',c:0x4caf50,b:'rock'},
+  {n:'馬來貘',e:'🐾',x:1210,y:720,k:'quad',c:0x222233,c2:0xffffff,b:'bear'},{n:'鱷魚',e:'🐊',x:870,y:750,k:'rept',c:0x3f6e3a,b:'dragon',big:1.4},
+  {n:'袋鼠',e:'🦘',x:380,y:710,k:'quad',c:0xc98a4a,b:'cheetah'},{n:'駱駝',e:'🐫',x:540,y:720,k:'quad',c:0xd9b47a,b:'rock',hump:1,big:1.2},
+  {n:'棉頭絹猴',e:'🐒',x:670,y:715,k:'ape',c:0x8a6a4a,b:'spark',small:1},{n:'穿山甲',e:'🦔',x:600,y:790,k:'rept',c:0x8a6a3a,b:'rock',small:1},
+  {n:'水豚',e:'🦫',x:690,y:800,k:'quad',c:0xa0703a,b:'leaf',small:1},{n:'貓熊館館長',e:'🐼',x:610,y:960,k:'quad',c:0xffffff,c2:0x222222,b:'panda',bld:'box'},
+  {n:'台灣黑熊',e:'🐻‍❄️',x:665,y:1080,k:'quad',c:0x1a1a1f,c2:0xffffff,b:'bear',big:1.2},{n:'梅花鹿',e:'🦌',x:570,y:1150,k:'quad',c:0xc98a4a,c2:0xffffff,b:'zebra',spots:1},
+  {n:'無尾熊館館長',e:'🐨',x:590,y:1280,k:'ape',c:0x9aa3b1,b:'penguin',bld:'box'},{n:'園長',e:'👨‍💼',x:1190,y:1000,k:'human',c:0x2b4a8a,b:'lion',bld:'tower2'},
+  {n:'遊客中心姐姐',e:'👩',x:520,y:1450,k:'human',c:0xff7eb6,b:'fox'},
+];
+const ZOO_ROADS=[
+  [[560,1640],[570,1450],[590,1300],[620,1150],[660,1000],[700,880],[720,780],[740,650],[750,520],[730,470]],
+  [[600,1300],[560,1180],[590,1050],[660,1000]],
+  [[640,1560],[800,1300],[950,1050],[1020,900],[1080,950],[1120,1200],[1110,1520]],
+  [[665,400],[560,330],[420,280],[300,260],[150,270]],[[700,375],[700,300],[720,240]],
+  [[760,390],[850,320],[1000,290],[1120,290]],
+  [[770,440],[900,410],[1020,420],[1080,520],[1120,650],[1150,780],[1160,860],[1000,850],[800,830],[760,700]],
+  [[800,700],[950,640],[1060,560]],
+  [[660,450],[580,470],[560,560],[540,600],[300,560],[150,620],[200,700],[420,760],[560,800],[620,850]],
+  [[560,600],[620,680],[650,760]],
+];
+const ZOO_EXIT={x:470,y:1600},ZOO_GATE={x:610,y:1650};
+const Z={x:580,y:1560,fx:0,fy:-1,moving:false,trail:[],petPos:{x:580,y:1600},cool:0,yaw:0,rot:null,near:null};
+function f5(){if(!save.f5)save.f5={beaten:[],tops:['start'],equip:'start'};return save.f5;}
+function myBey(){const F=f5();return BEYS[F.equip]||BEYS.start;}
+function foeBey(i){const f=ZOO_FOES[i],b=BEYS[f.b],far=clamp((1650-f.y)/1400,0,1),bonus=Math.round(far*2);
+  return Object.assign({},b,{atk:b.atk+bonus,def:b.def+bonus,sta:b.sta+bonus});}
+function zBlocked(x,y,r){if(x<60||y<120||x>1400||y>1700)return true;for(const f of ZOO_FOES){if(f.bld&&hyp(f.x-x,f.y-60-y)<70)return true;}return false;}
+/* ---------- 3D 模型：動物、人、陀螺 ---------- */
+function makeAnimal(f){
+  const g=new THREE.Group(),A=M3(f.c),B=M3(f.c2||f.c),eye=M3(0x111111);
+  const s=(f.big||1)*(f.small?.65:1);
+  if(f.k==='quad'){
+    const bd=mk(new THREE.SphereGeometry(.6,16,12),A,0,.85,0,g);bd.scale.set(.8,.7,1.3);
+    [[-.3,.5],[.3,.5],[-.3,-.5],[.3,-.5]].forEach(([x,z])=>mk(new THREE.CylinderGeometry(.1,.09,.6,8),A,x,.3,z,g));
+    const hy=f.neck?2.1:1.15,hz=f.neck?.75:.85;if(f.neck){const n=mk(new THREE.CylinderGeometry(.13,.18,1.4,8),A,0,1.45,.6,g);n.rotation.x=.3;}
+    const hd=mk(new THREE.SphereGeometry(.36,14,10),A,0,hy,hz,g);hd.scale.z=1.15;
+    [-.14,.14].forEach(x=>mk(new THREE.SphereGeometry(.05,8,6),eye,x,hy+.08,hz+.33,g));
+    [-.2,.2].forEach(x=>mk(new THREE.ConeGeometry(.1,.2,6),A,x,hy+.33,hz,g));
+    if(f.trunk){const t=mk(new THREE.CylinderGeometry(.06,.12,.8,8),A,0,hy-.35,hz+.45,g);t.rotation.x=-.4;[-1,1].forEach(sx=>{const e=mk(new THREE.SphereGeometry(.3,10,8),A,sx*.35,hy,hz-.05,g);e.scale.set(.25,1,.8);});}
+    if(f.horn){const h=mk(new THREE.ConeGeometry(.08,.4,8),M3(0xf2e6c8),0,hy+.1,hz+.42,g);h.rotation.x=.9;}
+    if(f.mane){const m=mk(new THREE.SphereGeometry(.5,14,10),B,0,hy,hz-.12,g);m.scale.z=.6;hd.position.z+=.08;}
+    if(f.hump)mk(new THREE.SphereGeometry(.35,12,8),A,0,1.3,0,g);
+    if(f.stripes)for(let i=0;i<5;i++){const r=mk(new THREE.TorusGeometry(.5,.05,6,20),B,0,.85,-.5+i*.25,g);r.scale.set(.8*1.1,.7*1.1,1);}
+    if(f.spots)for(let i=0;i<8;i++){const a=i*1.7;mk(new THREE.SphereGeometry(.08,8,6),B,Math.cos(a)*.45,.95+Math.sin(i)*.15,Math.sin(a)*.6,g);}
+    if(f.c2&&!f.stripes&&!f.spots&&!f.mane){const bl=mk(new THREE.SphereGeometry(.45,12,8),B,0,.78,.25,g);bl.scale.set(.8,.6,.9);}
+    const tl=mk(new THREE.CylinderGeometry(.03,.07,.6,6),A,0,.95,-.85,g);tl.rotation.x=-.8;
+  }else if(f.k==='bird'){
+    const bd=mk(new THREE.SphereGeometry(.5,16,12),A,0,f.tall?1.5:.75,0,g);bd.scale.set(.8,1.2,.8);
+    if(f.c2){const bl=mk(new THREE.SphereGeometry(.38,12,10),B,0,.7,.2,g);bl.scale.set(.8,1.2,.6);}
+    const hy=f.tall?2.3:1.45;mk(new THREE.SphereGeometry(.28,12,10),A,0,hy,.05,g);[-.1,.1].forEach(x=>mk(new THREE.SphereGeometry(.04,8,6),eye,x,hy+.05,.3,g));
+    const bk=mk(new THREE.ConeGeometry(.07,.3,8),M3(0xffb02e),0,hy-.05,.4,g);bk.rotation.x=Math.PI/2;
+    if(f.tall){[-.08,.08].forEach(x=>mk(new THREE.CylinderGeometry(.03,.03,1.1,6),M3(0xff8fb1),x,.55,0,g));}
+    [-1,1].forEach(sx=>{const w=mk(new THREE.SphereGeometry(.3,10,8),A,sx*.42,f.tall?1.5:.8,0,g);w.scale.set(.25,.9,.6);});
+  }else if(f.k==='rept'||f.k==='turtle'){
+    if(f.k==='turtle'){mk(new THREE.SphereGeometry(.6,16,10,0,Math.PI*2,0,Math.PI/2),M3(0x6b4a2b),0,.25,0,g);mk(new THREE.SphereGeometry(.2,10,8),A,0,.35,.65,g);}
+    else{const bd=mk(new THREE.SphereGeometry(.4,14,10),A,0,.3,0,g);bd.scale.set(.9,.5,2);const sn=mk(new THREE.SphereGeometry(.25,12,8),A,0,.32,.95,g);sn.scale.set(.8,.5,1.6);
+      [-.12,.12].forEach(x=>mk(new THREE.SphereGeometry(.05,8,6),eye,x,.45,.85,g));const t=mk(new THREE.ConeGeometry(.15,1.1,8),A,0,.25,-1.2,g);t.rotation.x=-Math.PI/2;}
+    [[-.35,.4],[.35,.4],[-.35,-.4],[.35,-.4]].forEach(([x,z])=>mk(new THREE.SphereGeometry(.12,8,6),A,x,.12,z,g));
+  }else{ // ape / human
+    const human=f.k==='human';const bd=mk(new THREE.SphereGeometry(.45,14,12),A,0,1.0,0,g);bd.scale.set(1,1.3,.8);
+    mk(new THREE.SphereGeometry(.33,14,12),human?M3(0xffd9b0):A,0,1.75,0,g);
+    if(!human){const fc=mk(new THREE.SphereGeometry(.22,12,10),M3(0xd9b48a),0,1.7,.2,g);fc.scale.z=.5;}
+    if(human){const hat=mk(new THREE.SphereGeometry(.34,14,8,0,Math.PI*2,0,Math.PI/2),M3(0x3a2f1c),0,1.82,0,g);hat.scale.y=.6;}
+    [-.12,.12].forEach(x=>mk(new THREE.SphereGeometry(.045,8,6),eye,x,1.8,.3,g));
+    [-1,1].forEach(sx=>{const a=mk(new THREE.CylinderGeometry(.09,.08,.8,8),A,sx*.5,1.0,0,g);a.rotation.z=sx*.25;mk(new THREE.CylinderGeometry(.1,.09,.6,8),human?M3(0x3d4258):A,sx*.18,.3,0,g);});
+  }
+  g.scale.setScalar(s);return g;
+}
+function makeBeyModel(b){
+  const g=new THREE.Group(),spin=new THREE.Group();g.add(spin);
+  const mat=M3(b.c,{metalness:.5,roughness:.35}),mat2=M3(b.c2,{metalness:.7,roughness:.25});
+  mk(new THREE.CylinderGeometry(.42,.38,.12,24),mat,0,.2,0,spin);
+  for(let i=0;i<3;i++){const a=i/3*Math.PI*2,bl=mk(new THREE.BoxGeometry(.5,.1,.16),mat2,Math.cos(a)*.32,.24,Math.sin(a)*.32,spin);bl.rotation.y=-a+.6;}
+  const rim=mk(new THREE.TorusGeometry(.4,.04,8,24),mat2,0,.2,0,spin);rim.rotation.x=Math.PI/2;
+  mk(new THREE.CylinderGeometry(.16,.16,.1,16),M3(0xffffff,{metalness:.3}),0,.3,0,spin);
+  mk(new THREE.CylinderGeometry(.08,.08,.11,12),mat,0,.31,0,spin);
+  const tip=mk(new THREE.ConeGeometry(.14,.18,12),M3(0x333333),0,.07,0,spin);tip.rotation.x=Math.PI;
+  g.userData.spin=spin;return g;
+}
+let G5=null;
+const BEY_R=4;
+function build5(){
+  build4();if(G5||!G4)return;
+  // ---- 動物園場景 ----
+  const sc=new THREE.Scene();sc.background=new THREE.Color(0xbfe3ff);sc.fog=new THREE.Fog(0xbfe3ff,35,80);
+  sc.add(new THREE.HemisphereLight(0xffffff,0x6a8a5a,.85));const sun=new THREE.DirectionalLight(0xffffff,.75);sun.position.set(15,30,20);sc.add(sun);
+  const gr=mk(new THREE.PlaneGeometry(60,60),M3(0xa8d88a,{roughness:1}),15,0,18,sc);gr.rotation.x=-Math.PI/2;
+  const roadM=M3(0xf4ead5,{roughness:1});
+  ZOO_ROADS.forEach(pts=>{for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],dx=(b[0]-a[0])*U5,dz=(b[1]-a[1])*U5,l=Math.hypot(dx,dz);
+    const m=mk(new THREE.BoxGeometry(1.3,.04,l+1.2),roadM,(a[0]+b[0])/2*U5,.02,(a[1]+b[1])/2*U5,sc);m.rotation.y=Math.atan2(dx,dz);}});
+  const ring=mk(new THREE.TorusGeometry(1.2,.6,4,32),roadM,715*U5,.02,430*U5,sc);ring.rotation.x=Math.PI/2;ring.scale.z=.05;
+  mk(new THREE.CylinderGeometry(.75,.75,.3,24),M3(0x6fbf5a),715*U5,.15,430*U5,sc);
+  // 山、樹、池塘
+  const hills=[[420,140,2.4],[930,1080,2],[860,1180,1.6],[870,1350,1.6],[820,1500,1.4],[1080,860,1.4],[1250,170,1.8]];
+  hills.forEach(([x,y,r])=>{const h=mk(new THREE.ConeGeometry(r,r*1.4,7),M3(0x4f7a46,{flatShading:true}),x*U5,r*.7,y*U5,sc);h.rotation.y=x;});
+  const trees=[[540,230],[620,520],[1000,1150],[1250,950],[750,1350],[1300,600],[1150,1300],[200,800],[300,420],[950,600],[1060,1000],[1350,300]];
+  trees.forEach(([x,y])=>{mk(new THREE.CylinderGeometry(.15,.2,1.2,8),M3(0x8a5a30),x*U5,.6,y*U5,sc);mk(new THREE.ConeGeometry(.7,1.8,8),M3(0x2f7a3a),x*U5,1.9,y*U5,sc);});
+  const pond=mk(new THREE.CylinderGeometry(1,1,.05,24),M3(0x4a8fc4,{roughness:.2}),890*U5,.03,610*U5,sc);pond.scale.set(1.3,1,2.2);
+  const pond2=mk(new THREE.CylinderGeometry(.6,.6,.05,18),M3(0x4a8fc4,{roughness:.2}),1240*U5,.03,760*U5,sc);pond2.scale.set(1.4,1,.8);
+  // 建築
+  const bld={dome:()=>{const g=new THREE.Group();mk(new THREE.SphereGeometry(1.5,20,12,0,Math.PI*2,0,Math.PI/2),M3(0x9fd8c4),0,0,0,g);return g;},
+    box:()=>{const g=new THREE.Group();mk(new THREE.BoxGeometry(2.6,1.8,1.8),M3(0xf2e6c8),0,.9,0,g);const r=mk(new THREE.ConeGeometry(2,1,4),M3(0x7a4a2b),0,2.3,0,g);r.rotation.y=Math.PI/4;r.scale.z=.7;return g;},
+    tower:()=>{const g=new THREE.Group();mk(new THREE.BoxGeometry(1.2,4,1.2),M3(0x8a5a30),0,2,0,g);return g;},
+    tower2:()=>{const g=new THREE.Group();mk(new THREE.BoxGeometry(1.4,5,1.4),M3(0xf4f4f4),0,2.5,0,g);mk(new THREE.ConeGeometry(1.1,1.4,4),M3(0xc9541a),0,5.7,0,g).rotation.y=Math.PI/4;return g;},
+    cage:()=>{const g=new THREE.Group();mk(new THREE.BoxGeometry(3.4,2.6,2.6),M3(0xd8e4ee,{transparent:true,opacity:.45}),0,1.3,0,g);
+      for(let i=-3;i<=3;i++)mk(new THREE.BoxGeometry(.05,2.6,.05),M3(0x555555),i*.55,1.3,1.3,g);return g;}};
+  const foes=ZOO_FOES.map((f,i)=>{const g=new THREE.Group();g.position.set(f.x*U5,0,f.y*U5);sc.add(g);
+    if(f.bld){const b=bld[f.bld]();b.position.set(0,0,-1.4);g.add(b);}
+    else{const fn=new THREE.Group();for(let k=0;k<8;k++){const a=k/8*Math.PI*2;mk(new THREE.BoxGeometry(.1,.7,.1),M3(0xb9874a),Math.cos(a)*1.6,.35,Math.sin(a)*1.6,fn);}g.add(fn);}
+    const m=makeAnimal(f);g.add(m);
+    const lb=labelSprite(`${f.e} ${f.n}`,'rgba(255,250,240,.95)','#2a2416',320,64);lb.scale.set(2.6,.52,1);lb.position.y=3.0*(f.big||1);g.add(lb);
+    const st=labelSprite('🌀','rgba(0,0,0,0)',null,64,64);st.scale.set(.8,.8,1);st.position.y=3.6*(f.big||1);g.add(st);
+    return{g,m,st,lb,f,i};});
+  // 出口商店、大門
+  const shop=new THREE.Group();shop.position.set(ZOO_EXIT.x*U5,0,ZOO_EXIT.y*U5);sc.add(shop);
+  mk(new THREE.BoxGeometry(2.2,1.8,1.6),M3(0xffb02e),0,.9,-.6,shop);const sr=mk(new THREE.ConeGeometry(1.8,.9,4),M3(0xc4483a),0,2.25,-.6,shop);sr.rotation.y=Math.PI/4;
+  const sl=labelSprite('🎰 扭蛋商店','rgba(255,250,240,.95)','#c4483a',320,64);sl.scale.set(2.6,.52,1);sl.position.y=3.3;shop.add(sl);
+  const gate=new THREE.Group();gate.position.set(ZOO_GATE.x*U5,0,ZOO_GATE.y*U5);sc.add(gate);
+  [-1.4,1.4].forEach(x=>mk(new THREE.CylinderGeometry(.18,.18,2.6,10),M3(0x8a5a30),x,1.3,0,gate));mk(new THREE.BoxGeometry(3.4,.5,.3),M3(0x8a5a30),0,2.7,0,gate);
+  const gl=labelSprite('ZOO 出口・入口','rgba(255,250,240,.95)','#2a2416',320,64);gl.scale.set(2.6,.52,1);gl.position.y=3.4;gate.add(gl);
+  const heroHolder=new THREE.Group(),petHolder=new THREE.Group();sc.add(heroHolder);sc.add(petHolder);
+  // ---- 戰鬥盤（BEYBLADE X 風格）----
+  const bs=new THREE.Scene();bs.background=new THREE.Color(0xc9b98f);
+  bs.add(new THREE.HemisphereLight(0xffffff,0x887766,.9));const bl=new THREE.DirectionalLight(0xffffff,.7);bl.position.set(4,10,6);bs.add(bl);
+  const mat=mk(new THREE.PlaneGeometry(40,40),M3(0xb8a77a,{roughness:1}),0,-.31,0,bs);mat.rotation.x=-Math.PI/2;
+  mk(new THREE.BoxGeometry(11,.6,11),M3(0xf2f2f2),0,-.3,0,bs);
+  const prof=[];for(let i=0;i<=20;i++){const r=i/20*BEY_R;prof.push(new THREE.Vector2(r,.06*Math.pow(r,1.8)));}prof.push(new THREE.Vector2(BEY_R,1.5));
+  const bowl=new THREE.Mesh(new THREE.LatheGeometry(prof,48),M3(0xf7f7f7,{side:THREE.DoubleSide,roughness:.5}));bs.add(bowl);
+  const gapA=Math.PI/2,gapW=.7;  // 極限線（橘色軌道的缺口）在畫面上方
+  const rail=mk(new THREE.TorusGeometry(BEY_R-.15,.14,8,64,Math.PI*2-gapW),M3(0xff7a2e,{roughness:.5}),0,.06*Math.pow(BEY_R-.15,1.8)+.1,0,bs);
+  rail.rotation.x=Math.PI/2;rail.rotation.z=-Math.PI/2+gapW/2;   // 缺口對準 z<0（畫面上方），和物理的極限線同一邊
+  const wall=mk(new THREE.CylinderGeometry(BEY_R+.35,BEY_R+.35,1.8,48,1,true),M3(0xffffff,{transparent:true,opacity:.18,roughness:.1,side:THREE.DoubleSide}),0,1.1,0,bs);
+  const lg=labelSprite('BEYBLADE X','rgba(0,0,0,0)','#9aa3b1',512,96);lg.scale.set(4,.75,1);lg.position.set(0,.2,BEY_R+1.1);bs.add(lg);
+  const bMe=new THREE.Group(),bOp=new THREE.Group();bs.add(bMe);bs.add(bOp);
+  const bcam=new THREE.PerspectiveCamera(45,1,.1,100);
+  G5={sc,foes,heroHolder,petHolder,heroKey:'',petKey:'',bs,bcam,bMe,bOp,gapA,gapW};
+}
+function bowlY(r){return .06*Math.pow(Math.min(r,BEY_R),1.8);}
+function syncZoo(){
+  const key=P.id+'|'+P.weapon;if(G5.heroKey!==key){while(G5.heroHolder.children.length)G5.heroHolder.remove(G5.heroHolder.children[0]);G5.hero=makeHeroModel();G5.heroHolder.add(G5.hero);G5.heroKey=key;}
+  const p=petOf(),pk=p?p.seed+'|'+petStage(p):'';if(G5.petKey!==pk){while(G5.petHolder.children.length)G5.petHolder.remove(G5.petHolder.children[0]);G5.pet=p?makePetModel(p):null;if(G5.pet)G5.petHolder.add(G5.pet);G5.petKey=pk;}
+}
+function startZoo(){
+  build5();if(!G5){toast('這台手機不能顯示 3D');startFloor();return;}
+  scene='zoo';setLayers();lay4();const F=f5();persist();
+  Object.assign(Z,{x:580,y:1560,trail:[],cool:1.2,petPos:{x:580,y:1600},yaw:0});
+  showModal(`<h2>🦁 最高樓 5F：動物園陀螺大賽</h2>
+   <div class="tips">
+   <p>🗺️ 這層是照著<b>動物園地圖</b>做的 3D 園區，可以到處走。頭上有 🌀 的動物和人類都想跟你比<b>戰鬥陀螺</b>！</p>
+   <p>🎮 <b>虛擬發射</b>：喊完「3、2、1，GO SHOOT！」，用手指<b>按住發射繩往下拉再放開</b>，拉越長越快陀螺越強。</p>
+   <p>📷 <b>攝影機對戰</b>：手機從上面拍真的戰鬥盤，真人發射真陀螺，對手的虛擬陀螺會一起在盤子裡轉、會互相碰撞。（要在一般網站上開才能用攝影機）</p>
+   <p>🏆 <b>轉得最久的贏</b>；被擠出盤子、從極限線（橘色軌道的缺口）飛出去、被撞爆裂都算輸。贏了拿錢！</p>
+   <p>🎰 <b>出口</b>的扭蛋商店可以抽<b>寵物</b>和<b>陀螺</b>。走到大門可以隨時上 6 樓。</p>
+   <p>🌀 你的陀螺：<b>${myBey().n}</b>（${myBey().t}型）　已打贏 ${F.beaten.length}/${ZOO_FOES.length}</p>
+   </div><div class="row"><button class="pill red" id="mGo">進動物園！</button></div>`);
+  $('mGo').onclick=hideModal;
+}
+function updZoo(dt){
+  Z.cool-=dt;let mx=0,my=0;const K=input.keys;
+  if(K.KeyA||K.ArrowLeft)mx--;if(K.KeyD||K.ArrowRight)mx++;if(K.KeyW||K.ArrowUp)my--;if(K.KeyS||K.ArrowDown)my++;
+  if(joy.active){const jx=joy.x-joy.bx,jy=joy.y-joy.by,l=hyp(jx,jy);if(l>8){const m=Math.min(1,l/55);mx+=jx/l*m;my+=jy/l*m;}}
+  const ml=hyp(mx,my);if(ml>1){mx/=ml;my/=ml;}
+  const cy=Math.cos(Z.yaw),sy=Math.sin(Z.yaw),wx=mx*cy+my*sy,wz=-mx*sy+my*cy,sp=idk()==='racer'?260:200;
+  if(!zBlocked(Z.x+wx*sp*dt,Z.y,14))Z.x+=wx*sp*dt;if(!zBlocked(Z.x,Z.y+wz*sp*dt,14))Z.y+=wz*sp*dt;
+  Z.moving=ml>.1;if(Z.moving){Z.fx=wx;Z.fy=wz;}
+  if(!Z.trail.length||hyp(Z.x-Z.trail[0].x,Z.y-Z.trail[0].y)>6){Z.trail.unshift({x:Z.x,y:Z.y});if(Z.trail.length>60)Z.trail.pop();}
+  const tp=Z.trail[Math.min(Z.trail.length-1,9)]||Z;Z.petPos.x+=(tp.x-Z.petPos.x)*Math.min(1,dt*6);Z.petPos.y+=(tp.y-Z.petPos.y)*Math.min(1,dt*6);
+  const F=f5();let near=null;
+  ZOO_FOES.forEach((f,i)=>{if(hyp(f.x-Z.x,f.y-Z.y)<75)near={k:'foe',i};});
+  if(hyp(ZOO_EXIT.x-Z.x,ZOO_EXIT.y-Z.y)<70)near={k:'shop'};
+  if(hyp(ZOO_GATE.x-Z.x,ZOO_GATE.y-Z.y)<55)near={k:'gate'};
+  Z.near=near;const a=$('z5Act');
+  if(near){a.classList.remove('hidden');a.textContent=near.k==='shop'?'🎰 扭蛋商店':near.k==='gate'?'⬆️ 上 6 樓':(F.beaten.includes(near.i)?'🔁 再比一次':'🌀 比陀螺！')+` ${ZOO_FOES[near.i].e}`;}else a.classList.add('hidden');
+}
+function drawZoo(){
+  if(!G5)return;syncZoo();const F=f5(),hx=Z.x*U5,hz=Z.y*U5;
+  G5.heroHolder.position.set(hx,0,hz);
+  if(G5.hero){const ud=G5.hero.userData,sw=Z.moving?Math.sin(T*10)*.7:0;G5.hero.rotation.y=Math.atan2(Z.fx,Z.fy);ud.lL.rotation.x=sw;ud.lR.rotation.x=-sw;ud.aL.rotation.x=-sw*.8;ud.aR.rotation.x=sw*.5-.3;}
+  if(G5.pet){G5.petHolder.position.set(Z.petPos.x*U5,0,Z.petPos.y*U5);G5.pet.rotation.y=Math.atan2(hx-Z.petPos.x*U5,hz-Z.petPos.y*U5);G5.pet.userData.body.position.y=Math.abs(Math.sin(T*5))*.15;}
+  G5.foes.forEach(o=>{o.m.rotation.y=Math.atan2(hx-o.f.x*U5,hz-o.f.y*U5)*.5+Math.sin(T+o.i)*.3;o.m.position.y=Math.abs(Math.sin(T*2+o.i))*.05;
+    // 只顯示附近的名牌，遠的就收起來，畫面才不會亂
+    const dd=hyp(o.f.x-Z.x,o.f.y-Z.y);o.lb.visible=dd<230;o.st.visible=dd<480;
+    o.st.material.rotation=F.beaten.includes(o.i)?0:T*4;if(F.beaten.includes(o.i)&&!o.done){o.done=1;o.st.material.map=labelSprite('✅','rgba(0,0,0,0)',null,64,64).material.map;}});
+  const d=10,cx=hx+Math.sin(Z.yaw)*d,cz=hz+Math.cos(Z.yaw)*d;G4.cam.position.set(cx,8,cz);G4.cam.lookAt(hx,1,hz);
+  G4.R.render(G5.sc,G4.cam);
+  const p=petOf();
+  $('z5Hud').innerHTML=`🦁 5F 動物園　🌀 打贏 ${F.beaten.length}/${ZOO_FOES.length}<br><span style="color:#ffe066">💰 ${save.money}　陀螺：${myBey().n}（${myBey().t}）</span>`+(p?`<br><span style="color:#bff7c3">${ELS[p.el].e} ${petName(p)} 跟著你</span>`:'');
+}
+(function(){const c=$('cv4');
+  c.addEventListener('pointerdown',e=>{if(scene!=='zoo')return;Z.rot={id:e.pointerId,x:e.clientX,yaw:Z.yaw};});
+  c.addEventListener('pointermove',e=>{if(Z.rot&&Z.rot.id===e.pointerId)Z.yaw=Z.rot.yaw-(e.clientX-Z.rot.x)/innerWidth*4;});
+  const up=e=>{if(Z.rot&&Z.rot.id===e.pointerId)Z.rot=null;};c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
+  const z=$('joyZone5');
+  z.addEventListener('pointerdown',e=>{e.preventDefault();if(joy.active)return;joy.active=true;joy.id=e.pointerId;joy.bx=joy.x=e.clientX;joy.by=joy.y=e.clientY;try{z.setPointerCapture(e.pointerId);}catch(_){}});
+  z.addEventListener('pointermove',e=>{if(joy.active&&e.pointerId===joy.id){joy.x=e.clientX;joy.y=e.clientY;}});
+  const end=e=>{if(e.pointerId===joy.id)joy.active=false;};z.addEventListener('pointerup',end);z.addEventListener('pointercancel',end);})();
+$('z5Act').onclick=()=>{const n=Z.near;if(!n||!$('modal').classList.contains('hidden'))return;
+  if(n.k==='shop')openGacha();else if(n.k==='gate')leaveZoo();else chooseBattle(n.i);};
+$('z5Pause').addEventListener('pointerdown',e=>{e.preventDefault();openPause();});
+$('z5Rec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
+$('z5Bey').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openMyTops();});
+function leaveZoo(){scene='result';setLayers();const n=f5().beaten.length;
+  clearFloor(`<h2>🦁 離開動物園</h2><p>你在動物園打贏了 <b>${n}</b> 位對手。不管贏幾場，都可以繼續往上爬！</p>`);}
+
+/* ---------- 扭蛋商店 ---------- */
+const PET_MAX=8;
+function openGacha(){
+  showModal(`<h2>🎰 扭蛋商店（出口）</h2><p>你有 <b>💰 ${save.money}</b> 元。</p>
+   <div class="grid">
+   <button class="item" id="gPet" ${save.money<30?'disabled':''}><div class="big">🐾</div><div class="nm">寵物扭蛋</div><div class="ds">💰 30　抽一隻全新的寵物（每隻都不一樣）<br>⭐ 有機會抽到 Lv5、Lv10 的稀有寵物</div></button>
+   <button class="item" id="gBey" ${save.money<25?'disabled':''}><div class="big">🌀</div><div class="nm">陀螺扭蛋</div><div class="ds">💰 25　抽一顆戰鬥陀螺<br>N／R／SR／SSR</div></button></div>
+   <div class="row"><button class="pill" id="gTops">🌀 我的陀螺</button><button class="pill green" id="mClose">離開</button></div>`);
+  $('gPet').onclick=()=>{if(save.money<30)return;const F=f4();if(F.pets.length>=PET_MAX){toast(`寵物最多 ${PET_MAX} 隻喔`);return;}
+    save.money-=30;const p=newPet(pick(ELK)),r=Math.random();p.xp=r<.05?400:r<.3?150:0;p.hp=petMax(p);F.pets.push(p);if(F.pets.length===1)F.active=0;persist();stat('gachaPets');
+    const star=r<.05?'🌟🌟 超稀有！':r<.3?'⭐ 稀有！':'';logRec(`🎰 抽到寵物 ${ELS[p.el].e}${petName(p)}（Lv${petLv(p)}）`);
+    showModal(`<h2>🎰 喀啦喀啦……${star}</h2><canvas id="gPrev" width="192" height="192" style="display:block;margin:0 auto;background:#f3ecdc;border-radius:14px;width:160px;height:160px"></canvas>
+     <p style="text-align:center">抽到 <b>${ELS[p.el].e} ${petName(p)}</b>（Lv${petLv(p)}）！牠加入你的寵物隊了，4 樓可以帶牠去對戰。</p>
+     <div class="row"><button class="pill green" id="mGo">好耶！</button><button class="pill" id="mAgain">再抽一次</button></div>`);
+    petThumb(p,$('gPrev'));sfx(880,.2,'triangle',.06,400);$('mGo').onclick=hideModal;$('mAgain').onclick=openGacha;};
+  $('gBey').onclick=()=>{if(save.money<25)return;save.money-=25;const r=Math.random(),rar=r<.06?'SSR':r<.25?'SR':r<.6?'R':'N';
+    const k=pick(BEY_KEYS.filter(x=>BEYS[x].r===rar)),F=f5(),dup=F.tops.includes(k);if(!dup)F.tops.push(k);else save.money+=10;persist();stat('gachaTops');
+    const b=BEYS[k];logRec(`🎰 抽到陀螺 ${b.n}（${rar}）`);
+    showModal(`<h2>🎰 喀啦喀啦……</h2><div style="text-align:center"><span style="display:inline-block;padding:4px 14px;border-radius:12px;background:${RARE_COL[rar]};color:#fff;font-weight:900;font-size:20px">${rar}</span></div>
+     <p style="text-align:center;font-size:20px"><b>🌀 ${b.n}</b>（${b.t}型）</p><p style="text-align:center">攻擊 ${b.atk}　防禦 ${b.def}　持久 ${b.sta}　重量 ${b.wt}</p>
+     ${dup?'<p style="text-align:center;color:#7a6a4a">已經有這顆了，退你 💰10</p>':''}
+     <div class="row"><button class="pill green" id="mEq">裝上它</button><button class="pill" id="mAgain">再抽一次</button><button class="pill" id="mGo">好</button></div>`);
+    sfx(880,.2,'triangle',.06,400);$('mEq').onclick=()=>{F.equip=k;persist();hideModal();toast(`🌀 裝上 ${b.n}`);};$('mAgain').onclick=openGacha;$('mGo').onclick=hideModal;};
+  $('gTops').onclick=openMyTops;$('mClose').onclick=hideModal;
+}
+function openMyTops(){const F=f5();
+  let h=`<h2>🌀 我的陀螺</h2><p style="font-size:13px">攻擊型會沿著橘色軌道衝刺撞人；防禦型很重不怕撞；持久型轉很久；平衡型都不錯。</p><div class="grid">`;
+  F.tops.forEach(k=>{const b=BEYS[k];h+=`<button class="item ${F.equip===k?'sel':''}" data-top="${k}"><div class="big">🌀</div><div class="nm" style="color:${'#'+b.c.toString(16).padStart(6,'0')}">${b.n}</div><div class="ds"><b style="color:${RARE_COL[b.r]}">${b.r}</b> ${b.t}型<br>攻${b.atk} 防${b.def} 持${b.sta} 重${b.wt}</div></button>`;});
+  h+='</div><div class="row"><button class="pill green" id="mClose">好了</button></div>';showModal(h);
+  document.querySelectorAll('[data-top]').forEach(b=>b.onclick=()=>{F.equip=b.dataset.top;persist();openMyTops();});$('mClose').onclick=hideModal;}
+
+/* ---------- 陀螺物理（虛擬與攝影機共用） ---------- */
+// 位置用 -1~1（盤子半徑 = 1），spin 0~1
+function topState(b,ang,power){const r=.75;return{b,x:Math.cos(ang)*r,y:Math.sin(ang)*r,vx:-Math.sin(ang)*(1.15+b.atk*.1)*power,vy:Math.cos(ang)*(1.15+b.atk*.1)*power,
+  spin:clamp(power*(.82+b.sta*.025),.3,1.1),max:1,m:1+b.wt*.08,out:null,rot:0,alive:true,hitT:0};}
+function stepTop(t,dt){
+  if(!t.alive||t.kin)return;
+  const r=Math.hypot(t.x,t.y)||1e-4,nx=t.x/r,ny=t.y/r;
+  // 盤子的斜坡把陀螺往中間拉；攻擊型碰到外圈軌道會被加速
+  t.vx+=-t.x*2.2*dt;t.vy+=-t.y*2.2*dt;
+  if(r>.82&&(t.b.t==='攻擊'||t.b.t==='平衡')){const tx=-ny,ty=nx,dir=Math.sign(t.vx*tx+t.vy*ty)||1;const boost=(t.b.t==='攻擊'?2.2:1)*t.b.atk/10*Math.min(1,t.spin*1.4);t.vx+=tx*dir*boost*dt;t.vy+=ty*dir*boost*dt;
+    // 沿著軌道衝一段之後，會往中間衝過去撞人（像真的 X 衝刺）
+    t.railT=(t.railT||0)+dt;if(t.railT>(t.b.t==='攻擊'?.7:1.2)){t.railT=0;const k=(t.b.t==='攻擊'?1.6:1)*(.6+t.spin*.5);t.vx-=nx*k;t.vy-=ny*k;}}
+  else t.railT=0;
+  const damp=Math.pow(t.b.t==='持久'?.55:t.b.t==='攻擊'?.8:.7,dt);t.vx*=damp;t.vy*=damp;
+  const vmax=2.2+t.b.atk*.05,v=Math.hypot(t.vx,t.vy);if(v>vmax){t.vx*=vmax/v;t.vy*=vmax/v;}
+  t.x+=t.vx*dt;t.y+=t.vy*dt;t.rot+=t.spin*40*dt;t.hitT-=dt;
+  t.spin-=dt*.05*(1.35-t.b.sta*.06)*(1+Math.hypot(t.vx,t.vy)*.12);
+  const r2=Math.hypot(t.x,t.y);
+  if(r2>1){const a=Math.atan2(t.y,t.x),gap=Math.abs(angDiff4(a,BG.gapA))<BG.gapW/2,spd=Math.hypot(t.vx,t.vy);
+    // 只有剛被撞過才會飛出去（自己轉不會自己出局）
+    if(t.hitT>0&&gap&&spd>1.1){t.out='xtreme';t.alive=false;return;}
+    if(t.hitT>0&&spd>2.1&&Math.random()<.3){t.out='over';t.alive=false;return;}
+    const nx2=t.x/r2,ny2=t.y/r2,vn=t.vx*nx2+t.vy*ny2;t.vx-=1.7*vn*nx2;t.vy-=1.7*vn*ny2;t.x=nx2*.99;t.y=ny2*.99;if(vn>.4&&!(t.wallT>0)){t.spin-=.012*vn;t.wallT=.3;}}
+  t.wallT=(t.wallT||0)-dt;
+  if(t.spin<=0){t.spin=0;t.out='spin';t.alive=false;}
+}
+function angDiff4(a,b){let d=(a-b)%(Math.PI*2);if(d>Math.PI)d-=Math.PI*2;if(d<-Math.PI)d+=Math.PI*2;return d;}
+const BG={gapA:-Math.PI/2,gapW:.7};   // 極限線在盤子「上方」（畫面上）
+function collideTops(a,b,rad){
+  if(!a.alive||!b.alive)return null;const dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy),R=rad||.21;if(d>=2*R||d===0)return null;
+  const nx=dx/d,ny=dy/d,ov=2*R-d,ma=a.kin?20:a.m,mb=b.kin?20:b.m;
+  if(!a.kin){a.x-=nx*ov*mb/(ma+mb);a.y-=ny*ov*mb/(ma+mb);}if(!b.kin){b.x+=nx*ov*ma/(ma+mb);b.y+=ny*ov*ma/(ma+mb);}
+  const rv=(b.vx-a.vx)*nx+(b.vy-a.vy)*ny;if(rv>0)return null;
+  const j=-(1.85)*rv/(1/ma+1/mb);
+  if(!a.kin){a.vx-=j*nx/ma;a.vy-=j*ny/ma;}if(!b.kin){b.vx+=j*nx/mb;b.vy+=j*ny/mb;}
+  // 陀螺之間會互相轉一點（側推）
+  if(!a.kin){a.vx+=-ny*.25;a.vy+=nx*.25;}if(!b.kin){b.vx+=ny*.25;b.vy+=-nx*.25;}
+  const J=Math.abs(j);
+  if(!a.kin)a.spin-=J*.07*(b.b.atk+2)/(a.b.def+3);if(!b.kin)b.spin-=J*.07*(a.b.atk+2)/(b.b.def+3);
+  [a,b].forEach((t,i)=>{const o=i?a:b;if(!t.kin&&J>1.5&&Math.random()<.12*(11-t.b.def)/10*(o.b.atk/8)){t.out='burst';t.alive=false;}});
+  a.hitT=b.hitT=.45;sfx(900+Math.random()*400,.05,'square',.05,-300);
+  return{x:(a.x+b.x)/2,y:(a.y+b.y)/2,J};
+}
+const FINISH={spin:['旋轉結束','Spin Finish'],over:['擠出場外','Over Finish'],xtreme:['極限線飛出','Xtreme Finish'],burst:['爆裂','Burst Finish']};
+
+/* ---------- 選擇對戰方式 ---------- */
+function chooseBattle(i){
+  const f=ZOO_FOES[i],ob=foeBey(i),mb=myBey();
+  showModal(`<h2>🌀 ${f.e} ${f.n}：「來比戰鬥陀螺吧！」</h2>
+   <p>對手的陀螺：<b>${ob.n}</b>（${ob.t}型）攻${ob.atk} 防${ob.def} 持${ob.sta}</p>
+   <p>你的陀螺：<b>${mb.n}</b>（${mb.t}型）攻${mb.atk} 防${mb.def} 持${mb.sta}</p>
+   <div class="grid"><button class="item" id="cbV"><div class="big">🎮</div><div class="nm">虛擬發射</div><div class="ds">用手指拉發射繩，在 3D 戰鬥盤裡對戰</div></button>
+   <button class="item" id="cbC"><div class="big">📷</div><div class="nm">攝影機對戰</div><div class="ds">手機從上面拍真的戰鬥盤，真人發射真陀螺</div></button></div>
+   <div class="row"><button class="pill" id="cbTop">換陀螺</button><button class="pill green" id="mClose">下次再說</button></div>`);
+  $('cbV').onclick=()=>{hideModal();startBey(i);};
+  $('cbC').onclick=()=>{hideModal();startCamBattle(i);};
+  $('cbTop').onclick=openMyTops;$('mClose').onclick=()=>{hideModal();Z.cool=1;};
+}
+/* ---------- 虛擬發射對戰 ---------- */
+const BB={};
+function startBey(i){
+  build5();scene='bey';setLayers();lay4();
+  Object.assign(BB,{i,ph:'count',t:0,me:null,op:null,ob:foeBey(i),mb:myBey(),sparks:[],winner:null,pull:null,goT:0});
+  while(G5.bMe.children.length)G5.bMe.remove(G5.bMe.children[0]);while(G5.bOp.children.length)G5.bOp.remove(G5.bOp.children[0]);
+  G5.bMe.add(makeBeyModel(BB.mb));G5.bOp.add(makeBeyModel(BB.ob));G5.bMe.children[0].scale.setScalar(1.5);G5.bOp.children[0].scale.setScalar(1.5);G5.bMe.visible=G5.bOp.visible=false;
+  beyUI();sfx(440,.15,'sine',.05);
+}
+function beyUI(){
+  const f=ZOO_FOES[BB.i],me=BB.me,op=BB.op;
+  $('bey5Top').innerHTML=`<div class="hp me"><b>🌀 ${BB.mb.n}</b>（你）<div class="bar"><i style="width:${me?clamp(me.spin,0,1)*100:100}%;background:#3c9bff"></i></div></div>
+    <div class="hp op"><b>${f.e} ${BB.ob.n}</b><div class="bar"><i style="width:${op?clamp(op.spin,0,1)*100:100}%;background:#ff5a5a"></i></div></div>`;
+}
+const RIP=$('bey5Rip');
+RIP.addEventListener('pointerdown',e=>{if(scene!=='bey'||BB.ph!=='pull')return;e.preventDefault();try{RIP.setPointerCapture(e.pointerId);}catch(_){}
+  BB.pull={id:e.pointerId,x0:e.clientX,y0:e.clientY,t0:performance.now(),y:e.clientY,x:e.clientX};});
+RIP.addEventListener('pointermove',e=>{if(BB.pull&&BB.pull.id===e.pointerId){BB.pull.y=e.clientY;BB.pull.x=e.clientX;$('bey5Cord').style.height=clamp(e.clientY-BB.pull.y0,0,innerHeight*.5)+40+'px';}});
+const ripUp=e=>{if(!BB.pull||BB.pull.id!==e.pointerId)return;const p=BB.pull;BB.pull=null;$('bey5Cord').style.height='40px';
+  const dist=(p.y-p.y0)/innerHeight,dt=Math.max(.05,(performance.now()-p.t0)/1000),speed=dist/dt;
+  if(dist<.05){toast('要用力往下拉喔！');return;}
+  const late=Math.max(0,BB.t-BB.goT-1.5)*.15,power=clamp(.3+dist*1.1+Math.min(speed,3)*.12-late,.3,1),side=clamp((p.x-p.x0)/innerWidth*3,-1,1);
+  launchMe(power,side);};
+RIP.addEventListener('pointerup',ripUp);RIP.addEventListener('pointercancel',ripUp);
+function launchMe(power,side){
+  BB.me=topState(BB.mb,Math.PI/2+side*.6,power);G5.bMe.visible=true;BB.ph='spin';$('bey5Pull').classList.add('hidden');
+  bigMsg(`${power>.85?'🔥 超強發射！':power>.6?'💨 好發射！':'發射！'} ${Math.round(power*100)}%`);sfx(300,.4,'sawtooth',.06,600);
+}
+function launchOp(){const pw=rand(.6,.95);BB.op=topState(BB.ob,-Math.PI/2+rand(-.4,.4),pw);G5.bOp.visible=true;}
+function bigMsg(s){$('bey5Msg').innerHTML=s;$('bey5Msg').style.opacity=1;clearTimeout(bigMsg.t);bigMsg.t=setTimeout(()=>{$('bey5Msg').style.opacity=0;},1400);}
+function updBey(dt){
+  BB.t+=dt;
+  if(BB.ph==='count'){const n=3-Math.floor(BB.t/.8);
+    if(n>=1){if($('bey5Msg').dataset.n!=n){$('bey5Msg').dataset.n=n;bigMsg(n+'');sfx(500,.12,'square',.05);}}
+    else{BB.ph='pull';BB.goT=BB.t;bigMsg('GO SHOOT!');sfx(880,.3,'square',.06);launchOp();$('bey5Pull').classList.remove('hidden');}}
+  if(BB.ph==='pull'&&BB.t-BB.goT>4&&!BB.me)launchMe(.35,0);
+  const sub=4;for(let k=0;k<sub;k++){const h=dt/sub;if(BB.op)stepTop(BB.op,h);if(BB.me)stepTop(BB.me,h);
+    if(BB.me&&BB.op){const c=collideTops(BB.me,BB.op);if(c){BB.sparks.push({x:c.x,y:c.y,t:.3});}}}
+  for(const s of BB.sparks)s.t-=dt;BB.sparks=BB.sparks.filter(s=>s.t>0);
+  if(BB.ph==='spin'&&(!BB.me.alive||!BB.op.alive)){BB.ph='end';
+    const iWin=BB.me.alive||(!BB.op.alive&&BB.me.spin>=BB.op.spin&&BB.me.out==='spin'&&BB.op.out==='spin');
+    const loser=iWin?BB.op:BB.me;setTimeout(()=>beyEnd(iWin,loser.out),900);}
+  beyUI();
+}
+function drawBey(){
+  if(!G5)return;
+  const S=BEY_R*.93,place=(g,t)=>{if(!t)return;const x=t.x*S,z=t.y*S;let y=bowlY(Math.hypot(x,z));
+    if(!t.alive&&t.out!=='spin'){t.fly=(t.fly||0)+.05;y+=t.fly*2;}
+    g.position.set(x+(t.fly?t.x*t.fly*3:0),y,z+(t.fly?t.y*t.fly*3:0));const sp=g.children[0].userData.spin;sp.rotation.y=t.rot;
+    const wob=t.alive?Math.max(0,.35-t.spin)*1.2:(t.out==='spin'?.5:t.fly*2);g.children[0].rotation.x=Math.sin(T*9)*wob;g.children[0].rotation.z=Math.cos(T*9)*wob;
+    if(t.out==='burst'){g.children[0].scale.setScalar(Math.max(.01,1-(t.fly||0)));}};
+  place(G5.bMe,BB.me);place(G5.bOp,BB.op);
+  while(G5.fx&&G5.fx.length)G5.bs.remove(G5.fx.pop());G5.fx=G5.fx||[];
+  BB.sparks.forEach(s=>{for(let i=0;i<6;i++){const a=i+T*20,m=mk(new THREE.SphereGeometry(.06,6,4),new THREE.MeshBasicMaterial({color:0xffe066}),s.x*S+Math.cos(a)*(.3-s.t),.6,s.y*S+Math.sin(a)*(.3-s.t));G5.bs.add(m);G5.fx.push(m);}});
+  const asp=innerWidth/innerHeight,dist=asp<1?13/Math.max(.6,asp):11.5;
+  G5.bcam.aspect=asp;G5.bcam.updateProjectionMatrix();G5.bcam.position.set(0,dist*.85,dist*.55);G5.bcam.lookAt(0,0,.4);
+  G4.R.render(G5.bs,G5.bcam);
+}
+function beyEnd(win,how,real){
+  const f=ZOO_FOES[BB.i!==undefined?BB.i:CB.i],F=f5(),i=BB.i!==undefined&&scene==='bey'?BB.i:CB.i,fin=FINISH[how]||['',''];stopCam();
+  if(win){const first=!F.beaten.includes(i),money=first?15+Math.round((1650-f.y)/60):5;save.money+=money;if(first)F.beaten.push(i);stat('beyWins');persist();
+    logRec(`🌀 陀螺打贏了${f.e}${f.n}（${fin[0]}）`);sfx(660,.4,'triangle',.07,400);
+    showModal(`<h2>🏆 你贏了！</h2><p style="font-size:18px">${fin[0]}！<small>${fin[1]}</small></p><p>${f.e} ${f.n}：「好厲害的陀螺……」</p><p>獲得 <b>💰 ${money}</b> 元${first?'':'（第二次以後只有 5 元）'}。</p>
+     <div class="row"><button class="pill green" id="mGo">回動物園</button><button class="pill" id="mAgain">再比一次</button></div>`);}
+  else{save.money+=2;persist();logRec(`🌀 陀螺輸給了${f.e}${f.n}`);sfx(150,.5,'sawtooth',.07,-60);
+    showModal(`<h2>💦 輸了……</h2><p style="font-size:18px">你的陀螺${fin[0]}！<small>${fin[1]}</small></p><p>${f.e} ${f.n}：「再來挑戰吧！」（參加獎 💰2）</p>
+     <p style="font-size:13px;color:#7a6a4a">💡 去出口扭蛋抽更強的陀螺，或用力一點拉發射繩！</p>
+     <div class="row"><button class="pill green" id="mGo">回動物園</button><button class="pill" id="mAgain">再比一次</button></div>`);}
+  $('mGo').onclick=()=>{hideModal();scene='zoo';setLayers();Z.cool=1.5;};
+  $('mAgain').onclick=()=>{hideModal();chooseBattle(i);};
+}
+
+/* ---------- 📷 攝影機對戰：追蹤真的陀螺 ---------- */
+const CB={stream:null,i:0,ph:'off',cx:0,cy:0,cr:0,prev:null,motion:0,quiet:0,outT:0,real:null,op:null,t:0,goT:0,hist:[]};
+const CBV=$('cbVid'),CBC=$('cbCv'),cbx=CBC.getContext('2d'),CBW=96,cbOff=document.createElement('canvas');cbOff.width=cbOff.height=CBW;const cbo=cbOff.getContext('2d',{willReadFrequently:true});
+async function startCamBattle(i){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){camFail();startBey(i);return;}
+  try{CB.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:640},height:{ideal:480}},audio:false});}
+  catch(e){camFail();startBey(i);return;}
+  CBV.srcObject=CB.stream;try{await CBV.play();}catch(_){}
+  Object.assign(CB,{i,ph:'calib',prev:null,motion:0,quiet:0,outT:0,real:null,op:null,t:0,hist:[],mb:myBey(),ob:foeBey(i),sparks:[]});
+  CB.cx=innerWidth/2;CB.cy=innerHeight*.45;CB.cr=Math.min(innerWidth,innerHeight)*.38;
+  scene='beycam';setLayers();cbPanel();
+}
+function camFail(){toast('📷 這個連結沒辦法開攝影機（claude.ai 連結不行，要用一般網站），先改用虛擬發射',3600);}
+function stopCam(){if(CB.stream){CB.stream.getTracks().forEach(t=>t.stop());CB.stream=null;}CBV.srcObject=null;CB.ph='off';}
+function cbPanel(){
+  const f=ZOO_FOES[CB.i],p=$('cbPanel');
+  if(CB.ph==='calib')p.innerHTML=`<div class="msg">📷 把手機放在戰鬥盤正上方，<b>拖曳白色圓圈</b>對準盤子，用滑桿調大小。</div>
+    <input type="range" id="cbSize" min="60" max="${Math.round(Math.min(innerWidth,innerHeight)*.6)}" value="${Math.round(CB.cr)}" style="flex:1 1 100%">
+    <button class="mv" id="cbReady" style="background:#8be07b">✅ 對準了，準備發射！</button><button class="mv" id="cbQuit">✖ 不玩了</button>`;
+  else if(CB.ph==='count'||CB.ph==='spin')p.innerHTML=`<div class="msg">${CB.ph==='count'?'喊口令囉！喊到 GO SHOOT 就發射你的真陀螺！':'🌀 對戰中！程式會看你的真陀螺轉多久。看不準的話，可以按下面的按鈕告訴我。'}</div>
+    <button class="mv" id="cbStop" title="">🛑 我的陀螺停了</button><button class="mv" id="cbOut">💨 我的陀螺飛出去了</button><button class="mv" id="cbQuit">✖ 不玩了</button>`;
+  const s=$('cbSize');if(s)s.oninput=()=>{CB.cr=+s.value;};
+  if($('cbReady'))$('cbReady').onclick=()=>{CB.ph='count';CB.t=0;cbPanel();};
+  if($('cbQuit'))$('cbQuit').onclick=()=>{stopCam();scene='zoo';setLayers();Z.cool=1.5;};
+  if($('cbStop'))$('cbStop').onclick=()=>realDown('spin');
+  if($('cbOut'))$('cbOut').onclick=()=>realDown('over');
+  $('cbTop').innerHTML=`<div class="hp me"><b>📷 你的真陀螺</b><div class="bar"><i id="cbMeBar" style="width:100%;background:#3c9bff"></i></div><small id="cbMeTxt">等待發射</small></div>
+    <div class="hp op"><b>${f.e} ${CB.ob.n}</b><div class="bar"><i id="cbOpBar" style="width:100%;background:#ff5a5a"></i></div></div>`;
+}
+(function(){let drag=null;
+  CBC.addEventListener('pointerdown',e=>{if(CB.ph!=='calib')return;drag={id:e.pointerId,dx:e.clientX-CB.cx,dy:e.clientY-CB.cy};try{CBC.setPointerCapture(e.pointerId);}catch(_){}});
+  CBC.addEventListener('pointermove',e=>{if(drag&&drag.id===e.pointerId){CB.cx=e.clientX-drag.dx;CB.cy=e.clientY-drag.dy;}});
+  const up=e=>{if(drag&&drag.id===e.pointerId)drag=null;};CBC.addEventListener('pointerup',up);CBC.addEventListener('pointercancel',up);})();
+function realDown(how){if(!CB.real||!CB.real.alive)return;CB.real.alive=false;CB.real.out=how;}
+// 把螢幕上的圓圈換算成影片上的範圍，縮成 96×96 灰階，跟上一張比較：有在動的地方就是轉動中的陀螺
+function cbSample(){
+  const vw=CBV.videoWidth,vh=CBV.videoHeight;if(!vw)return null;
+  const s=Math.max(innerWidth/vw,innerHeight/vh),ox=(innerWidth-vw*s)/2,oy=(innerHeight-vh*s)/2;
+  const sx=(CB.cx-CB.cr-ox)/s,sy=(CB.cy-CB.cr-oy)/s,sw=2*CB.cr/s;
+  cbo.drawImage(CBV,sx,sy,sw,sw,0,0,CBW,CBW);
+  const d=cbo.getImageData(0,0,CBW,CBW).data,g=new Uint8Array(CBW*CBW);for(let i=0;i<g.length;i++)g[i]=(d[i*4]*3+d[i*4+1]*6+d[i*4+2])/10;
+  let n=0,mx=0,my=0;
+  if(CB.prev){for(let y=0;y<CBW;y++)for(let x=0;x<CBW;x++){const i=y*CBW+x,nx=x/CBW*2-1,ny=y/CBW*2-1;if(nx*nx+ny*ny>1.25)continue;
+    if(Math.abs(g[i]-CB.prev[i])>26){n++;mx+=nx;my+=ny;}}}
+  CB.prev=g;return{n,x:n?mx/n:0,y:n?my/n:0};
+}
+function updCam(dt){
+  CB.t+=dt;
+  if(CB.ph==='count'){const n=3-Math.floor(CB.t/.9);
+    if(n>=1){if($('cbMsg').dataset.n!=n){$('cbMsg').dataset.n=n;cbMsg(n+'');sfx(500,.12,'square',.05);}}
+    else{CB.ph='spin';CB.goT=CB.t;cbMsg('GO SHOOT!');sfx(880,.3,'square',.06);
+      CB.op=topState(CB.ob,-Math.PI/2+rand(-.4,.4),rand(.65,.95));CB.real={b:CB.mb,x:0,y:0,vx:0,vy:0,spin:1,m:20,kin:true,alive:true,out:null,rot:0,seen:false};cbPanel();}}
+  if(CB.ph!=='calib'&&CB.ph!=='off'){
+    const m=cbSample();
+    if(m&&CB.ph==='spin'&&CB.real){const R=CB.real,since=CB.t-CB.goT,thr=CBW*CBW*.004;
+      if(since>1.2&&R.alive){
+        if(m.n>thr){R.seen=true;CB.quiet=0;const px=R.x,py=R.y;R.x+=(m.x-R.x)*.5;R.y+=(m.y-R.y)*.5;R.vx=clamp((R.x-px)/dt,-2.5,2.5);R.vy=clamp((R.y-py)/dt,-2.5,2.5);R.spin=clamp(m.n/(thr*8),.2,1);
+          if(Math.hypot(m.x,m.y)>1.08){CB.outT+=dt;if(CB.outT>.5)realDown('over');}else CB.outT=0;}
+        else if(R.seen){CB.quiet+=dt;R.spin=Math.max(0,R.spin-dt*.6);if(CB.quiet>1.2)realDown('spin');}
+        else if(since>8){toast('看不到你的陀螺，確認圓圈有對準盤子喔',2500);CB.goT=CB.t-1.2;}}}
+    if(CB.op){const sub=3;for(let k=0;k<sub;k++){stepTop(CB.op,dt/sub);if(CB.real&&CB.real.alive&&CB.real.seen){const c=collideTops(CB.real,CB.op,.15);if(c)CB.sparks.push({x:c.x,y:c.y,t:.3});}}}
+    for(const s of CB.sparks)s.t-=dt;CB.sparks=CB.sparks.filter(s=>s.t>0);
+    if(CB.ph==='spin'&&CB.real&&(!CB.real.alive||!CB.op.alive)){CB.ph='end';const win=CB.real.alive;setTimeout(()=>{BB.i=undefined;beyEnd(win,win?CB.op.out:CB.real.out,true);},700);}
+    const mb=$('cbMeBar'),ob=$('cbOpBar');if(mb&&CB.real){mb.style.width=clamp(CB.real.alive?CB.real.spin:0,0,1)*100+'%';$('cbMeTxt').textContent=CB.real.alive?(CB.real.seen?'轉動中':'等你發射…'):'停了';}
+    if(ob&&CB.op)ob.style.width=clamp(CB.op.spin,0,1)*100+'%';
+  }
+}
+function cbMsg(s){$('cbMsg').innerHTML=s;$('cbMsg').style.opacity=1;clearTimeout(cbMsg.t);cbMsg.t=setTimeout(()=>{$('cbMsg').style.opacity=0;},1200);}
+function drawCam(){
+  const w=innerWidth,h=innerHeight;if(CBC.width!==Math.round(w*DPR)){CBC.width=Math.round(w*DPR);CBC.height=Math.round(h*DPR);}
+  cbx.setTransform(DPR,0,0,DPR,0,0);cbx.clearRect(0,0,w,h);
+  // 盤子圓圈與極限線
+  cbx.strokeStyle='rgba(255,255,255,.9)';cbx.lineWidth=3;cbx.setLineDash(CB.ph==='calib'?[10,8]:[]);cbx.beginPath();cbx.arc(CB.cx,CB.cy,CB.cr,0,7);cbx.stroke();cbx.setLineDash([]);
+  cbx.strokeStyle='#ff7a2e';cbx.lineWidth=6;cbx.beginPath();cbx.arc(CB.cx,CB.cy,CB.cr*.96,BG.gapA+BG.gapW/2,BG.gapA-BG.gapW/2+Math.PI*2);cbx.stroke();
+  if(CB.ph==='calib'){cbx.fillStyle='rgba(0,0,0,.45)';cbx.font=`900 15px ${FONT}`;cbx.textAlign='center';cbx.fillText('↕ 橘色缺口對準盤子的極限線',CB.cx,CB.cy-CB.cr-12);}
+  const P2=(t)=>[CB.cx+t.x*CB.cr,CB.cy+t.y*CB.cr];
+  // 真陀螺的位置（追蹤到的）
+  if(CB.real&&CB.real.seen){const[x,y]=P2(CB.real);cbx.strokeStyle=CB.real.alive?'#3c9bff':'#999';cbx.lineWidth=4;cbx.beginPath();cbx.arc(x,y,CB.cr*.15,0,7);cbx.stroke();cbx.fillStyle='#3c9bff';cbx.font=`900 13px ${FONT}`;cbx.textAlign='center';cbx.fillText('你的陀螺',x,y-CB.cr*.18);}
+  // 虛擬對手陀螺
+  if(CB.op&&(CB.op.alive||CB.op.out==='spin')){const[x,y]=P2(CB.op),r=CB.cr*.15,b=CB.ob,c1='#'+b.c.toString(16).padStart(6,'0'),c2='#'+b.c2.toString(16).padStart(6,'0');
+    cbx.save();cbx.translate(x,y);cbx.rotate(CB.op.rot);cbx.fillStyle='rgba(0,0,0,.3)';cbx.beginPath();cbx.arc(4,6,r,0,7);cbx.fill();
+    cbx.fillStyle=c1;cbx.beginPath();cbx.arc(0,0,r,0,7);cbx.fill();cbx.fillStyle=c2;for(let i=0;i<3;i++){cbx.rotate(Math.PI*2/3);cbx.beginPath();cbx.moveTo(0,-r*.2);cbx.lineTo(r*1.05,-r*.35);cbx.lineTo(r*.8,r*.2);cbx.closePath();cbx.fill();}
+    cbx.fillStyle='#fff';cbx.beginPath();cbx.arc(0,0,r*.35,0,7);cbx.fill();cbx.restore();}
+  CB.sparks.forEach(s=>{const x=CB.cx+s.x*CB.cr,y=CB.cy+s.y*CB.cr;cbx.fillStyle='#ffe066';for(let i=0;i<8;i++){const a=i/8*7+T*9;cbx.beginPath();cbx.arc(x+Math.cos(a)*(1-s.t*3)*30,y+Math.sin(a)*(1-s.t*3)*30,3,0,7);cbx.fill();}});
+}
+
 /* ---------- 紀錄 ---------- */
 function stat(k,n){save.st=save.st||{};save.st[k]=(save.st[k]||0)+(n||1);}
 function logRec(t){save.st=save.st||{};const d=new Date(),L=save.st.log=save.st.log||[];
@@ -2776,7 +3301,7 @@ function openRecords(){
   const box=(v,l)=>`<div class="st"><b>${v}</b><span>${l}</span></div>`;
   let h=`<h2>📜 我的紀錄</h2><div class="stats">
     ${box(cur+' 樓','現在在')}${box(Math.max(save.best||1,cur)+' 樓','最高到過')}${box(save.clears||0,'過關次數')}${box(save.tops||0,'登上 100 樓')}
-    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box(st.bosses||0,'打倒魔王')}${box(st.climbs||0,'攀岩進大樓')}${box(st.pets||0,'孵出寵物')}${box(st.battles||0,'寵物對戰勝利')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.shows||0,'馬戲團成功表演')}${box(st.escapes||0,'逃過妖怪')}${box(st.bestVotes||0,'畫畫最高分')}
+    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box(st.bosses||0,'打倒魔王')}${box(st.climbs||0,'攀岩進大樓')}${box(st.pets||0,'孵出寵物')}${box(st.battles||0,'寵物對戰勝利')}${box(st.beyWins||0,'陀螺對戰勝利')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.shows||0,'馬戲團成功表演')}${box(st.escapes||0,'逃過妖怪')}${box(st.bestVotes||0,'畫畫最高分')}
     ${box('💰 '+save.money,'現在的錢')}${box((save.toys||[]).length+' / '+TOYS.length,'收集的玩具')}${box(fmtTime(st.time),'一共玩了')}${box(IDS[P.id].e+' '+IDS[P.id].n,'現在的身分')}
   </div>`;
   const now=c&&c.rounds&&c.rounds.length?c.rounds.map(r=>r.imgs[0]):null,pics=now||st.lastPics;
@@ -2791,7 +3316,7 @@ $('hRec').onclick=openRecords;
 $('bRec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
 
 /* ---------- 暫停 / 存檔 ---------- */
-function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
+function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
 function openPause(){
   if(!canPause())return;
   input.atk=false;input.keys={};joy.active=false;
@@ -2802,7 +3327,7 @@ function openPause(){
    ${scene==='draw2'?`<p>🎨 畫畫比賽：已經畫了 ${(save.c2&&save.c2.rounds.length)||0} / 10 張（畫好的圖都有存起來）</p>`:''}
    <p style="color:#7a6a4a">💾 存檔會記住樓層、錢和玩具。回家後接電話，會從這一層的開頭繼續。</p>
    <div class="row"><button class="pill green" id="pRes">▶️ 繼續</button><button class="pill blue" id="pSave">💾 存檔回家</button><button class="pill red" id="pRec">📜 看紀錄</button></div>
-   ${scene!=='climb'&&scene!=='battle'?`<div class="row"><button class="pill" id="pClimb">🧗 爬外牆換樓層</button></div>`:''}`);
+   ${!['climb','battle','bey','beycam'].includes(scene)?`<div class="row"><button class="pill" id="pClimb">🧗 爬外牆換樓層</button></div>`:''}`);
   $('pRes').onclick=hideModal;
   if($('pClimb'))$('pClimb').onclick=()=>{hideModal();const f=scene==='drive'?1:curFloor;$('cv4').style.display='none';logRec(`🧗 從 ${f} 樓爬到外牆`);startClimb(f);};
   $('pRec').onclick=openRecords;
@@ -2831,7 +3356,9 @@ function setLayers(){
   $('ctlDrive').classList.toggle('hidden',scene!=='drive');
   $('ctl3').classList.toggle('hidden',scene!=='bike3');
   $('ctl4').classList.toggle('hidden',scene!=='village');['bt4','bt4Top','bt4Fx'].forEach(id=>$(id).classList.toggle('hidden',scene!=='battle'));
-  $('cv4').style.display=(scene==='village'||scene==='battle'||(scene==='result'&&curFloor===4))?'block':'none';
+  $('cv4').style.display=(scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||(scene==='result'&&(curFloor===4||curFloor===5)))?'block':'none';
+  $('ctl5').classList.toggle('hidden',scene!=='zoo');$('bey5').classList.toggle('hidden',scene!=='bey');
+  ['cbVid','cbCv','cbTop','cbPanel','cbMsg'].forEach(id=>$(id).classList.toggle('hidden',scene!=='beycam'));
   $('ctlClimb').classList.toggle('hidden',scene!=='climb');$('cvClimb').style.display=scene==='climb'?'block':'none';
   $('ctlHome').classList.toggle('hidden',scene!=='home');
   joy.active=false;input.atk=false;lastBtn='';refreshButtons();
@@ -2860,7 +3387,7 @@ let last=performance.now();
 function frame(now){
   let dt=Math.min(.033,(now-last)/1000);last=now;T+=dt;shake=Math.max(0,shake-dt*40);
   const paused=!$('modal').classList.contains('hidden');
-  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
+  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
   ctx.setTransform(DPR,0,0,DPR,0,0);
   if(scene==='home')drawHome(dt);
   else if(scene==='drive'){if(!paused)updDrive(dt);ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));drawDrive();ctx.restore();}
@@ -2868,8 +3395,11 @@ function frame(now){
   else if(scene==='bike3'){if(!paused)upd3(dt);draw3();}
   else if(scene==='village'){if(!paused)updVillage(dt);drawVillage();}
   else if(scene==='battle'){if(!paused)updBattle(dt);drawBattle();}
+  else if(scene==='zoo'){if(!paused)updZoo(dt);drawZoo();}
+  else if(scene==='bey'){if(!paused)updBey(dt);drawBey();}
+  else if(scene==='beycam'){if(!paused)updCam(dt);drawCam();}
   else if(scene==='climb'){if(!paused)updClimb(dt);drawClimb();}
-  else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else if(curFloor===3&&scene==='result')draw3();else if(curFloor===4&&scene==='result')drawVillage();else drawFloor();}
+  else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else if(curFloor===3&&scene==='result')draw3();else if(curFloor===4&&scene==='result')drawVillage();else if(curFloor===5&&scene==='result')drawZoo();else drawFloor();}
   requestAnimationFrame(frame);
 }
 P.r=idk()==='kid'?11:14;
