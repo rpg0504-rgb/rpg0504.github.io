@@ -184,6 +184,18 @@
   #cbPanel{position:fixed;left:0;right:0;bottom:0;z-index:8;padding:8px calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
   #cbPanel .msg{flex:1 1 100%;background:#fffaf0;color:#2a2416;border:3px solid #3a2f1c;border-radius:14px;padding:8px 12px;font-weight:800;font-size:14px}
   #cbPanel .mv{flex:1 1 30%;max-width:220px;border:3px solid #3a2f1c;border-radius:14px;padding:10px 6px;font-family:inherit;font-weight:900;font-size:14px;color:#2a2416;background:#fff}
+  /* 6 樓 */
+  #fish6Panel{position:absolute;left:0;right:0;bottom:0;padding:8px calc(10px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));display:flex;gap:8px;flex-wrap:wrap;justify-content:center;pointer-events:auto}
+  #fish6Panel .msg{flex:1 1 100%;background:#fffaf0;color:#2a2416;border:3px solid #3a2f1c;border-radius:14px;padding:8px 12px;font-weight:800;font-size:14px}
+  #fish6Panel .mv{flex:1 1 30%;max-width:240px;border:3px solid #3a2f1c;border-radius:14px;padding:12px 6px;font-family:inherit;font-weight:900;font-size:15px;color:#2a2416;background:#fff;touch-action:manipulation}
+  #fish6Panel .tap6{flex:1 1 20%;min-height:76px;border-radius:50%/40%;transition:transform .06s}
+  .tug{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px}.tugbar{flex:1;height:16px;border-radius:8px;position:relative;background:linear-gradient(90deg,#3a8fd0,#e8e2c8 50%,#7cc46a)}
+  .tugbar i{position:absolute;top:-5px;width:22px;height:22px;margin-left:-11px;border-radius:50%;background:#e8483a;border:3px solid #fff;box-shadow:0 0 6px #000}
+  #fish6Top .hp{width:min(92vw,520px)}
+  #dive6Aim{position:absolute;width:64px;height:64px;margin:-32px 0 0 -32px;border:3px solid #ff4d5e;border-radius:50%;pointer-events:none!important;box-shadow:0 0 8px #000}
+  #dive6Aim::before,#dive6Aim::after{content:'';position:absolute;background:#ff4d5e;left:50%;top:-12px;bottom:-12px;width:3px;margin-left:-1.5px}#dive6Aim::after{top:50%;bottom:auto;left:-12px;right:-12px;width:auto;height:3px;margin:-1.5px 0 0}
+  #dive6Fire{position:absolute;right:calc(22px + env(safe-area-inset-right));bottom:calc(26px + env(safe-area-inset-bottom));width:92px;height:92px;border-radius:50%;border:4px solid #fff;background:#e8483a;color:#fff;font-size:30px;font-weight:900;line-height:1;box-shadow:0 5px 0 #8a2018;touch-action:none}
+  #dive6Fire small{font-size:13px}
   /* 攀岩 */
   #cvClimb{position:fixed;inset:0;width:100%;height:100%;display:none;z-index:2;touch-action:none}
   #ctlClimb{z-index:6}
@@ -257,6 +269,27 @@
 <div id="cbTop" class="hpRow hidden"></div>
 <div id="cbMsg" class="bigMsg hidden"></div>
 <div id="cbPanel" class="hidden"></div>
+
+<!-- 6 樓：河邊釣魚 -->
+<div id="ctl6" class="layer hidden">
+  <div id="r6Hud" class="v4hud"></div>
+  <button class="btn pz" id="r6Pause" style="right:calc(66px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">⏸</button>
+  <button class="btn pz" id="r6Rec" style="right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">📜</button>
+  <button class="pill red act hidden" id="r6Act" style="position:absolute;right:calc(22px + env(safe-area-inset-right));bottom:calc(26px + env(safe-area-inset-bottom));font-size:18px;padding:16px 20px">釣魚</button>
+</div>
+<div id="fish6" class="layer hidden">
+  <div id="fish6Top" class="hpRow" style="justify-content:center"></div>
+  <div id="fish6Msg" class="bigMsg"></div>
+  <div id="fish6Panel"></div>
+</div>
+<div id="dive6" class="layer hidden">
+  <div id="dive6Hud" class="hpRow"></div>
+  <div id="fish6Msg2" class="bigMsg"></div>
+  <div id="dive6Aim"></div>
+  <button class="btn pz" id="dive6Pause" style="right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">⏸</button>
+  <button class="pill green" id="dive6Up" style="position:absolute;right:calc(14px + env(safe-area-inset-right));top:calc(66px + env(safe-area-inset-top));font-size:14px;padding:8px 12px">⬆️ 浮上岸</button>
+  <button id="dive6Fire">🔱<br><small>發射</small></button>
+</div>
 
 <!-- 攀岩 -->
 <canvas id="cvClimb"></canvas>
@@ -772,7 +805,7 @@ $('bId2').addEventListener('pointerdown',e=>{e.preventDefault();openIdentity();}
 function makeEnemy(kind,x,y,room){const t=ETYPE[kind];return{kind,x,y,r:t.r,hp:t.hp*FS.hp,max:t.hp*FS.hp,spd:t.spd*FS.spd,room,cd:rand(.6,1.6),aggro:false,flash:0,frozen:0,wind:0,stab:0,wdx:0,wdy:0,wt:0,losT:0,seen:false,face:1,bob:Math.random()*6,dead:false};}
 function goFloor(f){
   curFloor=clamp(f,1,TOP);FS=fscale(curFloor);
-  if(curFloor===2)startDraw2();else if(curFloor===3)startBike3();else if(curFloor===4)startVillage();else if(curFloor===5)startZoo();else startFloor();
+  if(curFloor===2)startDraw2();else if(curFloor===3)startBike3();else if(curFloor===4)startVillage();else if(curFloor===5)startZoo();else if(curFloor===6)startRiver();else startFloor();
 }
 function startFloor(){
   useWalls(WALLS1);
@@ -2057,8 +2090,8 @@ function buildClimb(){
   for(let f=1;f<=TOP;f++){mtx.makeTranslation(0,winY(f),.04);glass.setMatrixAt(f-1,mtx);}sc.add(glass);
   const labels=new Map();
   function label(f){if(labels.has(f))return;const c=document.createElement('canvas');c.width=160;c.height=72;const g=c.getContext('2d');
-    g.fillStyle='rgba(20,24,36,.85)';g.fillRect(0,0,160,72);g.fillStyle=f===2?'#ff9fc4':f===3?'#ffd23f':f===4?'#8be07b':f===5?'#ffb02e':'#fff';g.font='900 40px sans-serif';g.textAlign='center';g.textBaseline='middle';
-    g.fillText(f+'F'+(f===2?'🎨':f===3?'🎪':f===4?'🥚':f===5?'🦁':''),80,38);
+    g.fillStyle='rgba(20,24,36,.85)';g.fillRect(0,0,160,72);g.fillStyle=f===2?'#ff9fc4':f===3?'#ffd23f':f===4?'#8be07b':f===5?'#ffb02e':f===6?'#7fd3ff':'#fff';g.font='900 40px sans-serif';g.textAlign='center';g.textBaseline='middle';
+    g.fillText(f+'F'+(f===2?'🎨':f===3?'🎪':f===4?'🥚':f===5?'🦁':f===6?'🎣':''),80,38);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c)}));sp.scale.set(1.3,.6,1);sp.position.set(0,winY(f)+1.05,.3);sc.add(sp);labels.set(f,sp);}
   // 抓點（固定亂數，每次一樣）
   const rnd=srand(20261015),holds=[];
@@ -2133,7 +2166,7 @@ function clHud(){
   $('clSta').style.width=CL.sta+'%';$('clSta').style.background=CL.sta<25?'#ff5a5a':CL.sta<50?'#ffd23f':'#5bc46a';
   $('clStaT').textContent=`💪 體力 ${Math.ceil(CL.sta)}`;
   $('clHint').style.display=near?'none':'';
-  const b=$('clEnter');if(near){b.classList.remove('hidden');b.textContent=`🪟 進入 ${near} 樓${near===2?' 🎨':near===3?' 🎪':near===4?' 🥚':near===5?' 🦁':''}`;}else b.classList.add('hidden');
+  const b=$('clEnter');if(near){b.classList.remove('hidden');b.textContent=`🪟 進入 ${near} 樓${near===2?' 🎨':near===3?' 🎪':near===4?' 🥚':near===5?' 🦁':near===6?' 🎣':''}`;}else b.classList.add('hidden');
 }
 function nearWindow(){const f=climbFloorNow();return Math.abs(CL.B.y+.6-winY(f))<1.2&&Math.abs(CL.B.x)<1.6?f:0;}
 $('clEnter').onclick=()=>{const f=nearWindow();if(!f)return;logRec(`🧗 爬外牆到 ${f} 樓，從窗戶進去`);stat('climbs');$('cvClimb').style.display='none';goFloor(f);};
@@ -3328,6 +3361,304 @@ function drawCam(){
   CB.sparks.forEach(s=>{const x=CB.cx+s.x*CB.cr,y=CB.cy+s.y*CB.cr;cbx.fillStyle='#ffe066';for(let i=0;i<8;i++){const a=i/8*7+T*9;cbx.beginPath();cbx.arc(x+Math.cos(a)*(1-s.t*3)*30,y+Math.sin(a)*(1-s.t*3)*30,3,0,7);cbx.fill();}});
 }
 
+/* =========================================================
+   6 樓：3D 河邊釣魚
+   🎣 拿釣竿釣魚：魚上鉤後 20 秒內連按「跟魚一樣顏色」的按鈕，把魚拉上岸；太慢會被拉下河
+   魚分小（綠）、中（藍）、大（橘）、特大（紅）；釣到的魚拿去商店賣錢
+   🤿 買齊泳衣、泳帽、呼吸器就能潛水，用魚槍瞄準射魚
+   抓到一條大魚（大或特大）就出現上樓之門
+   ========================================================= */
+const FISH6={
+  s:{n:'溪哥',size:'小',btn:'綠',col:'#4cc35a',c:0x9fc7d8,price:5,tap:.09,pull:.1,len:.55,hp:1,spd:2.2,w:.5},
+  m:{n:'吳郭魚',size:'中',btn:'藍',col:'#3c9bff',c:0x8a8f6a,price:12,tap:.07,pull:.14,len:.85,hp:1,spd:2.6,w:.3},
+  l:{n:'鱸魚',size:'大',btn:'橘',col:'#ff9f1c',c:0x6a8aa0,price:30,tap:.062,pull:.18,len:1.25,hp:2,spd:3.2,w:.15},
+  xl:{n:'大鯰魚',size:'特大',btn:'紅',col:'#e8483a',c:0x4a4a3a,price:80,tap:.056,pull:.22,len:1.9,hp:3,spd:3.8,w:.05},
+};
+const FK6=['s','m','l','xl'];
+const GEAR6={suit:{n:'泳衣',e:'🩱',price:40},cap:{n:'泳帽',e:'🧢',price:20},tank:{n:'呼吸器',e:'🤿',price:80}};
+function f6(){if(!save.f6)save.f6={bag:{s:0,m:0,l:0,xl:0},gear:{},door:false,total:0};return save.f6;}
+function hasGear6(){const g=f6().gear;return g.suit&&g.cap&&g.tank;}
+function pickFish6(bias){const w=FK6.map(k=>FISH6[k].w*(bias&&k!=='s'?bias:1)),tot=w.reduce((a,x)=>a+x,0);let r=Math.random()*tot;for(let i=0;i<4;i++){if(r<w[i])return FK6[i];r-=w[i];}return 's';}
+function makeFish6(k){const F=FISH6[k],g=new THREE.Group(),m=M3(F.c,{roughness:.4,metalness:.2});
+  const b=mk(new THREE.SphereGeometry(.5,16,12),m,0,0,0,g);b.scale.set(1,.55,.32);
+  const t=mk(new THREE.ConeGeometry(.3,.45,4),m,-.62,0,0,g);t.rotation.z=Math.PI/2;t.scale.z=.3;
+  mk(new THREE.ConeGeometry(.12,.3,4),m,0,.28,0,g).scale.z=.3;
+  [-.13,.13].forEach(z=>{mk(new THREE.SphereGeometry(.06,8,6),M3(0xffffff),.32,.08,z,g);mk(new THREE.SphereGeometry(.035,8,6),M3(0x111111),.35,.08,z*1.15,g);});
+  if(k==='xl')[-1,1].forEach(s=>{const w=mk(new THREE.CylinderGeometry(.01,.02,.5,4),m,.45,-.05,s*.12,g);w.rotation.z=s*.9+1.6;});
+  g.scale.setScalar(F.len);return g;}
+let G6=null;
+const R6={x:0,z:9,fx:0,fz:-1,moving:false,trail:[],petPos:{x:0,z:10},yaw:0,rot:null,near:null,wet:0};
+function build6(){
+  build4();if(G6||!G4)return;
+  // ---- 河邊 ----
+  const sc=new THREE.Scene();sc.background=new THREE.Color(0xa8dcff);sc.fog=new THREE.Fog(0xa8dcff,30,80);
+  sc.add(new THREE.HemisphereLight(0xffffff,0x5a7a4a,.85));const sun=new THREE.DirectionalLight(0xffffff,.75);sun.position.set(10,25,15);sc.add(sun);
+  const gr=mk(new THREE.PlaneGeometry(80,30),M3(0x7cc46a,{roughness:1}),0,0,15,sc);gr.rotation.x=-Math.PI/2;
+  const far=mk(new THREE.PlaneGeometry(80,20),M3(0x6fb85e,{roughness:1}),0,0,-22,sc);far.rotation.x=-Math.PI/2;
+  const sand=mk(new THREE.PlaneGeometry(80,2),M3(0xe8d6a8,{roughness:1}),0,.01,2.2,sc);sand.rotation.x=-Math.PI/2;
+  const wgeo=new THREE.PlaneGeometry(80,14,60,14);const water=new THREE.Mesh(wgeo,M3(0x3a8fd0,{roughness:.15,metalness:.2,transparent:true,opacity:.88}));water.rotation.x=-Math.PI/2;water.position.set(0,-.15,-5);sc.add(water);
+  const bed=mk(new THREE.PlaneGeometry(80,14),M3(0x2a5a7a),0,-1.2,-5,sc);bed.rotation.x=-Math.PI/2;
+  // 碼頭（釣魚點）
+  const wood=M3(0x9a6a3a);mk(new THREE.BoxGeometry(2,.2,5.5),wood,0,.2,-.4,sc);
+  for(let z=-2.8;z<=1.6;z+=1.4)[-.9,.9].forEach(x=>mk(new THREE.CylinderGeometry(.1,.1,1.4,8),wood,x,-.4,z,sc));
+  const sign=labelSprite('🎣 釣魚碼頭','rgba(255,250,240,.95)','#2a2416',320,64);sign.scale.set(2.4,.48,1);sign.position.set(0,2,1.8);sc.add(sign);
+  // 潛水點
+  mk(new THREE.BoxGeometry(1.6,.2,2.4),wood,10,.2,1.4,sc);const ds=labelSprite('🤿 潛水點','rgba(255,250,240,.95)','#2a2416',256,64);ds.scale.set(2,.5,1);ds.position.set(10,2,2);sc.add(ds);
+  // 商店
+  const shop=new THREE.Group();shop.position.set(-10,0,8);sc.add(shop);
+  mk(new THREE.BoxGeometry(3,2,2),M3(0x4a9ee8),0,1,0,shop);const aw=mk(new THREE.BoxGeometry(3.4,.15,1.4),M3(0xffffff),0,2.1,1.2,shop);aw.rotation.x=.35;
+  for(let i=0;i<5;i++)mk(new THREE.BoxGeometry(.34,.16,1.42),M3(0xe8483a),-1.36+i*.68,2.11,1.2,shop).rotation.x=.35;
+  const sl=labelSprite('🏪 漁具・潛水店','rgba(255,250,240,.95)','#2a2416',320,64);sl.scale.set(2.6,.52,1);sl.position.y=3.3;shop.add(sl);
+  // 上樓之門
+  const door=new THREE.Group();door.position.set(15,0,9);sc.add(door);
+  mk(new THREE.BoxGeometry(2.2,3.2,.3),M3(0xffd23f,{emissive:0x664400,metalness:.5}),0,1.6,0,door);mk(new THREE.BoxGeometry(1.6,2.7,.32),M3(0x8a5a30),0,1.35,.02,door);
+  const dl=labelSprite('🚪 上樓之門','rgba(255,250,240,.95)','#c4483a',256,64);dl.scale.set(2,.5,1);dl.position.y=4;door.add(dl);door.visible=false;
+  // 樹、石頭、蘆葦
+  [[-16,6],[-14,12],[-5,13],[6,12],[18,4],[12,13],[-18,11],[3,-14],[-8,-16],[14,-15],[-15,-13]].forEach(([x,z])=>{mk(new THREE.CylinderGeometry(.18,.25,1.4,8),M3(0x8a5a30),x,.7,z,sc);mk(new THREE.SphereGeometry(1.1,12,10),M3(0x3f9b46),x,2.1,z,sc);});
+  [[-4,2.4],[5,2.6],[-13,2.5],[16,2.4]].forEach(([x,z])=>mk(new THREE.DodecahedronGeometry(.5),M3(0x8a8f98,{flatShading:true}),x,.25,z,sc));
+  for(let i=0;i<40;i++){const x=-30+i*1.5+Math.sin(i)*.4;mk(new THREE.CylinderGeometry(.03,.03,1.2,4),M3(0x6a8a3a),x,.4,1.6+Math.sin(i*3)*.3,sc);}
+  const heroHolder=new THREE.Group(),petHolder=new THREE.Group();sc.add(heroHolder);sc.add(petHolder);
+  // 釣竿、浮標、釣線
+  const rod=mk(new THREE.CylinderGeometry(.025,.04,2.6,6),M3(0x5a3a1a),0,0,0,sc);rod.visible=false;
+  const bob=new THREE.Group();mk(new THREE.SphereGeometry(.14,12,10),M3(0xe8483a),0,.05,0,bob);mk(new THREE.SphereGeometry(.14,12,10,0,Math.PI*2,Math.PI/2,Math.PI/2),M3(0xffffff),0,.05,0,bob);sc.add(bob);bob.visible=false;
+  const lineGeo=new THREE.BufferGeometry();lineGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));const line=new THREE.Line(lineGeo,new THREE.LineBasicMaterial({color:0xffffff}));sc.add(line);line.visible=false;
+  const hook=new THREE.Group();sc.add(hook);
+  // ---- 水裡 ----
+  const us=new THREE.Scene();us.background=new THREE.Color(0x1d5f8a);us.fog=new THREE.Fog(0x1d5f8a,8,34);
+  us.add(new THREE.HemisphereLight(0xbfe6ff,0x103040,.9));const ul=new THREE.DirectionalLight(0xbfe6ff,.6);ul.position.set(0,20,10);us.add(ul);
+  const floor=mk(new THREE.PlaneGeometry(80,40),M3(0xd8c08a,{roughness:1}),0,-12,0,us);floor.rotation.x=-Math.PI/2;
+  const surf=mk(new THREE.PlaneGeometry(80,40),new THREE.MeshBasicMaterial({color:0x8fd3ff,transparent:true,opacity:.35,side:THREE.DoubleSide}),0,0,0,us);surf.rotation.x=Math.PI/2;
+  for(let i=0;i<40;i++){const x=-24+i*1.2+Math.sin(i*7)*.5,h=1.5+Math.abs(Math.sin(i*1.7))*3;const sw=mk(new THREE.ConeGeometry(.15,h,5),M3(0x2f8a3a),x,-12+h/2,-2-Math.abs(Math.sin(i*2.3))*4,us);sw.userData.sway=i;}
+  for(let i=0;i<14;i++)mk(new THREE.DodecahedronGeometry(.5+Math.abs(Math.sin(i))*.8),M3(0x6a7a8a,{flatShading:true}),-22+i*3.4,-11.6,-3-Math.sin(i*3)*2,us);
+  for(let i=0;i<8;i++){const ray=mk(new THREE.PlaneGeometry(1.5,14),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.06,side:THREE.DoubleSide}),-20+i*6,-6,-1,us);ray.rotation.z=.2;}
+  const diver=new THREE.Group();us.add(diver);
+  const spearM=mk(new THREE.CylinderGeometry(.03,.03,1.2,6),M3(0xd8dde6,{metalness:.7}),0,0,0,us);spearM.visible=false;
+  G6={sc,water,wgeo,heroHolder,petHolder,heroKey:'',petKey:'',rod,bob,line,door,us,diver,diverKey:'',spearM,fishM:[]};
+}
+function startRiver(){
+  build6();if(!G6){toast('這台手機不能顯示 3D');startFloor();return;}
+  scene='river';setLayers();lay4();const F=f6();persist();
+  Object.assign(R6,{x:0,z:9,trail:[],petPos:{x:0,z:10},yaw:0,wet:0});G6.door.visible=F.door;
+  showModal(`<h2>🎣 最高樓 6F：河邊釣魚</h2>
+   <div class="tips">
+   <p>🎣 走到<b>釣魚碼頭</b>按「釣魚」，拋竿後等浮標動。<b>魚上鉤了</b>就要快快連按跟魚一樣顏色的按鈕！</p>
+   <p>🟢 小魚　🔵 中魚　🟠 大魚　🔴 特大魚——魚越大越會拉，要按越快。只有 <b>20 秒</b>，太慢會被魚<b>拉下河</b>，全身濕透、魚也跑掉。</p>
+   <p>🏪 釣到的魚拿去<b>漁具・潛水店</b>賣錢。買齊 🩱泳衣、🧢泳帽、🤿呼吸器，就能到<b>潛水點</b>潛到水裡，用<b>魚槍</b>瞄準射魚！</p>
+   <p>🚪 只要抓到 <b>一條大魚（大或特大）</b>，上樓之門就會出現。</p>
+   <p>現在背包：${fishBagText()}　💰 ${save.money}</p>
+   </div><div class="row"><button class="pill red" id="mGo">去河邊！</button></div>`);
+  $('mGo').onclick=hideModal;
+}
+function fishBagText(){const b=f6().bag;return FK6.map(k=>`${FISH6[k].size}${b[k]}`).join('　');}
+function updRiver(dt){
+  R6.wet=Math.max(0,R6.wet-dt);
+  let mx=0,my=0;const K=input.keys;
+  if(K.KeyA||K.ArrowLeft)mx--;if(K.KeyD||K.ArrowRight)mx++;if(K.KeyW||K.ArrowUp)my--;if(K.KeyS||K.ArrowDown)my++;
+  if(joy.active){const jx=joy.x-joy.bx,jy=joy.y-joy.by,l=hyp(jx,jy);if(l>8){const m=Math.min(1,l/55);mx+=jx/l*m;my+=jy/l*m;}}
+  const ml=hyp(mx,my);if(ml>1){mx/=ml;my/=ml;}
+  const cy=Math.cos(R6.yaw),sy=Math.sin(R6.yaw),wx=mx*cy+my*sy,wz=-mx*sy+my*cy,sp=(idk()==='racer'?6:4.6)*(R6.wet?.7:1);
+  const ok6=(x,z)=>(x>=-20&&x<=20&&z>=2.6&&z<=14)||(Math.abs(x)<=.85&&z>=-2.4&&z<=2.8);   // 岸上或碼頭上
+  const nx=R6.x+wx*sp*dt,nz=R6.z+wz*sp*dt;if(ok6(nx,nz)){R6.x=nx;R6.z=nz;}else if(ok6(nx,R6.z))R6.x=nx;else if(ok6(R6.x,nz))R6.z=nz;
+  R6.moving=ml>.1;if(R6.moving){R6.fx=wx;R6.fz=wz;}
+  if(!R6.trail.length||hyp(R6.x-R6.trail[0].x,R6.z-R6.trail[0].z)>.15){R6.trail.unshift({x:R6.x,z:R6.z});if(R6.trail.length>60)R6.trail.pop();}
+  const tp=R6.trail[Math.min(R6.trail.length-1,8)]||R6;R6.petPos.x+=(tp.x-R6.petPos.x)*Math.min(1,dt*6);R6.petPos.z+=(tp.z-R6.petPos.z)*Math.min(1,dt*6);
+  const F=f6();let near=null;
+  if(Math.abs(R6.x)<1.4&&R6.z<4)near={k:'fish'};
+  if(hyp(R6.x+10,R6.z-9.5)<2.2)near={k:'shop'};
+  if(hyp(R6.x-10,R6.z-3)<2)near={k:'dive'};
+  if(F.door&&hyp(R6.x-15,R6.z-10)<2)near={k:'door'};
+  R6.near=near;const a=$('r6Act');
+  if(near){a.classList.remove('hidden');a.textContent=near.k==='fish'?(R6.wet?`💦 濕透了…${Math.ceil(R6.wet)}秒`:'🎣 釣魚'):near.k==='shop'?'🏪 漁具・潛水店':near.k==='dive'?(hasGear6()?'🤿 潛水':'🤿 要先買齊潛水裝備'):'🚪 上 7 樓';}
+  else a.classList.add('hidden');
+}
+function syncRiverHero(holder,keyName){
+  const key=P.id+'|'+P.weapon;if(G6[keyName]!==key){while(holder.children.length)holder.remove(holder.children[0]);const h=makeHeroModel();holder.add(h);G6[keyName]=key;}
+  return holder.children[0];}
+function drawRiver(){
+  if(!G6)return;const hero=syncRiverHero(G6.heroHolder,'heroKey');
+  // 河水波動
+  const pos=G6.wgeo.attributes.position;for(let i=0;i<pos.count;i++){const x=pos.getX(i),y=pos.getY(i);pos.setZ(i,Math.sin(x*.6+T*1.8)*.06+Math.cos(y*.9+T*1.3)*.05);}pos.needsUpdate=true;
+  G6.heroHolder.position.set(R6.x,R6.z<2.6?.3:0,R6.z);
+  const ud=hero.userData,sw=R6.moving?Math.sin(T*10)*.7:0;hero.rotation.y=Math.atan2(R6.fx,R6.fz);ud.lL.rotation.x=sw;ud.lR.rotation.x=-sw;ud.aL.rotation.x=-sw*.8;ud.aR.rotation.x=sw*.5-.3;
+  hero.rotation.z=R6.wet?Math.sin(T*20)*.05:0;
+  const p=petOf(),pk=p?p.seed+'|'+petStage(p):'';if(G6.petKey!==pk){while(G6.petHolder.children.length)G6.petHolder.remove(G6.petHolder.children[0]);if(p)G6.petHolder.add(makePetModel(p));G6.petKey=pk;}
+  if(G6.petHolder.children[0]){G6.petHolder.position.set(R6.petPos.x,0,R6.petPos.z);G6.petHolder.children[0].userData.body.position.y=Math.abs(Math.sin(T*5))*.15;G6.petHolder.children[0].rotation.y=Math.atan2(R6.x-R6.petPos.x,R6.z-R6.petPos.z);}
+  G6.door.visible=f6().door;G6.door.rotation.y=Math.sin(T)*.1;
+  G6.rod.visible=G6.bob.visible=G6.line.visible=false;
+  const d=10,cx=R6.x+Math.sin(R6.yaw)*d,cz=R6.z+Math.cos(R6.yaw)*d;G4.cam.position.set(cx,7,cz);G4.cam.lookAt(R6.x,1,R6.z-1);
+  G4.R.render(G6.sc,G4.cam);
+  const F=f6();
+  $('r6Hud').innerHTML=`🎣 6F 河邊　💰 ${save.money}<br><span style="color:#ffe066">🐟 ${fishBagText()}</span><br><span style="color:#bff7c3">${F.door?'🚪 上樓之門出現了！（右邊）':'抓到一條大魚就能上樓'}　${Object.keys(GEAR6).map(k=>F.gear[k]?GEAR6[k].e:'').join('')}</span>${R6.wet?'<br><span style="color:#8fd3ff">💦 全身濕透了……</span>':''}`;
+}
+(function(){const c=$('cv4');
+  c.addEventListener('pointerdown',e=>{if(scene==='river'){R6.rot={id:e.pointerId,x:e.clientX,yaw:R6.yaw};}});
+  c.addEventListener('pointermove',e=>{if(scene==='river'&&R6.rot&&R6.rot.id===e.pointerId)R6.yaw=R6.rot.yaw-(e.clientX-R6.rot.x)/innerWidth*4;});
+  const up=e=>{if(R6.rot&&R6.rot.id===e.pointerId)R6.rot=null;};c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);})();
+$('r6Act').onclick=()=>{const n=R6.near;if(!n||!$('modal').classList.contains('hidden'))return;
+  if(n.k==='fish'){if(R6.wet){toast('💦 身體還濕濕的，等一下再釣');return;}startFishing();}
+  else if(n.k==='shop')openShop6();
+  else if(n.k==='dive'){if(!hasGear6()){toast('🤿 要先在漁具・潛水店買齊 🩱泳衣、🧢泳帽、🤿呼吸器',2600);return;}startDive();}
+  else if(n.k==='door'){scene='result';setLayers();clearFloor(`<h2>🚪 上樓之門</h2><p>你在河邊一共抓到 <b>${f6().total}</b> 條魚，帶著大魚的自信往上爬！</p>`);}};
+$('r6Pause').addEventListener('pointerdown',e=>{e.preventDefault();openPause();});
+$('r6Rec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
+function catchFish6(k,how){const F=f6();F.bag[k]++;F.total++;stat('fish');if(k==='l'||k==='xl'){if(!F.door)logRec('🚪 抓到大魚，6 樓的上樓之門出現了');F.door=true;}
+  logRec(`${how==='dive'?'🔱 射到':'🎣 釣到'}${FISH6[k].size}魚「${FISH6[k].n}」`);persist();}
+function openShop6(){
+  const F=f6(),val=FK6.reduce((a,k)=>a+F.bag[k]*FISH6[k].price,0);
+  let h=`<h2>🏪 漁具・潛水店</h2><p>你有 <b>💰 ${save.money}</b> 元。</p>
+   <div class="tips"><p>🐟 背包裡的魚：${FK6.map(k=>`${FISH6[k].size}魚 ${F.bag[k]} 條（每條 💰${FISH6[k].price}）`).join('、')}</p></div>
+   <div class="row"><button class="pill red" id="s6Sell" ${val?'':'disabled'}>💰 全部賣掉（${val} 元）</button></div><h3>🤿 潛水裝備（三樣都買齊才能潛水，送你一把魚槍）</h3><div class="grid">`;
+  Object.keys(GEAR6).forEach(k=>{const g=GEAR6[k],own=F.gear[k];h+=`<button class="item ${own?'own':''}" data-g6="${k}" ${own||save.money<g.price?'disabled':''}><div class="big">${g.e}</div><div class="nm">${g.n}</div><div class="ds">${own?'✅ 已經有了':'💰 '+g.price}</div></button>`;});
+  h+=`</div><div class="row"><button class="pill green" id="mClose">離開</button></div>`;showModal(h);
+  $('s6Sell').onclick=()=>{save.money+=val;FK6.forEach(k=>F.bag[k]=0);stat('fishMoney',val);persist();logRec(`💰 賣魚賺了 ${val} 元`);sfx(1300,.15,'square',.04,300);toast(`💰 賣了 ${val} 元！`);openShop6();};
+  document.querySelectorAll('[data-g6]').forEach(b=>b.onclick=()=>{const k=b.dataset.g6,g=GEAR6[k];if(save.money<g.price)return;save.money-=g.price;F.gear[k]=true;persist();sfx(880,.15,'triangle',.06,400);
+    if(hasGear6()){logRec('🤿 潛水裝備買齊了，拿到魚槍！');toast('🤿 裝備買齊了！還送你一把🔱魚槍，去潛水點潛水吧',3000);}openShop6();});
+  $('mClose').onclick=hideModal;
+}
+
+/* ---------- 🎣 釣魚 ---------- */
+const FS6={ph:'ready',t:0,k:null,pos:0,time:0,surge:0};
+const BTN6=[['s','#4cc35a','綠'],['m','#3c9bff','藍'],['l','#ff9f1c','橘'],['xl','#e8483a','紅']];
+function startFishing(){scene='fish';setLayers();lay4();Object.assign(FS6,{ph:'ready',t:0,k:null,pos:0,time:0});fishUI();}
+function fishUI(){
+  const p=$('fish6Panel');
+  if(FS6.ph==='ready')p.innerHTML=`<div class="msg">🎣 按「拋竿」把魚鉤丟進河裡，然後等浮標動。</div><button class="mv" id="f6Cast" style="background:#ffd23f;flex-basis:60%">🎣 拋竿！</button><button class="mv" id="f6Back">⬅ 回岸上</button>`;
+  else if(FS6.ph==='wait')p.innerHTML=`<div class="msg">……等魚上鉤……（浮標往下沉就是魚來了）</div><button class="mv" id="f6Back">收竿回岸上</button>`;
+  else if(FS6.ph==='reel'){const F=FISH6[FS6.k];p.innerHTML=`<div class="msg" style="border-color:${F.col}">🐟 <b style="color:${F.col}">${F.size}魚</b>上鉤了！快連按 <b style="color:${F.col}">${F.btn}色</b> 的按鈕！</div>`+
+    BTN6.map(([k,c,n])=>`<button class="mv tap6" data-k6="${k}" style="background:${c};color:#fff;font-size:20px;${k===FS6.k?'box-shadow:0 0 0 4px #fff,0 0 18px '+c:'opacity:.75'}">${n}</button>`).join('');
+    p.querySelectorAll('[data-k6]').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();tap6(b.dataset.k6);b.style.transform='scale(.92)';setTimeout(()=>b.style.transform='',80);}));}
+  else p.innerHTML='';
+  if($('f6Cast'))$('f6Cast').onclick=cast6;
+  if($('f6Back'))$('f6Back').onclick=()=>{scene='river';setLayers();};
+  fishTop();
+}
+function fishTop(){const t=$('fish6Top');
+  if(FS6.ph!=='reel'){t.innerHTML='';return;}const F=FISH6[FS6.k],left=Math.max(0,20-FS6.time);
+  t.innerHTML=`<div class="hp" style="width:min(92vw,520px);margin:0 auto"><b>⏱ ${left.toFixed(1)} 秒</b>　<span style="color:${F.col}">${F.size}魚・${F.n}</span>
+   <div class="tug"><span>🌊 河裡</span><div class="tugbar"><i style="left:${(FS6.pos+1)/2*100}%"></i></div><span>岸上 🏝️</span></div></div>`;}
+function cast6(){FS6.ph='wait';FS6.t=0;FS6.biteAt=rand(2,5.5);FS6.k=pickFish6();sfx(500,.2,'triangle',.05,-200);fishUI();}
+function tap6(k){if(FS6.ph!=='reel')return;
+  if(k===FS6.k){FS6.pos+=FISH6[k].tap;sfx(700+FS6.pos*300,.04,'square',.03);}else{FS6.pos-=.03;toast(`顏色不對！要按 ${FISH6[FS6.k].btn}色`,700);}}
+function updFish(dt){
+  FS6.t+=dt;
+  if(FS6.ph==='wait'&&FS6.t>=FS6.biteAt){FS6.ph='reel';FS6.time=0;FS6.pos=.05;FS6.surge=0;sfx(300,.3,'sawtooth',.06,400);bigMsg6('上鉤了！快按！');fishUI();}
+  if(FS6.ph==='reel'){const F=FISH6[FS6.k];FS6.time+=dt;
+    // 魚會一陣一陣用力拉
+    FS6.surge-=dt;if(FS6.surge<-rand(.6,1.6))FS6.surge=rand(.4,.9);
+    FS6.pos-=F.pull*(FS6.surge>0?1.8:.75)*dt;
+    if(FS6.pos>=1)endFish(true);else if(FS6.pos<=-1||FS6.time>=20)endFish(false);
+    fishTop();}
+}
+function endFish(win){const k=FS6.k,F=FISH6[k];FS6.ph='result';fishUI();
+  if(win){catchFish6(k,'rod');sfx(523,.2,'triangle',.06);setTimeout(()=>sfx(784,.3,'triangle',.06),150);
+    showModal(`<h2>🎉 釣到了！</h2><canvas id="f6Prev" width="240" height="140" style="display:block;margin:0 auto;background:#e8f4ff;border-radius:14px"></canvas>
+     <p style="text-align:center;font-size:18px"><b style="color:${F.col}">${F.size}魚</b>「${F.n}」！可以賣 💰${F.price}</p>${(k==='l'||k==='xl')?'<p style="text-align:center;color:#c4483a"><b>🚪 抓到大魚了！上樓之門出現了！</b></p>':''}
+     <div class="row"><button class="pill green" id="mGo">再釣一次</button><button class="pill" id="mBack">回岸上</button></div>`);
+    drawFishPic($('f6Prev'),k);$('mGo').onclick=()=>{hideModal();FS6.ph='ready';fishUI();};$('mBack').onclick=()=>{hideModal();scene='river';setLayers();};}
+  else{R6.wet=6;stat('wet');logRec(`💦 被${F.size}魚拉下河了`);sfx(120,.6,'sawtooth',.07,-60);shake=12;
+    showModal(`<h2>💦 撲通！被拉下河了！</h2><div style="text-align:center;font-size:64px">🌊😵💦</div>
+     <p style="text-align:center">${FS6.time>=20?'20 秒到了還沒拉上來，':''}${F.size}魚力氣好大，把你拉進河裡！全身濕透了，魚也跑掉了……</p>
+     <p style="text-align:center;font-size:13px;color:#7a6a4a">💡 魚越大要按越快，記得按跟魚一樣顏色的按鈕！</p>
+     <div class="row"><button class="pill green" id="mGo">爬上岸</button></div>`);
+    $('mGo').onclick=()=>{hideModal();scene='river';setLayers();};}
+}
+function drawFishPic(c,k){const g=c.getContext('2d'),F=FISH6[k],L=60+F.len*45;g.fillStyle='#'+F.c.toString(16).padStart(6,'0');
+  g.beginPath();g.ellipse(120,70,L/2,L/4,0,0,7);g.fill();g.beginPath();g.moveTo(120-L/2+6,70);g.lineTo(120-L/2-26,50);g.lineTo(120-L/2-26,90);g.fill();
+  g.fillStyle='#fff';g.beginPath();g.arc(120+L/3,64,7,0,7);g.fill();g.fillStyle='#111';g.beginPath();g.arc(120+L/3+2,64,3.5,0,7);g.fill();
+  g.fillStyle=F.col;g.font='900 16px sans-serif';g.textAlign='center';g.fillText(F.size+'魚',120,130);}
+function bigMsg6(s){const m=$(scene==='dive'?'fish6Msg2':'fish6Msg');m.innerHTML=s;m.style.opacity=1;clearTimeout(bigMsg6.t);bigMsg6.t=setTimeout(()=>m.style.opacity=0,1200);}
+function drawFish(){
+  if(!G6)return;const hero=syncRiverHero(G6.heroHolder,'heroKey');
+  const pos=G6.wgeo.attributes.position;for(let i=0;i<pos.count;i++){const x=pos.getX(i),y=pos.getY(i);pos.setZ(i,Math.sin(x*.6+T*1.8)*.06+Math.cos(y*.9+T*1.3)*.05);}pos.needsUpdate=true;
+  // 主角站在碼頭盡頭，面向河
+  G6.heroHolder.position.set(0,.3,-2.6);hero.rotation.y=Math.PI;const ud=hero.userData;ud.lL.rotation.x=ud.lR.rotation.x=0;
+  const reel=FS6.ph==='reel',pull=reel?(FS6.surge>0?.35:.1):0;ud.aR.rotation.x=-1.2-pull+(reel?Math.sin(T*30)*.1:0);ud.aL.rotation.x=-1.0-pull;
+  G6.rod.visible=true;G6.rod.position.set(.35,1.6,-3.6-pull);G6.rod.rotation.set(-1.0+pull*1.5,0,0);
+  const tip=new THREE.Vector3(.35,1.6+Math.cos(-1.0+pull*1.5)*1.3,-3.6-pull-Math.sin(1.0-pull*1.5)*1.3);
+  let bx=0,bz=-8,by=-.05;
+  if(FS6.ph==='wait'){by+=Math.sin(T*3)*.04;if(FS6.biteAt-FS6.t<.8)by-=.15*Math.abs(Math.sin(T*25));}
+  if(reel){bx=Math.sin(T*2.3)*1.5*(1-FS6.pos)/2;bz=-8+FS6.pos*3;by=-.25+Math.abs(Math.sin(T*8))*.1;}
+  G6.bob.visible=FS6.ph==='wait'||reel;G6.bob.position.set(bx,by,bz);
+  G6.line.visible=G6.bob.visible;const lp=G6.line.geometry.attributes.position;lp.setXYZ(0,tip.x,tip.y,tip.z);lp.setXYZ(1,bx,by+.1,bz);lp.needsUpdate=true;
+  // 魚跳出水面
+  if(reel){if(!G6.reelFish||G6.reelFishK!==FS6.k){if(G6.reelFish)G6.sc.remove(G6.reelFish);G6.reelFish=makeFish6(FS6.k);G6.reelFishK=FS6.k;G6.sc.add(G6.reelFish);}
+    const j=Math.max(0,Math.sin(T*2.5)),f=G6.reelFish;f.visible=true;f.position.set(bx+.3,-.4+j*1.2,bz-.3);f.rotation.set(0,Math.PI/2,Math.sin(T*2.5)*.8);}
+  else if(G6.reelFish)G6.reelFish.visible=false;
+  const sh=shake>0?rand(-shake,shake)*.02:0;G4.cam.position.set(1.6+sh,3.2,1.2);G4.cam.lookAt(0,0,-7);
+  G4.R.render(G6.sc,G4.cam);
+}
+
+/* ---------- 🤿 潛水：魚槍射魚 ---------- */
+const DV={x:0,y:-1.5,fx:1,o2:60,fish:[],spears:[],aim:{x:0,y:0},cd:0,got:{s:0,m:0,l:0,xl:0},bub:[]};
+function startDive(){
+  scene='dive';setLayers();lay4();Object.assign(DV,{x:0,y:-1.5,fx:1,o2:60,fish:[],spears:[],cd:0,got:{s:0,m:0,l:0,xl:0},bub:[]});
+  DV.aim={x:innerWidth*.7,y:innerHeight*.45};
+  for(let i=0;i<9;i++)spawnFish6(true);
+  logRec('🤿 潛到河裡');toast('🤿 潛下去了！左下角搖桿游泳，拖曳畫面移動🎯瞄準器，按🔱發射魚槍',3200);
+}
+function spawnFish6(anywhere){const k=pickFish6(1.6),F=FISH6[k],dir=Math.random()<.5?1:-1;
+  const g=makeFish6(k);G6.us.add(g);DV.fish.push({k,x:anywhere?DV.x+rand(-14,14):DV.x-dir*16,y:rand(-11,-1),dir,sp:F.spd*rand(.6,1),ph:rand(0,6),hp:F.hp,g,flee:0});}
+function divePt(){const v=new THREE.Vector2(DV.aim.x/innerWidth*2-1,-(DV.aim.y/innerHeight)*2+1),rc=new THREE.Raycaster();rc.setFromCamera(v,G4.cam);
+  const o=new THREE.Vector3();rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,0,1),0),o);return o;}
+function fire6(){if(scene!=='dive'||DV.cd>0)return;DV.cd=.6;const t=divePt(),dx=t.x-DV.x,dy=t.y-DV.y,l=Math.hypot(dx,dy)||1;
+  DV.fx=dx<0?-1:1;DV.spears.push({x:DV.x,y:DV.y,vx:dx/l*18,vy:dy/l*18,life:.9});sfx(900,.12,'sawtooth',.05,-600);}
+function updDive(dt){
+  let mx=0,my=0;const K=input.keys;
+  if(K.KeyA||K.ArrowLeft)mx--;if(K.KeyD||K.ArrowRight)mx++;if(K.KeyW||K.ArrowUp)my--;if(K.KeyS||K.ArrowDown)my++;
+  if(joy.active){const jx=joy.x-joy.bx,jy=joy.y-joy.by,l=hyp(jx,jy);if(l>8){const m=Math.min(1,l/55);mx+=jx/l*m;my+=jy/l*m;}}
+  const ml=hyp(mx,my);if(ml>1){mx/=ml;my/=ml;}
+  DV.x=clamp(DV.x+mx*4.5*dt,-30,30);DV.y=clamp(DV.y-my*4.5*dt,-11.3,-.6);if(Math.abs(mx)>.1)DV.fx=mx<0?-1:1;DV.moving=ml>.1;
+  DV.o2-=dt;DV.cd-=dt;
+  if(Math.random()<dt*3)DV.bub.push({x:DV.x+DV.fx*.4,y:DV.y+.6,t:2});for(const b of DV.bub){b.y+=dt*1.5;b.t-=dt;b.x+=Math.sin(T*3+b.y)*dt*.3;}DV.bub=DV.bub.filter(b=>b.t>0&&b.y<0);
+  for(const f of DV.fish){const F=FISH6[f.k],near=Math.hypot(f.x-DV.x,f.y-DV.y);
+    if(near<3.5&&(f.k==='l'||f.k==='xl'||f.k==='m')){f.flee=1;f.dir=f.x>DV.x?1:-1;}else f.flee=Math.max(0,f.flee-dt);
+    f.x+=f.dir*f.sp*(1+f.flee*1.2)*dt;f.ph+=dt*2;f.y=clamp(f.y+Math.sin(f.ph)*dt*.6,-11.2,-.8);
+    if(Math.abs(f.x-DV.x)>20){G6.us.remove(f.g);f.dead=true;}}
+  for(const s of DV.spears){s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;
+    for(const f of DV.fish){if(f.dead||s.life<=0)continue;if(Math.hypot(f.x-s.x,f.y-s.y)<FISH6[f.k].len*.55+.2){s.life=0;f.hp--;sfx(300,.15,'square',.05,-100);
+      if(f.hp<=0){f.dead=true;G6.us.remove(f.g);DV.got[f.k]++;catchFish6(f.k,'dive');bigMsg6(`🔱 射到${FISH6[f.k].size}魚！`);}
+      else{f.flee=2;f.dir*=-1;bigMsg6(`命中！${FISH6[f.k].size}魚還要再 ${f.hp} 發`);}}}}
+  DV.spears=DV.spears.filter(s=>s.life>0);DV.fish=DV.fish.filter(f=>!f.dead);
+  while(DV.fish.length<9)spawnFish6(false);
+  if(DV.o2<=0){surface6(true);return;}
+  diveHud();
+}
+function diveHud(){const g=DV.got,n=FK6.reduce((a,k)=>a+g[k],0);
+  $('dive6Hud').innerHTML=`<div class="hp" style="width:min(70vw,330px)"><b>🫧 氧氣 ${Math.ceil(DV.o2)} 秒</b><div class="bar"><i style="width:${DV.o2/60*100}%;background:${DV.o2<12?'#ff4d5e':'#3c9bff'}"></i></div>
+   <small>這次抓到 ${n} 條：${FK6.map(k=>`<span style="color:${FISH6[k].col}">${FISH6[k].size}${g[k]}</span>`).join(' ')}</small></div>`;
+  const a=$('dive6Aim');a.style.left=DV.aim.x+'px';a.style.top=DV.aim.y+'px';a.style.opacity=DV.cd>0?.5:1;}
+function surface6(auto){const g=DV.got,n=FK6.reduce((a,k)=>a+g[k],0);DV.fish.forEach(f=>G6.us.remove(f.g));DV.fish=[];
+  showModal(`<h2>${auto?'🫧 氧氣用完了，浮上來！':'⬆️ 浮上岸'}</h2><p>這次潛水抓到 <b>${n}</b> 條魚：${FK6.map(k=>`${FISH6[k].size}魚 ${g[k]}`).join('、')}</p>
+   ${f6().door?'<p style="color:#c4483a"><b>🚪 上樓之門已經出現了！</b></p>':''}<p style="font-size:13px;color:#7a6a4a">魚都放進背包了，可以拿去商店賣。</p>
+   <div class="row"><button class="pill green" id="mGo">好</button></div>`);
+  $('mGo').onclick=()=>{hideModal();scene='river';setLayers();R6.x=10;R6.z=4;};}
+(function(){const c=$('cv4');
+  c.addEventListener('pointerdown',e=>{if(scene!=='dive')return;DV.aimId=e.pointerId;DV.aim={x:e.clientX,y:e.clientY};try{c.setPointerCapture(e.pointerId);}catch(_){}});
+  c.addEventListener('pointermove',e=>{if(scene==='dive'&&DV.aimId===e.pointerId)DV.aim={x:e.clientX,y:e.clientY};});
+  const up=e=>{if(DV.aimId===e.pointerId)DV.aimId=null;};c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);})();
+$('dive6Fire').addEventListener('pointerdown',e=>{e.preventDefault();fire6();});
+$('dive6Up').addEventListener('pointerdown',e=>{e.preventDefault();if(scene==='dive')surface6(false);});
+$('dive6Pause').addEventListener('pointerdown',e=>{e.preventDefault();openPause();});
+addEventListener('keydown',e=>{if(scene==='dive'&&(e.code==='Space'||e.code==='KeyJ'))fire6();
+  if(scene==='fish'&&FS6.ph==='reel'){const m={Digit1:'s',Digit2:'m',Digit3:'l',Digit4:'xl',KeyZ:'s',KeyX:'m',KeyC:'l',KeyV:'xl'}[e.code];if(m)tap6(m);}});
+function drawDive(){
+  if(!G6)return;const d=G6.diver;
+  const key=P.id+'|dive';if(G6.diverKey!==key){while(d.children.length)d.remove(d.children[0]);const h=makeHeroModel();d.add(h);
+    const tank=mk(new THREE.CylinderGeometry(.16,.16,.7,10),M3(0xffd23f,{metalness:.4}),0,1.1,-.35,h);
+    const mask=mk(new THREE.BoxGeometry(.5,.18,.12),M3(0x7fd3ff,{transparent:true,opacity:.7}),0,1.75,.33,h);
+    const gun=mk(new THREE.CylinderGeometry(.04,.04,1,6),M3(0x555555,{metalness:.6}),0,-.6,.5,h.userData.aR);gun.rotation.x=Math.PI/2;G6.diverKey=key;}
+  const h=d.children[0];d.position.set(DV.x,DV.y,0);h.rotation.set(Math.PI/2*.85,DV.fx>0?Math.PI/2:-Math.PI/2,0,'YXZ');
+  const kick=Math.sin(T*(DV.moving?9:3))*.5;h.userData.lL.rotation.x=kick;h.userData.lR.rotation.x=-kick;
+  const t=divePt(),aimA=Math.atan2(t.y-DV.y,(t.x-DV.x)*DV.fx);h.userData.aR.rotation.x=-1.5-aimA*.8;
+  for(const f of DV.fish){f.g.position.set(f.x,f.y,0);f.g.rotation.y=f.dir>0?0:Math.PI;f.g.rotation.z=Math.sin(f.ph*3)*.1;}
+  G6.spearM.visible=DV.spears.length>0;if(DV.spears[0]){const s=DV.spears[0];G6.spearM.position.set(s.x,s.y,0);G6.spearM.rotation.z=Math.atan2(s.vy,s.vx)-Math.PI/2;}
+  G6.us.children.forEach(o=>{if(o.userData.sway!==undefined)o.rotation.z=Math.sin(T*1.5+o.userData.sway)*.15;});
+  if(!G6.bubM){G6.bubM=[];for(let i=0;i<30;i++){const b=mk(new THREE.SphereGeometry(.07,6,4),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.6}),0,0,0,G6.us);G6.bubM.push(b);}}
+  G6.bubM.forEach((b,i)=>{const q=DV.bub[i];b.visible=!!q;if(q)b.position.set(q.x,q.y,.1);});
+  G4.cam.position.set(DV.x,clamp(DV.y,-8,-3)+.5,10);G4.cam.lookAt(DV.x,clamp(DV.y,-8,-3),0);
+  G4.R.render(G6.us,G4.cam);
+}
+
 /* ---------- 紀錄 ---------- */
 function stat(k,n){save.st=save.st||{};save.st[k]=(save.st[k]||0)+(n||1);}
 function logRec(t){save.st=save.st||{};const d=new Date(),L=save.st.log=save.st.log||[];
@@ -3341,7 +3672,7 @@ function openRecords(){
   const box=(v,l)=>`<div class="st"><b>${v}</b><span>${l}</span></div>`;
   let h=`<h2>📜 我的紀錄</h2><div class="stats">
     ${box(cur+' 樓','現在在')}${box(Math.max(save.best||1,cur)+' 樓','最高到過')}${box(save.clears||0,'過關次數')}${box(save.tops||0,'登上 100 樓')}
-    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box(st.bosses||0,'打倒魔王')}${box(st.climbs||0,'攀岩進大樓')}${box(st.pets||0,'孵出寵物')}${box(st.battles||0,'寵物對戰勝利')}${box(st.beyWins||0,'陀螺對戰勝利')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.shows||0,'馬戲團成功表演')}${box(st.escapes||0,'逃過妖怪')}${box(st.bestVotes||0,'畫畫最高分')}
+    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box(st.bosses||0,'打倒魔王')}${box(st.climbs||0,'攀岩進大樓')}${box(st.pets||0,'孵出寵物')}${box(st.battles||0,'寵物對戰勝利')}${box(st.beyWins||0,'陀螺對戰勝利')}${box(st.fish||0,'抓到的魚')}${box(st.wet||0,'被魚拉下河')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.shows||0,'馬戲團成功表演')}${box(st.escapes||0,'逃過妖怪')}${box(st.bestVotes||0,'畫畫最高分')}
     ${box('💰 '+save.money,'現在的錢')}${box((save.toys||[]).length+' / '+TOYS.length,'收集的玩具')}${box(fmtTime(st.time),'一共玩了')}${box(IDS[P.id].e+' '+IDS[P.id].n,'現在的身分')}
   </div>`;
   const now=c&&c.rounds&&c.rounds.length?c.rounds.map(r=>r.imgs[0]):null,pics=now||st.lastPics;
@@ -3356,7 +3687,7 @@ $('hRec').onclick=openRecords;
 $('bRec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
 
 /* ---------- 暫停 / 存檔 ---------- */
-function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
+function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam'||scene==='river'||scene==='fish'||scene==='dive')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
 function openPause(){
   if(!canPause())return;
   input.atk=false;input.keys={};joy.active=false;
@@ -3367,7 +3698,7 @@ function openPause(){
    ${scene==='draw2'?`<p>🎨 畫畫比賽：已經畫了 ${(save.c2&&save.c2.rounds.length)||0} / 10 張（畫好的圖都有存起來）</p>`:''}
    <p style="color:#7a6a4a">💾 存檔會記住樓層、錢和玩具。回家後接電話，會從這一層的開頭繼續。</p>
    <div class="row"><button class="pill green" id="pRes">▶️ 繼續</button><button class="pill blue" id="pSave">💾 存檔回家</button><button class="pill red" id="pRec">📜 看紀錄</button></div>
-   ${!['climb','battle','bey','beycam'].includes(scene)?`<div class="row"><button class="pill" id="pClimb">🧗 爬外牆換樓層</button></div>`:''}`);
+   ${!['climb','battle','bey','beycam','fish','dive'].includes(scene)?`<div class="row"><button class="pill" id="pClimb">🧗 爬外牆換樓層</button></div>`:''}`);
   $('pRes').onclick=hideModal;
   if($('pClimb'))$('pClimb').onclick=()=>{hideModal();const f=scene==='drive'?1:curFloor;$('cv4').style.display='none';logRec(`🧗 從 ${f} 樓爬到外牆`);startClimb(f);};
   $('pRec').onclick=openRecords;
@@ -3396,12 +3727,13 @@ function setLayers(){
   $('ctlDrive').classList.toggle('hidden',scene!=='drive');
   $('ctl3').classList.toggle('hidden',scene!=='bike3');
   $('ctl4').classList.toggle('hidden',scene!=='village');['bt4','bt4Top','bt4Fx'].forEach(id=>$(id).classList.toggle('hidden',scene!=='battle'));
-  $('cv4').style.display=(scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||(scene==='result'&&(curFloor===4||curFloor===5)))?'block':'none';
+  $('cv4').style.display=(scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='river'||scene==='fish'||scene==='dive'||(scene==='result'&&(curFloor===4||curFloor===5||curFloor===6)))?'block':'none';
+  $('ctl6').classList.toggle('hidden',scene!=='river');$('fish6').classList.toggle('hidden',scene!=='fish');$('dive6').classList.toggle('hidden',scene!=='dive');
   $('ctl5').classList.toggle('hidden',scene!=='zoo');$('bey5').classList.toggle('hidden',scene!=='bey');
   ['cbVid','cbCv','cbTop','cbPanel','cbMsg'].forEach(id=>$(id).classList.toggle('hidden',scene!=='beycam'));
   $('ctlClimb').classList.toggle('hidden',scene!=='climb');$('cvClimb').style.display=scene==='climb'?'block':'none';
   $('ctlHome').classList.toggle('hidden',scene!=='home');
-  $('joyPad').classList.toggle('hidden',!['floor','draw2','village','zoo'].includes(scene));resetKnob();
+  $('joyPad').classList.toggle('hidden',!['floor','draw2','village','zoo','river','dive'].includes(scene));resetKnob();
   joy.active=false;input.atk=false;lastBtn='';refreshButtons();
 }
 /* 固定搖桿：圓心就是起點，拖動中間的小圓決定走的方向 */
@@ -3438,7 +3770,7 @@ let last=performance.now();
 function frame(now){
   let dt=Math.min(.033,(now-last)/1000);last=now;T+=dt;shake=Math.max(0,shake-dt*40);
   const paused=!$('modal').classList.contains('hidden');
-  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
+  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam'||scene==='river'||scene==='fish'||scene==='dive')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
   ctx.setTransform(DPR,0,0,DPR,0,0);
   if(scene==='home')drawHome(dt);
   else if(scene==='drive'){if(!paused)updDrive(dt);ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));drawDrive();ctx.restore();}
@@ -3449,8 +3781,11 @@ function frame(now){
   else if(scene==='zoo'){if(!paused)updZoo(dt);drawZoo();}
   else if(scene==='bey'){if(!paused)updBey(dt);drawBey();}
   else if(scene==='beycam'){if(!paused)updCam(dt);drawCam();}
+  else if(scene==='river'){if(!paused)updRiver(dt);drawRiver();}
+  else if(scene==='fish'){if(!paused)updFish(dt);drawFish();}
+  else if(scene==='dive'){if(!paused)updDive(dt);drawDive();}
   else if(scene==='climb'){if(!paused)updClimb(dt);drawClimb();}
-  else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else if(curFloor===3&&scene==='result')draw3();else if(curFloor===4&&scene==='result')drawVillage();else if(curFloor===5&&scene==='result')drawZoo();else drawFloor();}
+  else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else if(curFloor===3&&scene==='result')draw3();else if(curFloor===4&&scene==='result')drawVillage();else if(curFloor===5&&scene==='result')drawZoo();else if(curFloor===6&&scene==='result')drawRiver();else drawFloor();}
   requestAnimationFrame(frame);
 }
 P.r=idk()==='kid'?11:14;
