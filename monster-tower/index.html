@@ -196,6 +196,31 @@
   #dive6Aim::before,#dive6Aim::after{content:'';position:absolute;background:#ff4d5e;left:50%;top:-12px;bottom:-12px;width:3px;margin-left:-1.5px}#dive6Aim::after{top:50%;bottom:auto;left:-12px;right:-12px;width:auto;height:3px;margin:-1.5px 0 0}
   #dive6Fire{position:absolute;right:calc(22px + env(safe-area-inset-right));bottom:calc(26px + env(safe-area-inset-bottom));width:92px;height:92px;border-radius:50%;border:4px solid #fff;background:#e8483a;color:#fff;font-size:30px;font-weight:900;line-height:1;box-shadow:0 5px 0 #8a2018;touch-action:none}
   #dive6Fire small{font-size:13px}
+  /* 7 樓 */
+  #a7Btns{position:absolute;right:calc(18px + env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;align-items:stretch}
+  #a7Btns .pill{font-size:17px;padding:13px 18px}
+  #fly7Frame{position:absolute;inset:0;pointer-events:none!important;border:solid #1a1e28;border-width:16px 26px 0;border-radius:46px 46px 0 0;box-shadow:inset 0 0 30px rgba(0,0,0,.5)}
+  #fly7Flash{position:absolute;inset:0;pointer-events:none!important;opacity:0}
+  #fly7Top .hp,#salv7Top .hp{width:min(56vw,400px)}
+  #salv7Top .hp{width:min(92vw,520px)}
+  #fly7Hint{position:absolute;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top));width:max-content;max-width:min(92vw,560px);background:rgba(255,250,240,.95);color:#2a2416;border:3px solid #3a2f1c;border-radius:12px;padding:4px 12px;font-weight:800;font-size:13px;line-height:1.4;text-align:center;pointer-events:none!important}
+  #fly7Hint:empty{display:none}
+  #fly7Hint small{color:#7a6a4a;font-weight:700}#fly7Hint .big7{color:#c4483a;font-size:16px;font-weight:900}
+  #fly7Panel{position:absolute;left:calc(160px + env(safe-area-inset-left));right:calc(8px + env(safe-area-inset-right));bottom:calc(6px + env(safe-area-inset-bottom));background:linear-gradient(#2a303c,#1a1e28);border:3px solid #4a5468;border-radius:14px;padding:5px;display:flex;flex-direction:column;gap:4px}
+  #fly7Inst{display:flex;flex-wrap:wrap;gap:4px 10px;justify-content:center;color:#9fe6ff;font-size:12px;font-weight:800;font-family:ui-monospace,monospace}
+  #fly7Inst b{color:#7dff9a;font-size:14px;margin:0 2px}#fly7Inst span{opacity:.95}#fly7Inst .ok{text-shadow:0 0 6px #7dff9a}#fly7Inst span:not(.ok)[class=""]{filter:grayscale(1);opacity:.4}#fly7Inst .warn{color:#ffb02e}
+  #fly7Panel.mini #fly7Btns{display:none}
+  #fly7Btns{display:grid;grid-template-columns:repeat(5,1fr);gap:4px}
+  .b7{position:relative;min-height:42px;border-radius:10px;background:#323a4c;color:#e8f0ff;border:2px solid #56617a;font-family:inherit;font-weight:900;font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;padding:2px;touch-action:none;box-shadow:0 3px 0 #11141c}
+  .b7 .e{font-size:16px}.b7 .s{font-size:10px;color:#9fe6ff;min-height:10px}
+  .b7.on{background:#2f6b3a;border-color:#7dff9a}.b7.down{transform:translateY(2px);box-shadow:none}
+  .b7.next7{border-color:#ffd23f;animation:pulse7 .7s infinite alternate}
+  @keyframes pulse7{from{box-shadow:0 0 0 2px #ffd23f,0 0 6px #ffd23f}to{box-shadow:0 0 0 4px #ffd23f,0 0 20px #ffd23f}}
+  @media (max-width:600px){#fly7Panel{left:calc(8px + env(safe-area-inset-left));bottom:calc(158px + env(safe-area-inset-bottom))}}
+  @media (max-height:420px){.b7{min-height:36px}.b7 .e{font-size:14px}#fly7Hint{top:calc(52px + env(safe-area-inset-top));font-size:12px}}
+  #salv7Panel{position:absolute;left:0;right:0;bottom:0;padding:8px calc(10px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  #salv7Panel .msg{flex:1 1 100%;background:#fffaf0;color:#2a2416;border:3px solid #3a2f1c;border-radius:14px;padding:8px 12px;font-weight:800;font-size:14px}
+  #salv7Panel .mv{flex:1 1 30%;max-width:300px;min-height:64px;border:3px solid #3a2f1c;border-radius:16px;padding:12px 6px;font-family:inherit;font-weight:900;color:#2a2416;background:#fff;touch-action:none;transition:transform .06s}
   /* 攀岩 */
   #cvClimb{position:fixed;inset:0;width:100%;height:100%;display:none;z-index:2;touch-action:none}
   #ctlClimb{z-index:6}
@@ -289,6 +314,29 @@
   <button class="btn pz" id="dive6Pause" style="right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">⏸</button>
   <button class="pill green" id="dive6Up" style="position:absolute;right:calc(14px + env(safe-area-inset-right));top:calc(66px + env(safe-area-inset-top));font-size:14px;padding:8px 12px">⬆️ 浮上岸</button>
   <button id="dive6Fire">🔱<br><small>發射</small></button>
+</div>
+
+<!-- 7 樓：機場 -->
+<div id="air7" class="layer hidden">
+  <div id="a7Hud" class="v4hud"></div>
+  <button class="btn pz" id="a7Pause" style="right:calc(66px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">⏸</button>
+  <button class="btn pz" id="a7Rec" style="right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">📜</button>
+  <div id="a7Btns"><button class="pill blue" id="a7Sim">🧑‍✈️ 模擬駕駛艙</button><button class="pill red" id="a7Race">✈️ 開真飛機比賽</button><button class="pill green hidden" id="a7Door">🚪 上 8 樓</button></div>
+</div>
+<div id="fly7" class="layer hidden">
+  <div id="fly7Frame"></div>
+  <div id="fly7Flash"></div>
+  <div id="fly7Top" class="hpRow" style="justify-content:center"></div>
+  <div id="fly7Hint"></div>
+  <div id="fly7Msg" class="bigMsg"></div>
+  <button class="btn pz" id="fly7Pause" style="right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">⏸</button>
+  <div id="fly7Panel"><div id="fly7Inst"></div><div id="fly7Btns"></div></div>
+</div>
+<div id="salv7" class="layer hidden">
+  <div id="salv7Top" class="hpRow" style="justify-content:center"></div>
+  <div id="salv7Msg" class="bigMsg"></div>
+  <button class="btn pz" id="salv7Pause" style="right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">⏸</button>
+  <div id="salv7Panel"></div>
 </div>
 
 <!-- 攀岩 -->
@@ -805,7 +853,7 @@ $('bId2').addEventListener('pointerdown',e=>{e.preventDefault();openIdentity();}
 function makeEnemy(kind,x,y,room){const t=ETYPE[kind];return{kind,x,y,r:t.r,hp:t.hp*FS.hp,max:t.hp*FS.hp,spd:t.spd*FS.spd,room,cd:rand(.6,1.6),aggro:false,flash:0,frozen:0,wind:0,stab:0,wdx:0,wdy:0,wt:0,losT:0,seen:false,face:1,bob:Math.random()*6,dead:false};}
 function goFloor(f){
   curFloor=clamp(f,1,TOP);FS=fscale(curFloor);
-  if(curFloor===2)startDraw2();else if(curFloor===3)startBike3();else if(curFloor===4)startVillage();else if(curFloor===5)startZoo();else if(curFloor===6)startRiver();else startFloor();
+  if(curFloor===2)startDraw2();else if(curFloor===3)startBike3();else if(curFloor===4)startVillage();else if(curFloor===5)startZoo();else if(curFloor===6)startRiver();else if(curFloor===7)startAirport();else startFloor();
 }
 function startFloor(){
   useWalls(WALLS1);
@@ -2090,8 +2138,8 @@ function buildClimb(){
   for(let f=1;f<=TOP;f++){mtx.makeTranslation(0,winY(f),.04);glass.setMatrixAt(f-1,mtx);}sc.add(glass);
   const labels=new Map();
   function label(f){if(labels.has(f))return;const c=document.createElement('canvas');c.width=160;c.height=72;const g=c.getContext('2d');
-    g.fillStyle='rgba(20,24,36,.85)';g.fillRect(0,0,160,72);g.fillStyle=f===2?'#ff9fc4':f===3?'#ffd23f':f===4?'#8be07b':f===5?'#ffb02e':f===6?'#7fd3ff':'#fff';g.font='900 40px sans-serif';g.textAlign='center';g.textBaseline='middle';
-    g.fillText(f+'F'+(f===2?'🎨':f===3?'🎪':f===4?'🥚':f===5?'🦁':f===6?'🎣':''),80,38);
+    g.fillStyle='rgba(20,24,36,.85)';g.fillRect(0,0,160,72);g.fillStyle=f===2?'#ff9fc4':f===3?'#ffd23f':f===4?'#8be07b':f===5?'#ffb02e':f===6?'#7fd3ff':f===7?'#c8a2ff':'#fff';g.font='900 40px sans-serif';g.textAlign='center';g.textBaseline='middle';
+    g.fillText(f+'F'+(f===2?'🎨':f===3?'🎪':f===4?'🥚':f===5?'🦁':f===6?'🎣':f===7?'✈️':''),80,38);
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c)}));sp.scale.set(1.3,.6,1);sp.position.set(0,winY(f)+1.05,.3);sc.add(sp);labels.set(f,sp);}
   // 抓點（固定亂數，每次一樣）
   const rnd=srand(20261015),holds=[];
@@ -2166,7 +2214,7 @@ function clHud(){
   $('clSta').style.width=CL.sta+'%';$('clSta').style.background=CL.sta<25?'#ff5a5a':CL.sta<50?'#ffd23f':'#5bc46a';
   $('clStaT').textContent=`💪 體力 ${Math.ceil(CL.sta)}`;
   $('clHint').style.display=near?'none':'';
-  const b=$('clEnter');if(near){b.classList.remove('hidden');b.textContent=`🪟 進入 ${near} 樓${near===2?' 🎨':near===3?' 🎪':near===4?' 🥚':near===5?' 🦁':near===6?' 🎣':''}`;}else b.classList.add('hidden');
+  const b=$('clEnter');if(near){b.classList.remove('hidden');b.textContent=`🪟 進入 ${near} 樓${near===2?' 🎨':near===3?' 🎪':near===4?' 🥚':near===5?' 🦁':near===6?' 🎣':near===7?' ✈️':''}`;}else b.classList.add('hidden');
 }
 function nearWindow(){const f=climbFloorNow();return Math.abs(CL.B.y+.6-winY(f))<1.2&&Math.abs(CL.B.x)<1.6?f:0;}
 $('clEnter').onclick=()=>{const f=nearWindow();if(!f)return;logRec(`🧗 爬外牆到 ${f} 樓，從窗戶進去`);stat('climbs');$('cvClimb').style.display='none';goFloor(f);};
@@ -3659,6 +3707,426 @@ function drawDive(){
   G4.R.render(G6.us,G4.cam);
 }
 
+/* =========================================================
+   7 樓：機場 ✈️
+   🧑‍✈️ 模擬駕駛艙：照真的飛機步驟起飛（8 步）、閃開障礙物和烏雲、降落（7 步）
+   ✈️ 通過模擬後開真飛機，跟妖怪飛行員比賽穿圈圈；撞到東西或被雷打到就墜機掉進河裡
+   🪝 墜機後到 6 樓那條河把飛機拉上岸，再從最後通過的圈圈繼續飛
+   飛完全程並安全降落就能上 8 樓
+   ========================================================= */
+function f7(){if(!save.f7)save.f7={simPass:false,racePass:false,races:0,best:0,crashes:0};return save.f7;}
+const STEP7={
+  to:[{b:'bat',t:'打開電池 BATTERY',d:'飛機要先有電，儀表才會亮。'},
+      {b:'fuel',t:'打開燃油泵 FUEL PUMP',d:'把燃油送到引擎。'},
+      {b:'eng',t:'啟動引擎 ENGINE START',d:'引擎轉起來了！'},
+      {b:'flap',t:'襟翼放到起飛位置 FLAPS 1',d:'讓機翼多一點升力，比較好起飛。'},
+      {b:'pbrk',t:'放開停機剎車 PARKING BRAKE',d:'飛機可以開始往前跑了。'},
+      {b:'thr+',t:'油門推到全開 THROTTLE 100%',d:'連按「油門＋」推到 100%。'},
+      {b:'pull',t:'速度到 140 節，拉桿起飛 ROTATE',d:'看速度表，到 140 節就按「拉桿」。'},
+      {b:'gear',t:'離地後收起落架 GEAR UP',d:'把輪子收起來，飛得比較順。'}],
+  ld:[{b:'thr-',t:'油門收到 50% 以下 THROTTLE',d:'按「油門－」讓飛機慢下來。'},
+      {b:'flap',t:'襟翼全放 FLAPS FULL',d:'飛得慢也不會掉下去。'},
+      {b:'gear',t:'放下起落架 GEAR DOWN',d:'輪子放下來才能降落！'},
+      {b:'joy',t:'用左下搖桿對準跑道中線',d:'讓飛機對準跑道中間的白線。'},
+      {b:'pull',t:'高度低於 100 呎時拉平 FLARE',d:'快碰到地面時按「拉桿」把機頭抬起來。'},
+      {b:'thr-',t:'落地後油門收到 0 IDLE',d:'連按「油門－」收到 0%。'},
+      {b:'brk',t:'踩剎車 BRAKES',d:'按住「剎車」讓飛機停下來。'}]};
+const BTN7=[['bat','🔋','電池'],['fuel','⛽','燃油泵'],['eng','🔑','引擎'],['flap','🪶','襟翼'],['pbrk','🅿️','停機剎車'],['thr+','⏫','油門＋'],['thr-','⏬','油門－'],['pull','⬆️','拉桿'],['gear','⚙️','起落架'],['brk','🛑','剎車']];
+const AI7=[{n:'雷霆妖',c:0xe8483a,t:15.5,s:24.4,lx:-5.5,lz:0},{n:'小鴨號',c:0xffd23f,t:17,s:25.2,lx:5.5,lz:0},{n:'飛天貓',c:0x4cc35a,t:18.5,s:25.9,lx:0,lz:16}];
+const GY7=.9;   // 輪子著地時飛機的高度
+const FL={mode:'sim',ph:'ground',step:0,x:0,y:GY7,z:0,v:0,vx:0,vy:0,thr:0,flaps:0,gear:true,bat:false,fuel:false,eng:false,pbrk:true,flare:false,brk:false,hp:3,inv:0,obs:[],rings:[],ai:[],fx:[]};
+let G7=null;
+function makePlane7(col){
+  const g=new THREE.Group(),body=M3(col,{roughness:.4,metalness:.3}),wh=M3(0xf4f6fa,{roughness:.5}),dk=M3(0x1f3a5a,{roughness:.2,metalness:.5});
+  const f=mk(new THREE.CylinderGeometry(.42,.32,4.2,14),wh,0,0,0,g);f.rotation.x=Math.PI/2;
+  mk(new THREE.SphereGeometry(.42,14,10),wh,0,0,-2.1,g).scale.z=1.4;
+  mk(new THREE.BoxGeometry(.62,.26,.6),dk,0,.28,-1.75,g);
+  mk(new THREE.BoxGeometry(6.2,.1,1.1),body,0,-.05,-.2,g);
+  mk(new THREE.BoxGeometry(2.3,.08,.6),body,0,.15,1.85,g);
+  mk(new THREE.BoxGeometry(.1,1.1,.85),body,0,.6,1.8,g);
+  mk(new THREE.BoxGeometry(.86,.05,3.2),body,0,.4,0,g);
+  [-1.6,1.6].forEach(x=>{const e=mk(new THREE.CylinderGeometry(.22,.22,.9,10),M3(0x8a92a0,{metalness:.6}),x,-.3,-.4,g);e.rotation.x=Math.PI/2;});
+  const gear=new THREE.Group();g.add(gear);
+  [[0,-1.5],[-.7,.2],[.7,.2]].forEach(([x,z])=>{mk(new THREE.CylinderGeometry(.04,.04,.5,6),M3(0x555555),x,-.5,z,gear);mk(new THREE.CylinderGeometry(.16,.16,.12,10),M3(0x222222),x,-.75,z,gear).rotation.z=Math.PI/2;});
+  g.userData.gear=gear;return g;}
+function makeRunway7(landing){
+  const g=new THREE.Group(),flat=(w,h,c,x,y,z)=>{const p=mk(new THREE.PlaneGeometry(w,h),M3(c,{roughness:1}),x,y,z,g);p.rotation.x=-Math.PI/2;return p;};
+  if(landing)flat(46,600,0x78bf62,0,.06,-260);
+  flat(16,520,0x50555c,0,.08,-260);
+  for(let z=-20;z>-510;z-=24)flat(.5,10,0xffffff,0,.1,z);
+  [-7.4,7.4].forEach(x=>flat(.3,520,0xffffff,x,.1,-260));
+  for(let i=0;i<8;i++)flat(.8,8,0xffffff,-6+i*(i<4?1.2:1.2)+(i>=4?2.4:0),.1,-6);
+  if(landing)for(let i=1;i<=8;i++)[-1,0,1].forEach(s=>mk(new THREE.SphereGeometry(.25,6,4),new THREE.MeshBasicMaterial({color:0xffe066}),s*2.5,.3,i*8,g));
+  return g;}
+function build7(){
+  build4();if(G7||!G4)return;
+  const sc=new THREE.Scene();sc.background=new THREE.Color(0x9fd4ff);sc.fog=new THREE.Fog(0x9fd4ff,160,820);
+  sc.add(new THREE.HemisphereLight(0xffffff,0x5a7a4a,.9));const sun=new THREE.DirectionalLight(0xffffff,.7);sun.position.set(30,80,20);sc.add(sun);
+  const cam=new THREE.PerspectiveCamera(62,innerWidth/innerHeight,.1,1600);
+  const gnd=mk(new THREE.PlaneGeometry(1600,8400),M3(0x78bf62,{roughness:1}),0,0,-3700,sc);gnd.rotation.x=-Math.PI/2;
+  const pc=[0x8fcf6a,0x6aa84f,0xd8c86a,0x9fc77a,0xb8d88a];
+  for(let i=0;i<90;i++){const p=mk(new THREE.PlaneGeometry(rand(30,90),rand(30,130)),M3(pick(pc),{roughness:1}),(Math.random()<.5?-1:1)*rand(32,420),.02,rand(-4200,100),sc);p.rotation.x=-Math.PI/2;}
+  const rv=mk(new THREE.PlaneGeometry(40,7400),M3(0x3a8fd0,{roughness:.2,metalness:.2}),0,.04,-4260,sc);rv.rotation.x=-Math.PI/2;
+  [-21,21].forEach(x=>{const s=mk(new THREE.PlaneGeometry(3,7400),M3(0xe8d6a8,{roughness:1}),x,.03,-4260,sc);s.rotation.x=-Math.PI/2;});
+  const rw=makeRunway7(false);rw.position.set(0,0,15);sc.add(rw);
+  const lrw=makeRunway7(true);sc.add(lrw);lrw.visible=false;
+  // 航廈、塔台、機庫
+  mk(new THREE.BoxGeometry(30,6,10),M3(0xdfe6ee),-34,3,-30,sc);mk(new THREE.BoxGeometry(30.2,2,10.2),M3(0x5aa0d8,{metalness:.5,roughness:.2}),-34,4,-30,sc);
+  mk(new THREE.CylinderGeometry(1.4,1.8,16,10),M3(0xe8e2d0),-24,8,8,sc);mk(new THREE.CylinderGeometry(3,2.4,3,10),M3(0x5aa0d8,{metalness:.5,roughness:.2}),-24,17.5,8,sc);
+  const hg=mk(new THREE.CylinderGeometry(8,8,22,16,1,false,0,Math.PI),M3(0xb8c0cc,{metalness:.4}),26,0,-60,sc);hg.rotation.set(Math.PI/2,0,Math.PI/2);
+  const lb=labelSprite('✈️ 最高樓機場 7F','rgba(255,250,240,.95)','#2a2416',320,64);lb.scale.set(10,2,1);lb.position.set(-34,10,-30);sc.add(lb);
+  // 樹、房子、山、雲
+  const tg=new THREE.CylinderGeometry(.4,.6,3,6),tm=M3(0x8a5a30),lg=new THREE.ConeGeometry(2.4,6,8),lm=M3(0x3f9b46),sg=new THREE.SphereGeometry(2.6,8,6),sm=M3(0x4fae4f);
+  for(let i=0;i<300;i++){const x=(Math.random()<.5?-1:1)*rand(28,420),z=rand(-4200,140);if(Math.abs(x)<60&&z>-120&&z<40&&x<0)continue;mk(tg,tm,x,1.5,z,sc);Math.random()<.5?mk(lg,lm,x,5.5,z,sc):mk(sg,sm,x,5,z,sc);}
+  const hc=[0xf2e2c8,0xffd6a8,0xd8e6f2,0xf2c8c8];
+  for(let i=0;i<60;i++){const x=(Math.random()<.5?-1:1)*rand(45,380),z=rand(-4200,-80);mk(new THREE.BoxGeometry(6,4,6),M3(pick(hc)),x,2,z,sc);const r=mk(new THREE.ConeGeometry(5,3,4),M3(0xc4483a),x,5.5,z,sc);r.rotation.y=Math.PI/4;}
+  for(let i=0;i<26;i++){const x=(i%2?1:-1)*rand(480,640),z=-200-i*170,h=rand(90,180);mk(new THREE.ConeGeometry(h*.8,h,7),M3(0x6a8a7a,{flatShading:true}),x,h/2,z,sc);mk(new THREE.ConeGeometry(h*.24,h*.3,7),M3(0xffffff,{flatShading:true}),x,h*.86,z,sc);}
+  const cm=new THREE.MeshLambertMaterial({color:0xffffff,transparent:true,opacity:.92}),cg=new THREE.SphereGeometry(1,10,8);
+  for(let i=0;i<80;i++){const c=new THREE.Group(),x=(Math.random()<.5?-1:1)*rand(24,260);c.position.set(x,rand(34,90),rand(-4200,0));for(let j=0;j<4;j++){const s=mk(cg,cm,rand(-6,6),rand(-1,1.5),rand(-3,3),c);s.scale.setScalar(rand(3,6));}sc.add(c);}
+  const pl=makePlane7(0x3c7be8);sc.add(pl);
+  const ai=AI7.map(a=>{const p=makePlane7(a.c),l=labelSprite(a.n,'rgba(255,250,240,.95)','#2a2416',200,56);l.scale.set(3.2,.9,1);l.position.y=2.2;p.add(l);sc.add(p);return p;});
+  const park=[makePlane7(0xe8483a),makePlane7(0xffd23f)];park[0].position.set(-16,GY7,-60);park[1].position.set(-16,GY7,-80);park.forEach(p=>{p.rotation.y=-Math.PI/2;sc.add(p);});
+  G7={sc,cam,rw,lrw,pl,ai,park,ringM:[]};
+}
+function lay7(){if(!G7)return;lay4();G7.cam.aspect=innerWidth/innerHeight;G7.cam.updateProjectionMatrix();}
+addEventListener('resize',()=>{if(['air','fly','salv'].includes(scene)||(scene==='result'&&curFloor===7))lay7();});
+
+/* ---------- 機場大廳 ---------- */
+function startAirport(){
+  build7();if(!G7){toast('這台手機不能顯示 3D');startFloor();return;}
+  scene='air';setLayers();lay7();persist();
+  const F=f7();
+  showModal(`<h2>✈️ 最高樓 7F：機場</h2><div class="tips">
+   <p>🧑‍✈️ 先到<b>模擬駕駛艙</b>練習。按鈕要照<b>真的開飛機的順序</b>按：起飛 8 步、降落 7 步。不知道按哪個時，<b>發亮的按鈕</b>就是下一步。</p>
+   <p>☁️ 飛上天以後用<b>左下搖桿</b>上下左右飛，會遇到亂流、鳥群、無人機、熱氣球、直升機、飛天妖怪。<b>烏雲會打雷</b>，不要飛進烏雲，也不要飛到烏雲下面！</p>
+   <p>✈️ 模擬通過後才能<b>開真的飛機</b>，跟妖怪飛行員比賽穿過金色圈圈。真飛機撞到東西或被雷打到就會<b>墜機掉進河裡</b>，要像 6 樓一樣把飛機<b>拉上岸</b>，才能繼續飛。</p>
+   <p>🚪 比賽<b>飛完全程並安全降落</b>，就能上 8 樓。</p></div>
+   <div class="row"><button class="pill red" id="mGo">進機場！</button></div>`);
+  $('mGo').onclick=hideModal;
+}
+function airHud(){const F=f7();
+  $('a7Hud').innerHTML=`✈️ 7F 機場　💰 ${save.money}<br><span style="color:${F.simPass?'#8be07b':'#ffe066'}">🧑‍✈️ 模擬駕駛艙：${F.simPass?'✅ 通過':'還沒通過'}</span><br><span style="color:${F.racePass?'#8be07b':'#ffe066'}">🏁 飛機比賽：${F.racePass?'✅ 完成（最好第 '+F.best+' 名）':F.simPass?'可以去比了！':'🔒 要先通過模擬'}</span>`;
+  $('a7Race').textContent=F.simPass?'✈️ 開真飛機比賽':'🔒 開真飛機比賽';$('a7Race').style.opacity=F.simPass?1:.6;
+  $('a7Door').classList.toggle('hidden',!F.racePass);}
+function drawAir(){
+  if(!G7)return;airHud();
+  G7.pl.visible=true;G7.pl.position.set(0,GY7,0);G7.pl.rotation.set(0,0,0);G7.pl.userData.gear.visible=true;
+  G7.ai.forEach(p=>p.visible=false);G7.lrw.visible=false;G7.ringM.forEach(m=>m.visible=false);
+  const a=T*.18;G7.cam.position.set(Math.sin(a)*15,5.5,Math.cos(a)*15-2);G7.cam.lookAt(0,1.2,-1);
+  G4.R.render(G7.sc,G7.cam);
+}
+$('a7Sim').onclick=()=>{if(!$('modal').classList.contains('hidden'))return;startFlight('sim');};
+$('a7Race').onclick=()=>{if(!$('modal').classList.contains('hidden'))return;if(!f7().simPass){toast('🔒 要先通過 🧑‍✈️ 模擬駕駛艙訓練，才能開真的飛機',2600);return;}startFlight('race');};
+$('a7Door').onclick=()=>{if(!$('modal').classList.contains('hidden'))return;scene='result';setLayers();clearFloor(`<h2>🚪 上樓之門</h2><p>你是合格的飛行員了！最好的比賽成績是第 <b>${f7().best}</b> 名。</p>`);};
+$('fly7Pause').addEventListener('pointerdown',e=>{e.preventDefault();FL.brk=false;openPause();});
+$('salv7Pause').addEventListener('pointerdown',e=>{e.preventDefault();openPause();});
+$('a7Pause').addEventListener('pointerdown',e=>{e.preventDefault();openPause();});
+$('a7Rec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
+
+/* ---------- 飛行 ---------- */
+function clearObs7(){FL.obs.forEach(o=>G7.sc.remove(o.g));FL.obs=[];}
+function startFlight(mode){
+  build7();scene='fly';setLayers();lay7();clearObs7();FL.fx.forEach(f=>G7.sc.remove(f.m));FL.fx=[];
+  Object.assign(FL,{mode,ph:'ground',step:0,x:0,y:GY7,z:0,v:0,vx:0,vy:0,thr:0,flaps:0,gear:true,bat:false,fuel:false,eng:false,pbrk:true,flare:false,brk:false,
+    hp:3,inv:0,t:0,cruise:0,ringI:0,lastRing:-1,alignT:0,turb:0,turbMsg:null,bank:0,finish:null,place:0,raceT:0,boost:0,slow:0,crashT:0,obsNext:0,rwX:0,rwZ:0,splash:false,cam:null});
+  G7.ringM.forEach(m=>G7.sc.remove(m));G7.ringM=[];FL.rings=[];FL.ai=[];
+  if(mode==='race'){
+    let x=0,y=26;for(let i=0;i<12;i++){x=clamp(x+rand(-7,7),-11,11);y=clamp(y+rand(-8,8),14,42);const z=-450-i*120;FL.rings.push({x,y,z});
+      const m=new THREE.Mesh(new THREE.TorusGeometry(3.5,.3,8,28),M3(i===11?0xe8483a:0xffd23f,{emissive:i===11?0x661010:0x664400,metalness:.4}));m.position.set(x,y,z);G7.sc.add(m);G7.ringM.push(m);}
+    FL.ai=AI7.map(a=>({...a,sP:-a.lz,v:0,x:a.lx,y:GY7,z:a.lz,fin:null}));
+    f7().races++;logRec('✈️ 開真飛機參加比賽');
+  }else logRec('🧑‍✈️ 進入模擬駕駛艙');
+  persist();
+  $('fly7Frame').style.display=mode==='sim'?'block':'none';
+  $('fly7Btns').innerHTML=BTN7.map(([k,e,n])=>`<button class="b7" data-b7="${k}"><span class="e">${e}</span><span class="n">${n}</span><span class="s"></span></button>`).join('');
+  $('fly7Btns').querySelectorAll('[data-b7]').forEach(b=>{
+    b.addEventListener('pointerdown',e=>{e.preventDefault();if(b.dataset.b7==='brk')FL.brk=true;press7(b.dataset.b7);b.classList.add('down');});
+    const up=()=>{if(b.dataset.b7==='brk')FL.brk=false;b.classList.remove('down');};b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);b.addEventListener('pointerleave',up);});
+  FL.hintK='';FL.instK='';FL.btnK='';
+  bigMsg7(mode==='sim'?'🧑‍✈️ 模擬駕駛艙':'🏁 比賽開始！');
+  toast(mode==='sim'?'照著發亮的按鈕，一步一步把飛機開起來！':'妖怪飛行員也在準備起飛了！快照步驟起飛，穿過 12 個金色圈圈',3000);
+}
+function bigMsg7(s){const m=$(scene==='salv'?'salv7Msg':'fly7Msg');m.innerHTML=s;m.style.opacity=1;clearTimeout(bigMsg7.t);bigMsg7.t=setTimeout(()=>m.style.opacity=0,1400);}
+function curStep7(){const L=(FL.ph==='ground'||FL.ph==='climb')?STEP7.to:(FL.ph==='appr'||FL.ph==='roll')?STEP7.ld:null;return L?L[FL.step]:null;}
+function btnName7(b){const x=BTN7.find(q=>q[0]===b);return x?x[1]+' '+x[2]:b;}
+function next7(){FL.step++;sfx(880,.08,'triangle',.05);setTimeout(()=>sfx(1320,.1,'triangle',.05),70);}
+function press7(b){
+  if(scene!=='fly'||!$('modal').classList.contains('hidden'))return;
+  if(FL.ph==='crash'||FL.ph==='done')return;
+  const st=curStep7();
+  if(!st){if(FL.ph==='cruise')toast('現在專心飛！用左下搖桿控制飛機',1200);return;}
+  if(st.b==='joy'){toast('現在用左下搖桿把飛機對準跑道中線',1300);return;}
+  if(b!==st.b){if(b==='brk'&&st.b!=='brk'&&FL.ph!=='roll')return;sfx(160,.15,'square',.05);toast(`還不是這個喔！<br>下一步：${st.t}<br>👉 按發亮的「${btnName7(st.b)}」`,1800);return;}
+  if(FL.ph==='ground'||FL.ph==='climb'){
+    switch(FL.step){
+      case 0:FL.bat=true;next7();break;
+      case 1:FL.fuel=true;next7();break;
+      case 2:FL.eng=true;sfx(80,.9,'sawtooth',.06,120);next7();break;
+      case 3:FL.flaps=1;next7();break;
+      case 4:FL.pbrk=false;next7();break;
+      case 5:FL.thr=Math.min(100,FL.thr+25);sfx(200+FL.thr*3,.12,'sawtooth',.04);if(FL.thr>=100)next7();break;
+      case 6:if(FL.v<14){toast(`速度還不夠！現在 ${Math.round(FL.v*10)} 節，要到 140 節`,1300);return;}FL.ph='climb';next7();bigMsg7('🛫 起飛！');break;
+      case 7:if(FL.y<GY7+1.5){toast('等飛機離開地面高一點再收起落架',1300);return;}FL.gear=false;FL.flaps=0;next7();break;
+    }
+  }else{
+    switch(FL.step){
+      case 0:FL.thr=Math.max(0,FL.thr-25);if(FL.thr<=50)next7();break;
+      case 1:FL.flaps=2;next7();break;
+      case 2:FL.gear=true;sfx(300,.3,'square',.04,-100);next7();break;
+      case 4:if((FL.y-GY7)*25>100){toast(`還太高了！現在 ${Math.round((FL.y-GY7)*25)} 呎，低於 100 呎再拉平`,1300);return;}FL.flare=true;next7();break;
+      case 5:if(FL.ph!=='roll'){toast('等輪子碰到跑道再收油門',1200);return;}FL.thr=Math.max(0,FL.thr-25);if(FL.thr<=0)next7();break;
+      case 6:break;   // 按住剎車在 updFly 裡處理
+    }
+  }
+}
+function joy7(){let mx=0,my=0;const K=input.keys;
+  if(K.KeyA||K.ArrowLeft)mx--;if(K.KeyD||K.ArrowRight)mx++;if(K.KeyW||K.ArrowUp)my--;if(K.KeyS||K.ArrowDown)my++;
+  if(joy.active){const jx=joy.x-joy.bx,jy=joy.y-joy.by,l=hyp(jx,jy);if(l>6){const m=Math.min(1,l/55);mx+=jx/l*m;my+=jy/l*m;}}
+  const l=hyp(mx,my);if(l>1){mx/=l;my/=l;}return [mx,my];}
+function startApproach7(){
+  FL.ph='appr';FL.step=0;FL.flare=false;FL.alignT=0;FL.rwZ=FL.z-650;FL.rwX=rand(-7,7);clearObs7();
+  G7.lrw.position.set(FL.rwX,0,FL.rwZ);G7.lrw.visible=true;bigMsg7('🛬 準備降落！');
+}
+function goAround7(why){
+  sfx(200,.4,'sawtooth',.05,200);bigMsg7('🔁 重飛！');toast(`${why}<br>沒關係，飛起來再降落一次！`,2600);stat('goAround');
+  FL.thr=100;FL.flaps=0;FL.gear=false;FL.brk=false;FL.ph='appr';FL.step=0;FL.flare=false;FL.alignT=0;FL.v=Math.max(FL.v,20);
+  FL.rwZ=FL.z-650;FL.rwX=rand(-7,7);G7.lrw.position.set(FL.rwX,0,FL.rwZ);
+}
+const OBS7=[['bird',3],['drone',2],['balloon',1.5],['heli',1],['monster',1.5],['plane',1],['storm',1.6],['turb',1.1]];
+function obs7Mesh(k){const g=new THREE.Group();let r=1.8;
+  if(k==='bird'){const m=M3(0x3a3a44);for(let i=0;i<6;i++){const b=new THREE.Group();b.position.set(rand(-1.6,1.6),rand(-.9,.9),rand(-1,1));mk(new THREE.SphereGeometry(.2,8,6),m,0,0,0,b).scale.z=1.7;
+      const wl=mk(new THREE.BoxGeometry(.75,.04,.28),m,-.4,0,0,b),wr=mk(new THREE.BoxGeometry(.75,.04,.28),m,.4,0,0,b);b.userData={wl,wr,ph:rand(0,6)};g.add(b);}r=2;}
+  else if(k==='drone'){const m=M3(0x2a2e36,{metalness:.5});mk(new THREE.BoxGeometry(.9,.25,.9),m,0,0,0,g);const ro=[];[[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([a,b])=>{const arm=mk(new THREE.BoxGeometry(1.5,.08,.1),m,a*.45,0,b*.45,g);arm.rotation.y=Math.atan2(b,a)*-1;ro.push(mk(new THREE.CylinderGeometry(.42,.42,.03,12),new THREE.MeshBasicMaterial({color:0xaaaaaa,transparent:true,opacity:.6}),a*.85,.12,b*.85,g));});
+    mk(new THREE.SphereGeometry(.1,6,4),new THREE.MeshBasicMaterial({color:0xff2020}),0,-.15,-.45,g);g.userData.ro=ro;r=1.5;}
+  else if(k==='balloon'){mk(new THREE.SphereGeometry(2.3,16,12,0,Math.PI*2,0,Math.PI/2),M3(0xe8483a),0,0,0,g);const lo=mk(new THREE.SphereGeometry(2.3,16,12,0,Math.PI*2,Math.PI/2,Math.PI/2),M3(0xffd23f),0,0,0,g);lo.scale.y=1.2;
+    mk(new THREE.BoxGeometry(.9,.7,.9),M3(0x9a6a3a),0,-3.6,0,g);r=2.7;}
+  else if(k==='heli'){const m=M3(0x3a9e5a);mk(new THREE.SphereGeometry(.9,12,10),m,0,0,0,g).scale.z=1.5;const tb=mk(new THREE.CylinderGeometry(.12,.2,2.6,8),m,0,.2,1.9,g);tb.rotation.x=Math.PI/2;
+    mk(new THREE.BoxGeometry(.6,.6,.04),M3(0x7fd3ff),0,.15,-1.2,g);const rot=mk(new THREE.BoxGeometry(4.6,.05,.25),M3(0x222222),0,1,0,g);g.userData.rot=rot;r=2.3;}
+  else if(k==='monster'){const m=M3(0x8a4ad8);mk(new THREE.SphereGeometry(.95,14,12),m,0,0,0,g);[-.35,.35].forEach(x=>{mk(new THREE.SphereGeometry(.28,10,8),M3(0xffffff),x,.25,-.8,g);mk(new THREE.SphereGeometry(.13,8,6),M3(0x111111),x,.25,-1.05,g);});
+    mk(new THREE.ConeGeometry(.14,.4,6),M3(0xffffff),-.2,-.35,-.85,g).rotation.x=Math.PI;mk(new THREE.ConeGeometry(.14,.4,6),M3(0xffffff),.2,-.35,-.85,g).rotation.x=Math.PI;
+    const wl=mk(new THREE.ConeGeometry(.9,2,3),M3(0x5a2a98),-1.6,.2,0,g),wr=mk(new THREE.ConeGeometry(.9,2,3),M3(0x5a2a98),1.6,.2,0,g);wl.rotation.z=Math.PI/2;wr.rotation.z=-Math.PI/2;wl.scale.z=wr.scale.z=.2;g.userData.w=[wl,wr];r=1.9;}
+  else if(k==='plane'){const p=makePlane7(pick([0x9a9aa8,0xff8fb8,0x8fd3ff,0xffffff]));p.userData.gear.visible=false;g.add(p);r=2.5;}
+  else if(k==='storm'){const mats=[];for(let i=0;i<7;i++){const mm=M3(0x4a4f5a,{roughness:1});mats.push(mm);const s=mk(new THREE.SphereGeometry(1,12,10),mm,rand(-3.4,3.4),rand(-1,1.2),rand(-2.5,2.5),g);s.scale.setScalar(rand(2.2,3.2));}
+    const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(3*12),3));const bolt=new THREE.Line(bg,new THREE.LineBasicMaterial({color:0xfff6a0}));bolt.visible=false;g.add(bolt);
+    const glow=mk(new THREE.CylinderGeometry(.5,.5,1,6),new THREE.MeshBasicMaterial({color:0xffffaa,transparent:true,opacity:.5}),0,0,0,g);glow.visible=false;g.userData={mats,bolt,glow};r=4.3;}
+  else if(k==='turb'){const m=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.22,side:THREE.DoubleSide});const ws=[];for(let i=0;i<7;i++){const w=mk(new THREE.TorusGeometry(rand(3,6),.12,4,20,Math.PI*1.4),m,rand(-8,8),rand(-5,5),rand(-20,20),g);w.rotation.set(rand(0,3),rand(0,3),0);ws.push(w);}g.userData.ws=ws;r=0;}
+  return {g,r};}
+function spawnObs7(z){
+  const tot=OBS7.reduce((a,o)=>a+o[1],0);let q=Math.random()*tot,k='bird';for(const [n,w] of OBS7){if(q<w){k=n;break;}q-=w;}
+  const {g,r}=obs7Mesh(k),o={k,g,r,z,x:rand(-12,12),y:clamp(FL.y+rand(-7,7),11,50),vx:0,vy:0,ph:rand(0,6),cd:rand(.6,2),strike:0};
+  if(k==='plane'||k==='heli'||k==='bird'){const s=Math.random()<.5?1:-1,sp=k==='plane'?10:k==='heli'?4:2.5,tA=Math.max(1,(FL.z-z)/Math.max(18,FL.v)),tx=rand(-9,9);o.vx=s*sp;o.x=tx-o.vx*tA;if(k!=='bird')g.rotation.y=s>0?-Math.PI/2:Math.PI/2;}
+  if(k==='storm'){o.x=rand(-10,10);o.y=clamp(FL.y+rand(-3,6),15,48);}
+  if(k==='turb'){o.x=0;o.y=FL.y;}
+  if(k==='balloon')o.vy=.5;
+  if(FL.mode==='race'&&k!=='turb'){const nr=FL.rings.find(R=>Math.abs(R.z-z)<18);if(nr){if(Math.abs(o.x-nr.x)<6)o.x=nr.x+(o.x<nr.x?-7:7);}}
+  o.x0=o.x;g.position.set(o.x,o.y,z);G7.sc.add(g);FL.obs.push(o);}
+function hit7(why){
+  if(FL.inv>0||FL.ph==='crash')return;
+  flash7(why.startsWith('⚡')?'#fff6a0':'#ff4d5e');shake=14;
+  if(FL.mode==='sim'){FL.hp--;FL.inv=1.6;sfx(120,.4,'sawtooth',.07,-60);toast(`${why}<br>模擬機警告！剩下 ${'❤️'.repeat(Math.max(0,FL.hp))||'0 顆心'}`,1800);
+    if(FL.hp<=0){showModal(`<h2>🔴 模擬失敗</h2><div style="text-align:center;font-size:56px">🧑‍✈️💦</div><p>${why}模擬機撞了 3 次，教練說再練習一次！</p><p style="color:#7a6a4a">從飛上天的地方重新開始（起飛步驟已經會了，不用重做）。</p><div class="row"><button class="pill green" id="mGo">再試一次</button><button class="pill" id="mBack">回機場</button></div>`);
+      $('mGo').onclick=()=>{hideModal();clearObs7();Object.assign(FL,{hp:3,inv:2,cruise:0,x:0,y:26,vx:0,vy:0});FL.obsNext=FL.z-140;};$('mBack').onclick=()=>{hideModal();startAirport();hideModal();};}
+    return;}
+  // 真飛機：墜機
+  FL.ph='crash';FL.crashT=0;FL.vy=2;FL.splash=false;FL.crashWhy=why;FL.cam={x:FL.x+8,y:FL.y+4,z:FL.z+14};
+  sfx(70,1.2,'sawtooth',.09,-40);setTimeout(()=>sfx(50,.8,'square',.07,-20),200);bigMsg7('💥 墜機了！');toast(why,2000);
+  for(let i=0;i<16;i++)fx7(FL.x,FL.y,FL.z,i<10?pick([0xff9f1c,0xffd23f,0xe8483a]):0x555555,rand(.5,1),1.2);
+}
+function fx7(x,y,z,col,s,life,vy){const m=mk(new THREE.SphereGeometry(1,8,6),new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.9}),x+rand(-1,1),y+rand(-1,1),z+rand(-1,1),G7.sc);m.scale.setScalar(s);
+  FL.fx.push({m,life,max:life,vx:rand(-3,3),vy:vy!==undefined?vy:rand(-1,4),vz:rand(-3,3),g:rand(1.5,3)});}
+function flash7(c){const f=$('fly7Flash');f.style.background=c;f.style.transition='none';f.style.opacity=.75;requestAnimationFrame(()=>{f.style.transition='opacity .45s';f.style.opacity=0;});}
+function updFly(dt){
+  FL.t+=dt;FL.inv=Math.max(0,FL.inv-dt);
+  const [jx,jy]=joy7();
+  if(FL.mode==='race'&&FL.ph!=='crash')FL.raceT+=dt;
+  // FX
+  for(const f of FL.fx){f.life-=dt;f.m.position.x+=f.vx*dt;f.m.position.y+=f.vy*dt;f.m.position.z+=f.vz*dt;f.m.scale.multiplyScalar(1+f.g*dt*.5);f.m.material.opacity=Math.max(0,f.life/f.max*.9);if(f.life<=0)G7.sc.remove(f.m);}
+  FL.fx=FL.fx.filter(f=>f.life>0);
+  const pz=FL.z;
+  if(FL.ph==='ground'){
+    const acc=(FL.eng&&!FL.pbrk)?FL.thr/100*3-.15:-1;FL.v=clamp(FL.v+acc*dt,0,22);FL.z-=FL.v*dt;FL.y=GY7;
+    if(FL.z<-500){toast('衝出跑道了！速度到 140 節要記得拉桿起飛',2600);startFlight(FL.mode);return;}
+  }else if(FL.ph==='climb'){
+    FL.v+=(25-FL.v)*Math.min(1,dt*.8);FL.z-=FL.v*dt;FL.y=Math.min(30,FL.y+(FL.gear?2.4:4.5)*dt);FL.vy=FL.gear?2.4:4.5;
+    FL.x+=jx*6*dt;FL.x=clamp(FL.x,-8,8);
+    if(FL.step>=8&&FL.y>=22){FL.ph='cruise';FL.obsNext=FL.z-140;FL.vy=0;bigMsg7('☁️ 巡航！');toast(FL.mode==='sim'?'用左下搖桿上下左右飛，閃開障礙物和烏雲！':'用左下搖桿飛過金色圈圈！小心障礙物和烏雲',2600);}
+  }else if(FL.ph==='cruise'){
+    let sp=25;if(FL.boost>0){FL.boost-=dt;sp=31;}if(FL.slow>0){FL.slow-=dt;sp=19;}FL.v+=(sp-FL.v)*Math.min(1,dt*2);
+    FL.vx+=(jx*11-FL.vx)*Math.min(1,dt*4);FL.vy+=(-jy*8-FL.vy)*Math.min(1,dt*4);
+    // 亂流
+    const tb=FL.obs.find(o=>o.k==='turb'&&Math.abs(o.z-FL.z)<24);
+    if(tb){FL.turb=1;FL.vx+=rand(-1,1)*70*dt;FL.vy+=rand(-1,1)*60*dt;shake=Math.max(shake,5);if(FL.turbMsg!==tb){FL.turbMsg=tb;bigMsg7('⚠️ 亂流！抓穩！');sfx(90,.5,'sawtooth',.04);}}else FL.turb=0;
+    FL.x=clamp(FL.x+FL.vx*dt,-16,16);FL.y=clamp(FL.y+FL.vy*dt,8,55);FL.z-=FL.v*dt;FL.cruise+=FL.v*dt;
+    while(FL.obsNext>FL.z-300&&!(FL.mode==='race'&&FL.obsNext<FL.rings[11].z+20)){spawnObs7(FL.obsNext);FL.obsNext-=FL.mode==='race'?rand(48,72):rand(36,58);}
+    // 圈圈
+    if(FL.mode==='race'&&FL.ringI<FL.rings.length){const R=FL.rings[FL.ringI];if(pz>R.z&&FL.z<=R.z){const ok=hyp(FL.x-R.x,FL.y-R.y)<=3.6;
+      G7.ringM[FL.ringI].visible=false;FL.lastRing=FL.ringI;FL.ringI++;
+      if(ok){FL.boost=1.3;FL.slow=0;sfx(1046,.12,'triangle',.06);bigMsg7(`⭕ ${FL.ringI}/12`);}else{FL.slow=1.6;sfx(200,.2,'square',.05);toast('錯過圈圈了！速度變慢',1200);}
+      if(FL.ringI>=FL.rings.length){FL.finish=FL.raceT;FL.place=1+FL.ai.filter(a=>a.fin!=null).length;bigMsg7(`🏁 第 ${FL.place} 名！`);toast(`🏁 你第 ${FL.place} 名衝過終點！<br>接下來要安全降落`,2600);startApproach7();}}}
+    if(FL.mode==='sim'&&FL.cruise>=1300)startApproach7();
+  }else if(FL.ph==='appr'){
+    const tv=FL.thr>50?24:18;FL.v+=(tv-FL.v)*Math.min(1,dt*.7);FL.z-=FL.v*dt;
+    FL.vx+=(jx*8-FL.vx)*Math.min(1,dt*4);FL.x=clamp(FL.x+FL.vx*dt,-18,18);FL.vy=0;
+    const dist=FL.z-FL.rwZ,yT=GY7+Math.max(0,dist)*.045*(FL.flare?.6:1);FL.y+=(yT-FL.y)*Math.min(1,dt*1.6);FL.vy=(yT-FL.y);
+    if(FL.step<3&&dist<200){goAround7('降落準備太慢了！要在跑道前做好：收油門、放襟翼、放起落架');return;}
+    if(FL.step===3){if(Math.abs(FL.x-FL.rwX)<2.5)FL.alignT+=dt;else FL.alignT=0;if(FL.alignT>1.2&&dist<350)next7();else if(dist<40){goAround7('沒有對準跑道中線！');return;}}
+    if(dist<=0){if(FL.step<5){goAround7(FL.step===4?'沒有拉平，重重摔在跑道上（重落地）！':'還沒準備好就碰到跑道了！');return;}
+      FL.ph='roll';FL.y=GY7;sfx(140,.25,'square',.06);shake=6;bigMsg7('🛬 著陸！');}
+  }else if(FL.ph==='roll'){
+    FL.y=GY7;FL.x+=(FL.rwX-FL.x)*Math.min(1,dt*.8);
+    let dec=.35;if(FL.brk&&FL.step===6)dec=6;else if(FL.brk&&FL.step<6&&!FL.brkMsg){FL.brkMsg=1;toast('先把油門收到 0 再踩剎車！',1300);}
+    if(!FL.brk)FL.brkMsg=0;
+    FL.v=Math.max(0,FL.v+(FL.thr/100*1.2-dec)*dt);FL.z-=FL.v*dt;
+    if(FL.z<FL.rwZ-505&&FL.v>.5){goAround7('衝出跑道了！落地後要收油門、踩剎車');return;}
+    if(FL.step===6&&FL.v<.3){landed7();return;}
+  }else if(FL.ph==='crash'){
+    FL.crashT+=dt;
+    if(!FL.splash){FL.vy-=22*dt;FL.y+=FL.vy*dt;FL.z-=FL.v*.4*dt;FL.x+=(clamp(FL.x,-14,14)-FL.x)*Math.min(1,dt*2);
+      if(Math.random()<dt*25)fx7(FL.x,FL.y,FL.z,0x555555,rand(.4,.8),1.4,1);
+      if(FL.y<=.3){FL.y=.3;FL.splash=true;FL.crashT=Math.min(FL.crashT,1.4);sfx(60,1,'sawtooth',.09,-30);
+        for(let i=0;i<22;i++)fx7(FL.x,.5,FL.z,i<14?0xffffff:0xff9f1c,rand(.4,1),1.3,rand(4,10));}}
+    else if(FL.crashT>2.8){startSalvage7();return;}
+  }
+  // 障礙物
+  for(const o of FL.obs){o.ph+=dt;
+    if(o.k==='monster')o.x=o.x0+Math.sin(o.ph*1.4)*4;else o.x+=o.vx*dt;
+    o.y+=o.vy*dt+(o.k==='drone'?Math.sin(o.ph*2)*.6*dt:0);
+    if(o.k==='storm'){o.cd-=dt;o.strike=Math.max(0,o.strike-dt);if(o.cd<=0){o.strike=.28;o.cd=rand(1.1,2);
+      if(Math.abs(o.z-FL.z)<90){sfx(50,.6,'sawtooth',.06,-20);if(Math.abs(o.z-FL.z)<50)flash7('rgba(255,255,220,.8)');}}}
+    if(FL.ph==='cruise'&&FL.inv<=0){const dz=Math.abs(o.z-FL.z),dx=FL.x-o.x,dy=FL.y-o.y;
+      if(o.k==='storm'){if(dz<4&&hyp(dx,dy)<4.3)hit7('⚡ 飛進烏雲，被雷打到了！');else if(o.strike>0&&dz<2.2&&Math.abs(dx)<2&&FL.y<o.y)hit7('⚡ 飛到烏雲下面，被閃電打到了！');}
+      else if(o.r&&dz<1.8&&hyp(dx,dy)<o.r+.9)hit7({bird:'🐦 撞到鳥群了！',drone:'🛸 撞到無人機了！',balloon:'🎈 撞到熱氣球了！',heli:'🚁 撞到直升機了！',monster:'👾 撞到飛天妖怪了！',plane:'✈️ 撞到別的飛機了！'}[o.k]);}
+    if(o.z>FL.z+30){G7.sc.remove(o.g);o.dead=true;}}
+  FL.obs=FL.obs.filter(o=>!o.dead);
+  // 妖怪飛行員
+  if(FL.mode==='race'&&FL.ph!=='crash')for(const a of FL.ai){
+    if(FL.raceT<a.t)a.v=0;
+    const lead=a.sP-(-FL.z),rb=lead>160?.93:lead<-160?1.07:1;
+    if(FL.raceT>=a.t)a.v=Math.min(a.v+3*dt,a.s*rb);
+    a.sP+=a.v*dt;a.z=-a.sP;
+    const R=FL.rings;let tx=a.lx,ty=26;
+    if(R.length){if(a.z>R[0].z){const k=clamp((-250-a.z)/(-250-R[0].z),0,1);tx=a.lx+(R[0].x-a.lx)*k;ty=26+(R[0].y-26)*k;}
+      else if(a.z<=R[R.length-1].z){tx=R[R.length-1].x;ty=R[R.length-1].y;}
+      else for(let i=0;i<R.length-1;i++)if(a.z<=R[i].z&&a.z>R[i+1].z){const k=(R[i].z-a.z)/(R[i].z-R[i+1].z);tx=R[i].x+(R[i+1].x-R[i].x)*k;ty=R[i].y+(R[i+1].y-R[i].y)*k;break;}}
+    const climbY=a.sP<45?GY7:Math.min(ty,GY7+(a.sP-45)*.2);a.x=a.sP<45?a.lx:tx;a.y=climbY;
+    if(a.fin==null&&R.length&&a.z<=R[R.length-1].z)a.fin=FL.raceT;}
+  drawUI7();
+}
+function rank7(){if(FL.mode!=='race')return 0;let r=1;for(const a of FL.ai){if(a.fin!=null){if(FL.finish==null||a.fin<FL.finish)r++;}else if(FL.finish==null&&a.sP>-FL.z)r++;}return r;}
+function drawUI7(){
+  const st=curStep7(),kt=Math.round(FL.v*10),alt=Math.max(0,Math.round((FL.y-GY7)*25));
+  // 提示
+  let h='';
+  if(FL.ph==='ground'||FL.ph==='climb'){if(st)h=`<b>🛫 起飛 第 ${FL.step+1}/8 步：</b>${st.t}${FL.step===6?`<br><span class="big7">速度 ${kt} / 140 節</span>`:''}<br><small>${st.d}</small>`;else h='<b>🛫 爬升中…</b> 飛到巡航高度';}
+  else if(FL.ph==='cruise')h=FL.mode==='sim'?`<b>☁️ 巡航</b>：用左下搖桿上下左右飛，閃開障礙物！<br><small>⛈️ 烏雲和烏雲下面會打雷，不要靠近</small>`:`<b>⭕ 穿過金色圈圈</b>（${FL.ringI}/12）<br><small>撞到東西或被雷打到會墜機！</small>`;
+  else if(FL.ph==='appr'||FL.ph==='roll'){if(st){const dx=FL.x-FL.rwX;h=`<b>🛬 降落 第 ${FL.step+1}/7 步：</b>${st.t}`+(FL.step===3?`<br><span class="big7">${Math.abs(dx)<2.5?'✅ 對準了！保持住':dx>0?'👈 往左一點':'往右一點 👉'}</span>`:FL.step===4?`<br><span class="big7">高度 ${alt} 呎</span>`:FL.step===6?`<br><span class="big7">速度 ${kt} 節</span>`:'')+`<br><small>${st.d}</small>`;}}
+  else if(FL.ph==='crash')h='<b>💥 墜機了！</b> 飛機掉進河裡……';
+  if(h!==FL.hintK){FL.hintK=h;$('fly7Hint').innerHTML=h;}
+  // 儀表
+  const flapT=['0','1','全'][FL.flaps];
+  const ins=`<span>💨<b>${kt}</b><small>節</small></span><span>📏<b>${alt}</b><small>呎</small></span><span>🎚️<b>${FL.thr}</b>%</span><span>🪶<b>${flapT}</b></span><span>⚙️<b>${FL.gear?'放下':'收起'}</b></span><span class="${FL.bat?'ok':''}">🔋</span><span class="${FL.fuel?'ok':''}">⛽</span><span class="${FL.eng?'ok':''}">🔑</span>${FL.turb?'<span class="warn">⚠️亂流</span>':''}`;
+  if(ins!==FL.instK){FL.instK=ins;$('fly7Inst').innerHTML=ins;}
+  $('fly7Panel').classList.toggle('mini',FL.ph==='cruise'||FL.ph==='crash');
+  const nb=st?st.b:'',bk=nb+'|'+FL.bat+FL.fuel+FL.eng+FL.pbrk+FL.gear+FL.flaps+FL.thr;
+  if(bk!==FL.btnK){FL.btnK=bk;$('fly7Btns').querySelectorAll('[data-b7]').forEach(b=>{const k=b.dataset.b7;b.classList.toggle('next7',k===nb);
+    const on=k==='bat'?FL.bat:k==='fuel'?FL.fuel:k==='eng'?FL.eng:false;b.classList.toggle('on',on);
+    b.querySelector('.s').textContent=k==='pbrk'?(FL.pbrk?'剎住':'放開'):k==='gear'?(FL.gear?'⬇️':'⬆️'):k==='flap'?flapT:k==='thr+'||k==='thr-'?FL.thr+'%':k==='pull'?((FL.ph==='appr'||FL.ph==='roll')?'拉平':''):(on?'ON':'');});}
+  // 上方
+  let top;
+  if(FL.mode==='sim'){const pr=FL.ph==='ground'?FL.step/8*12:FL.ph==='climb'?12:FL.ph==='cruise'?12+FL.cruise/1300*68:FL.ph==='appr'?80+FL.step/7*12:92+FL.step/7*8;
+    top=`<div class="hp"><b>🧑‍✈️ 模擬駕駛艙</b>　${'❤️'.repeat(Math.max(0,FL.hp))}${'🤍'.repeat(3-Math.max(0,FL.hp))}<div class="bar"><i style="width:${pr}%;background:#3c9bff"></i></div></div>`;}
+  else top=`<div class="hp"><b>🏁 第 ${rank7()} 名 / 4</b>　⏱ ${FL.raceT.toFixed(1)}　⭕ ${FL.ringI}/12<div class="bar"><i style="width:${FL.ringI/12*100}%;background:#ffd23f"></i></div></div>`;
+  if(top!==FL.topK){FL.topK=top;$('fly7Top').innerHTML=top;}
+}
+function landed7(){
+  FL.ph='done';stat('landings');sfx(523,.2,'triangle',.06);setTimeout(()=>sfx(659,.2,'triangle',.06),150);setTimeout(()=>sfx(784,.35,'triangle',.06),300);
+  const F=f7();
+  if(FL.mode==='sim'){const first=!F.simPass;F.simPass=true;if(first){save.money+=30;logRec('🧑‍✈️ 通過模擬駕駛艙訓練');}persist();
+    showModal(`<h2>🎉 模擬駕駛艙通過！</h2><div style="text-align:center;font-size:56px">🧑‍✈️✅</div><p>起飛 8 步、閃開障礙物、降落 7 步全部完成，安全停在跑道上！${first?'獎金 <b>💰 30</b>。':''}</p><p><b>現在可以開真的飛機去比賽了！</b></p><div class="row"><button class="pill red" id="mGo">✈️ 去開真飛機</button><button class="pill" id="mBack">回機場</button></div>`);
+    $('mGo').onclick=()=>{hideModal();startFlight('race');};$('mBack').onclick=()=>{hideModal();startAirport();hideModal();};return;}
+  const pl=FL.place||4,prize=[100,60,40,20][pl-1];save.money+=prize;F.racePass=true;F.best=F.best?Math.min(F.best,pl):pl;if(pl===1)stat('raceWins');
+  logRec(`🏁 飛機比賽第 ${pl} 名，安全降落`);persist();
+  showModal(`<h2>🏁 第 ${pl} 名，安全降落！</h2><div style="text-align:center;font-size:56px">${['🥇','🥈','🥉','🎖️'][pl-1]}✈️</div><p>比賽時間 ${FL.finish?FL.finish.toFixed(1):FL.raceT.toFixed(1)} 秒，獎金 <b>💰 ${prize}</b>。</p><p style="color:#c4483a"><b>🚪 飛完全程又安全降落，上樓之門打開了！</b></p>
+   <div class="row"><button class="pill red" id="mGo">🚪 上 8 樓</button><button class="pill green" id="mAgain">✈️ 再比一次</button><button class="pill" id="mBack">回機場</button></div>`);
+  $('mGo').onclick=()=>{hideModal();scene='result';setLayers();clearFloor(`<h2>🚪 上樓之門</h2><p>你是合格的飛行員了！最好的比賽成績是第 <b>${f7().best}</b> 名。</p>`);};
+  $('mAgain').onclick=()=>{hideModal();startFlight('race');};$('mBack').onclick=()=>{hideModal();startAirport();hideModal();};
+}
+function drawFly(){
+  if(!G7)return;const P7=G7.pl,race=FL.mode==='race';
+  FL.bank+=((-FL.vx*.045)-FL.bank)*.12;
+  P7.visible=race||FL.ph==='crash';P7.position.set(FL.x,FL.y,FL.z);P7.userData.gear.visible=FL.gear;
+  if(FL.ph==='crash'){P7.rotation.set(-.5-FL.crashT*.3,FL.crashT*2,FL.crashT*3);}
+  else P7.rotation.set(clamp(FL.vy*.05,-.35,.35)+(FL.flare&&FL.ph!=='done'?.12:0)+(FL.ph==='climb'?.15:0),0,FL.bank);
+  P7.visible=P7.visible&&!(FL.inv>0&&Math.floor(T*12)%2&&FL.ph!=='crash');
+  G7.ai.forEach((m,i)=>{const a=FL.ai[i];m.visible=race&&!!a;if(a){m.position.set(a.x,a.y,a.z);m.userData.gear.visible=a.y<GY7+2;m.rotation.set(a.y<GY7+.1?0:.08,0,Math.sin(T+i)*.08);}});
+  G7.park.forEach(p=>p.visible=true);
+  G7.lrw.visible=FL.ph==='appr'||FL.ph==='roll'||FL.ph==='done';
+  G7.ringM.forEach((m,i)=>{if(i<FL.ringI)m.visible=false;else{m.visible=true;const s=i===FL.ringI?1+Math.sin(T*6)*.08:1;m.scale.setScalar(s);m.rotation.z=T*.5;}});
+  for(const o of FL.obs){o.g.position.set(o.x,o.y,o.z);const u=o.g.userData;
+    if(o.k==='bird')o.g.children.forEach(b=>{const w=Math.sin(T*14+b.userData.ph)*.6;b.userData.wl.rotation.z=w;b.userData.wr.rotation.z=-w;});
+    if(u.ro)u.ro.forEach(r=>r.rotation.y+=.6);if(u.rot)u.rot.rotation.y+=.5;
+    if(u.w){const w=Math.sin(T*8)*.5;u.w[0].rotation.x=w;u.w[1].rotation.x=w;}
+    if(u.ws)u.ws.forEach((w,i)=>w.rotation.z+=.02*(i%2?1:-1));
+    if(u.mats){const warn=o.cd<.5||o.strike>0,c=o.strike>0?0x8888ff:warn&&Math.floor(T*16)%2?0x666622:0x000000;u.mats.forEach(m=>m.emissive.setHex(c));
+      u.bolt.visible=o.strike>0;u.glow.visible=o.strike>0;
+      if(o.strike>0){const p=u.bolt.geometry.attributes.position;for(let i=0;i<12;i++){const yy=-2-(o.y-2)*i/11;p.setXYZ(i,i&&i<11?rand(-1.2,1.2):0,yy,i&&i<11?rand(-1,1):0);}p.needsUpdate=true;u.glow.scale.set(1,o.y,1);u.glow.position.y=-o.y/2;}}}
+  const cam=G7.cam,sh=shake>0?rand(-shake,shake)*.012:0;
+  if(FL.ph==='crash'&&FL.cam){cam.position.set(FL.cam.x,FL.cam.y,FL.cam.z);cam.lookAt(FL.x,FL.y,FL.z);}
+  else if(race){const tx=FL.x,ty=FL.y+2.8,tz=FL.z+11;if(!FL.cc)FL.cc={x:tx,y:ty};FL.cc.x+=(tx-FL.cc.x)*.15;FL.cc.y+=(ty-FL.cc.y)*.15;cam.position.set(FL.cc.x+sh,FL.cc.y+sh,tz);cam.lookAt(FL.x,FL.y+.2,FL.z-14);}
+  else{cam.position.set(FL.x+sh,FL.y+.55+sh,FL.z-1.6);cam.lookAt(FL.x+FL.vx*.5,FL.y+.4+FL.vy*.3-(FL.ph==='appr'?2.2:0),FL.z-30);cam.rotateZ(FL.bank*1.2);}
+  G4.R.render(G7.sc,cam);
+}
+
+/* ---------- 🪝 把飛機拉上岸 ---------- */
+const SV={ph:'hook',pos:0,time:0,surge:0,t:0};
+function startSalvage7(){
+  build6();scene='salv';setLayers();lay7();Object.assign(SV,{ph:'hook',pos:0,time:0,surge:0,t:0});
+  f7().crashes++;stat('crashes');persist();logRec('💥 飛機墜機掉進河裡');
+  if(!G6.wreck){G6.wreck=makePlane7(0x3c7be8);G6.wreck.userData.gear.visible=false;G6.sc.add(G6.wreck);}G6.wreck.visible=true;
+  showModal(`<h2>💥 墜機了！</h2><div style="text-align:center;font-size:56px">✈️💥🌊</div><p>${FL.crashWhy||''}飛機掉進 6 樓那條河裡爆炸了！還好你跳傘逃出來了。</p>
+   <p>現在要像 6 樓釣魚一樣：先<b>丟鉤子</b>勾住飛機，然後在 <b>20 秒</b>內<b>連按「💪 拉！」</b>把飛機拉上岸。修好以後從<b>最後通過的圈圈</b>繼續飛。</p>
+   <div class="row"><button class="pill red" id="mGo">去河邊救飛機</button></div>`);
+  $('mGo').onclick=hideModal;salvUI();
+}
+function salvUI(){const p=$('salv7Panel');
+  if(SV.ph==='hook')p.innerHTML=`<div class="msg">🪝 按「丟鉤子」勾住河裡的飛機</div><button class="mv" id="sv7Hook" style="background:#ffd23f;flex-basis:60%;font-size:20px">🪝 丟鉤子！</button>`;
+  else if(SV.ph==='tug'){p.innerHTML=`<div class="msg">💪 勾到了！快連按「拉！」把飛機拉上岸！</div><button class="mv tap6" id="sv7Pull" style="background:#e8483a;color:#fff;font-size:24px;flex-basis:70%;max-width:420px">💪 拉！</button>`;
+    $('sv7Pull').addEventListener('pointerdown',e=>{e.preventDefault();pull7();e.currentTarget.style.transform='scale(.93)';const t=e.currentTarget;setTimeout(()=>t.style.transform='',80);});}
+  else p.innerHTML='';
+  if($('sv7Hook'))$('sv7Hook').onclick=()=>{if(SV.ph!=='hook')return;SV.ph='fly';SV.t=0;sfx(500,.25,'triangle',.05,-200);salvUI();};
+  salvTop();}
+function pull7(){if(SV.ph!=='tug'||!$('modal').classList.contains('hidden'))return;SV.pos+=.055;sfx(600+SV.pos*300,.04,'square',.03);}
+function salvTop(){const t=$('salv7Top');if(SV.ph!=='tug'){t.innerHTML='';return;}
+  t.innerHTML=`<div class="hp"><b>⏱ ${Math.max(0,20-SV.time).toFixed(1)} 秒</b>　✈️ 把飛機拉上岸<div class="tug"><span>🌊 河裡</span><div class="tugbar"><i style="left:${(SV.pos+1)/2*100}%"></i></div><span>岸上 🏝️</span></div></div>`;}
+function updSalv(dt){
+  if(SV.ph==='fly'){SV.t+=dt;if(SV.t>.8){SV.ph='tug';SV.time=0;SV.pos=0;SV.surge=0;bigMsg7('🪝 勾到了！快拉！');salvUI();}}
+  else if(SV.ph==='tug'){SV.time+=dt;SV.surge-=dt;if(SV.surge<-rand(.6,1.4))SV.surge=rand(.4,.8);SV.pos-=.13*(SV.surge>0?1.7:.7)*dt;
+    if(SV.pos>=1){SV.ph='done';salvUI();stat('salvage');logRec('🪝 把墜機的飛機拉上岸');sfx(523,.2,'triangle',.06);setTimeout(()=>sfx(784,.3,'triangle',.06),150);
+      showModal(`<h2>🎉 飛機拉上岸了！</h2><div style="text-align:center;font-size:56px">✈️🔧✨</div><p>修理師傅把飛機修好了！回到天上，從最後通過的圈圈繼續比賽。</p><p style="font-size:13px;color:#7a6a4a">妖怪飛行員趁這段時間飛遠了一點，加油追上去！</p><div class="row"><button class="pill red" id="mGo">✈️ 繼續飛</button></div>`);
+      $('mGo').onclick=()=>{hideModal();resume7();};}
+    else if(SV.pos<=-1||SV.time>=20){SV.ph='hook';SV.pos=0;sfx(120,.4,'sawtooth',.05,-60);bigMsg7('繩子鬆掉了！');toast('飛機太重，又滑回河裡了……再丟一次鉤子！',2200);salvUI();}
+    salvTop();}
+}
+function resume7(){
+  if(G6&&G6.wreck)G6.wreck.visible=false;build7();scene='fly';setLayers();lay7();
+  const R=FL.rings[FL.lastRing];FL.ph='cruise';FL.inv=3;FL.vx=FL.vy=0;FL.v=25;FL.gear=false;FL.flaps=0;FL.thr=100;FL.boost=FL.slow=0;FL.cc=null;FL.fx.forEach(f=>G7.sc.remove(f.m));FL.fx=[];
+  if(R){FL.x=R.x;FL.y=R.y;FL.z=R.z-4;}else{FL.x=0;FL.y=26;FL.z=FL.rings[0].z+150;}
+  clearObs7();FL.obsNext=FL.z-120;FL.ai.forEach(a=>{if(a.fin==null)a.sP+=150;});
+  FL.hintK=FL.instK=FL.btnK=FL.topK='';bigMsg7('✈️ 繼續飛！');
+}
+function drawSalv(){
+  if(!G6)return;const hero=syncRiverHero(G6.heroHolder,'heroKey');
+  const pos=G6.wgeo.attributes.position;for(let i=0;i<pos.count;i++){const x=pos.getX(i),y=pos.getY(i);pos.setZ(i,Math.sin(x*.6+T*1.8)*.06+Math.cos(y*.9+T*1.3)*.05);}pos.needsUpdate=true;
+  G6.heroHolder.position.set(0,.3,-2.6);hero.rotation.y=Math.PI;const ud=hero.userData;
+  const tug=SV.ph==='tug',lean=tug?(SV.surge>0?.35:.1):0;ud.lL.rotation.x=tug?.3:0;ud.lR.rotation.x=tug?-.2:0;ud.aR.rotation.x=-1.3+lean+(tug?Math.sin(T*30)*.12:0);ud.aL.rotation.x=-1.1+lean;hero.rotation.x=tug?lean*-.6:0;
+  G6.rod.visible=false;G6.bob.visible=false;if(G6.reelFish)G6.reelFish.visible=false;
+  const w=G6.wreck,wz=SV.ph==='done'?-3.2:-10+(SV.pos+1)/2*6.5;w.visible=true;w.position.set(Math.sin(T*.7)*.3,-.35+Math.sin(T*2)*.06,wz);w.rotation.set(.18,Math.PI*.15,.4);
+  const showL=SV.ph==='tug'||SV.ph==='fly';G6.line.visible=showL;
+  if(showL){const k=SV.ph==='fly'?Math.min(1,SV.t/.8):1,lp=G6.line.geometry.attributes.position;lp.setXYZ(0,.3,1.3,-3.1);lp.setXYZ(1,.3+(w.position.x-.3)*k,1.3+(w.position.y+.4-1.3)*k+Math.sin(k*Math.PI)*2,-3.1+(wz+1.4+3.1)*k);lp.needsUpdate=true;}
+  const sh=shake>0?rand(-shake,shake)*.02:0;G4.cam.position.set(2.2+sh,3.6,1.6);G4.cam.lookAt(0,0,-7);
+  G4.R.render(G6.sc,G4.cam);
+}
+
 /* ---------- 紀錄 ---------- */
 function stat(k,n){save.st=save.st||{};save.st[k]=(save.st[k]||0)+(n||1);}
 function logRec(t){save.st=save.st||{};const d=new Date(),L=save.st.log=save.st.log||[];
@@ -3672,7 +4140,7 @@ function openRecords(){
   const box=(v,l)=>`<div class="st"><b>${v}</b><span>${l}</span></div>`;
   let h=`<h2>📜 我的紀錄</h2><div class="stats">
     ${box(cur+' 樓','現在在')}${box(Math.max(save.best||1,cur)+' 樓','最高到過')}${box(save.clears||0,'過關次數')}${box(save.tops||0,'登上 100 樓')}
-    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box(st.bosses||0,'打倒魔王')}${box(st.climbs||0,'攀岩進大樓')}${box(st.pets||0,'孵出寵物')}${box(st.battles||0,'寵物對戰勝利')}${box(st.beyWins||0,'陀螺對戰勝利')}${box(st.fish||0,'抓到的魚')}${box(st.wet||0,'被魚拉下河')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.shows||0,'馬戲團成功表演')}${box(st.escapes||0,'逃過妖怪')}${box(st.bestVotes||0,'畫畫最高分')}
+    ${box(st.rescued||0,'救回的人')}${box(st.monster||0,'變成妖怪')}${box(st.bosses||0,'打倒魔王')}${box(st.climbs||0,'攀岩進大樓')}${box(st.pets||0,'孵出寵物')}${box(st.battles||0,'寵物對戰勝利')}${box(st.beyWins||0,'陀螺對戰勝利')}${box(st.fish||0,'抓到的魚')}${box(st.wet||0,'被魚拉下河')}${box(st.landings||0,'飛機安全降落')}${box(st.crashes||0,'飛機墜機')}${box(st.raceWins||0,'飛機比賽冠軍')}${box((st.contestWins||0)+' / '+(st.contests||0),'畫畫比賽 贏／比')}${box(st.shows||0,'馬戲團成功表演')}${box(st.escapes||0,'逃過妖怪')}${box(st.bestVotes||0,'畫畫最高分')}
     ${box('💰 '+save.money,'現在的錢')}${box((save.toys||[]).length+' / '+TOYS.length,'收集的玩具')}${box(fmtTime(st.time),'一共玩了')}${box(IDS[P.id].e+' '+IDS[P.id].n,'現在的身分')}
   </div>`;
   const now=c&&c.rounds&&c.rounds.length?c.rounds.map(r=>r.imgs[0]):null,pics=now||st.lastPics;
@@ -3687,7 +4155,7 @@ $('hRec').onclick=openRecords;
 $('bRec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
 
 /* ---------- 暫停 / 存檔 ---------- */
-function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam'||scene==='river'||scene==='fish'||scene==='dive')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
+function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam'||scene==='river'||scene==='fish'||scene==='dive'||scene==='air'||scene==='fly'||scene==='salv')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
 function openPause(){
   if(!canPause())return;
   input.atk=false;input.keys={};joy.active=false;
@@ -3698,7 +4166,7 @@ function openPause(){
    ${scene==='draw2'?`<p>🎨 畫畫比賽：已經畫了 ${(save.c2&&save.c2.rounds.length)||0} / 10 張（畫好的圖都有存起來）</p>`:''}
    <p style="color:#7a6a4a">💾 存檔會記住樓層、錢和玩具。回家後接電話，會從這一層的開頭繼續。</p>
    <div class="row"><button class="pill green" id="pRes">▶️ 繼續</button><button class="pill blue" id="pSave">💾 存檔回家</button><button class="pill red" id="pRec">📜 看紀錄</button></div>
-   ${!['climb','battle','bey','beycam','fish','dive'].includes(scene)?`<div class="row"><button class="pill" id="pClimb">🧗 爬外牆換樓層</button></div>`:''}`);
+   ${!['climb','battle','bey','beycam','fish','dive','fly','salv'].includes(scene)?`<div class="row"><button class="pill" id="pClimb">🧗 爬外牆換樓層</button></div>`:''}`);
   $('pRes').onclick=hideModal;
   if($('pClimb'))$('pClimb').onclick=()=>{hideModal();const f=scene==='drive'?1:curFloor;$('cv4').style.display='none';logRec(`🧗 從 ${f} 樓爬到外牆`);startClimb(f);};
   $('pRec').onclick=openRecords;
@@ -3727,13 +4195,14 @@ function setLayers(){
   $('ctlDrive').classList.toggle('hidden',scene!=='drive');
   $('ctl3').classList.toggle('hidden',scene!=='bike3');
   $('ctl4').classList.toggle('hidden',scene!=='village');['bt4','bt4Top','bt4Fx'].forEach(id=>$(id).classList.toggle('hidden',scene!=='battle'));
-  $('cv4').style.display=(scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='river'||scene==='fish'||scene==='dive'||(scene==='result'&&(curFloor===4||curFloor===5||curFloor===6)))?'block':'none';
+  $('cv4').style.display=(scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='river'||scene==='fish'||scene==='dive'||scene==='air'||scene==='fly'||scene==='salv'||(scene==='result'&&(curFloor===4||curFloor===5||curFloor===6||curFloor===7)))?'block':'none';
+  $('air7').classList.toggle('hidden',scene!=='air');$('fly7').classList.toggle('hidden',scene!=='fly');$('salv7').classList.toggle('hidden',scene!=='salv');
   $('ctl6').classList.toggle('hidden',scene!=='river');$('fish6').classList.toggle('hidden',scene!=='fish');$('dive6').classList.toggle('hidden',scene!=='dive');
   $('ctl5').classList.toggle('hidden',scene!=='zoo');$('bey5').classList.toggle('hidden',scene!=='bey');
   ['cbVid','cbCv','cbTop','cbPanel','cbMsg'].forEach(id=>$(id).classList.toggle('hidden',scene!=='beycam'));
   $('ctlClimb').classList.toggle('hidden',scene!=='climb');$('cvClimb').style.display=scene==='climb'?'block':'none';
   $('ctlHome').classList.toggle('hidden',scene!=='home');
-  $('joyPad').classList.toggle('hidden',!['floor','draw2','village','zoo','river','dive'].includes(scene));resetKnob();
+  $('joyPad').classList.toggle('hidden',!['floor','draw2','village','zoo','river','dive','fly'].includes(scene));resetKnob();
   joy.active=false;input.atk=false;lastBtn='';refreshButtons();
 }
 /* 固定搖桿：圓心就是起點，拖動中間的小圓決定走的方向 */
@@ -3770,7 +4239,7 @@ let last=performance.now();
 function frame(now){
   let dt=Math.min(.033,(now-last)/1000);last=now;T+=dt;shake=Math.max(0,shake-dt*40);
   const paused=!$('modal').classList.contains('hidden');
-  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam'||scene==='river'||scene==='fish'||scene==='dive')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
+  if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam'||scene==='river'||scene==='fish'||scene==='dive'||scene==='air'||scene==='fly'||scene==='salv')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
   ctx.setTransform(DPR,0,0,DPR,0,0);
   if(scene==='home')drawHome(dt);
   else if(scene==='drive'){if(!paused)updDrive(dt);ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));drawDrive();ctx.restore();}
@@ -3784,8 +4253,11 @@ function frame(now){
   else if(scene==='river'){if(!paused)updRiver(dt);drawRiver();}
   else if(scene==='fish'){if(!paused)updFish(dt);drawFish();}
   else if(scene==='dive'){if(!paused)updDive(dt);drawDive();}
+  else if(scene==='air')drawAir();
+  else if(scene==='fly'){if(!paused)updFly(dt);drawFly();}
+  else if(scene==='salv'){if(!paused)updSalv(dt);drawSalv();}
   else if(scene==='climb'){if(!paused)updClimb(dt);drawClimb();}
-  else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else if(curFloor===3&&scene==='result')draw3();else if(curFloor===4&&scene==='result')drawVillage();else if(curFloor===5&&scene==='result')drawZoo();else if(curFloor===6&&scene==='result')drawRiver();else drawFloor();}
+  else if(scene==='floor'||scene==='result'){if(!paused&&scene==='floor')updFloor(dt);if(curFloor===2&&scene==='result')drawDraw2();else if(curFloor===3&&scene==='result')draw3();else if(curFloor===4&&scene==='result')drawVillage();else if(curFloor===5&&scene==='result')drawZoo();else if(curFloor===6&&scene==='result')drawRiver();else if(curFloor===7&&scene==='result')drawAir();else drawFloor();}
   requestAnimationFrame(frame);
 }
 P.r=idk()==='kid'?11:14;
