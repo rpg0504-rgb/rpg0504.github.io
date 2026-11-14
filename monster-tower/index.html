@@ -225,6 +225,10 @@
   #salv7Panel{position:absolute;left:0;right:0;bottom:0;padding:8px calc(10px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
   #salv7Panel .msg{flex:1 1 100%;background:#fffaf0;color:#2a2416;border:3px solid #3a2f1c;border-radius:14px;padding:8px 12px;font-weight:800;font-size:14px}
   #salv7Panel .mv{flex:1 1 30%;max-width:300px;min-height:64px;border:3px solid #3a2f1c;border-radius:16px;padding:12px 6px;font-family:inherit;font-weight:900;color:#2a2416;background:#fff;touch-action:none;transition:transform .06s}
+  #towerBtn{position:fixed;z-index:7;right:calc(12px + env(safe-area-inset-right));top:calc(66px + env(safe-area-inset-top));width:58px;height:58px;border-radius:16px;border:3px solid #3a2f1c;background:linear-gradient(#bfe6ff,#7fc4ef);color:#2a2416;font-size:24px;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0;box-shadow:0 4px 0 #3a2f1c;touch-action:manipulation;font-family:inherit}
+  #towerBtn small{font-size:10px;font-weight:900;margin-top:2px}#towerBtn:active{transform:translateY(3px);box-shadow:0 1px 0 #3a2f1c}
+  #towerBtn.hidden{display:none}
+  #towerBtn.mm{top:calc(10px + env(safe-area-inset-top));right:calc(min(150px,30vw) + 30px + env(safe-area-inset-right))}#towerBtn.mm2{top:calc(10px + env(safe-area-inset-top));right:calc(min(130px,26vw) + 30px + env(safe-area-inset-right))}#towerBtn.dv{top:calc(114px + env(safe-area-inset-top))}
   /* 攀岩 */
   #cvClimb{position:fixed;inset:0;width:100%;height:100%;display:none;z-index:2;touch-action:none}
   #ctlClimb{z-index:6}
@@ -374,6 +378,7 @@
 <div id="dialog" class="hidden"><div class="who" id="dlgWho"></div><div class="txt" id="dlgTxt"></div><div class="next">點一下繼續 ▶</div></div>
 <div id="modal" class="modal hidden"><div class="card" id="modalCard"></div></div>
 <div id="joyPad" class="hidden"><span class="arr" style="left:50%;top:13%">▲</span><span class="arr" style="left:50%;top:87%">▼</span><span class="arr" style="left:13%;top:50%">◀</span><span class="arr" style="left:87%;top:50%">▶</span><div id="joyKnob"></div></div>
+<button id="towerBtn" class="hidden">🏢<small>大樓外觀</small></button>
 <div id="toast"></div>
 
 <!-- 2 樓畫畫比賽：畫圖畫面 -->
@@ -4349,6 +4354,13 @@ function openRecords(){
 $('hRec').onclick=openRecords;
 $('bRec').addEventListener('pointerdown',e=>{e.preventDefault();if(canPause())openRecords();});
 
+/* ---------- 🏢 任何樓層都能直接回到大樓外觀 ---------- */
+const TOWER_SC=['floor','draw2','bike3','village','zoo','river','fish','dive','air','fly','salv'];
+function towerBtnSync(){const show=TOWER_SC.includes(scene)&&!drawUIOpen();const b=$('towerBtn');if(b.classList.contains('hidden')===show)b.classList.toggle('hidden',!show);if(b.dataset.sc!==scene){b.dataset.sc=scene;b.classList.toggle('mm',scene==='floor');b.classList.toggle('mm2',scene==='draw2');b.classList.toggle('dv',scene==='dive');}}
+$('towerBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();
+  if(!TOWER_SC.includes(scene)||!$('modal').classList.contains('hidden')||drawUIOpen())return;
+  const f=curFloor;input.atk=false;input.keys={};joy.active=false;if(typeof FL!=='undefined')FL.brk=false;
+  $('cv4').style.display='none';persist();logRec(`🏢 從 ${f} 樓回到大樓外觀`);sfx(660,.12,'triangle',.05);startClimb(f);});
 /* ---------- 暫停 / 存檔 ---------- */
 function canPause(){return (scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam'||scene==='river'||scene==='fish'||scene==='dive'||scene==='air'||scene==='fly'||scene==='salv')&&$('modal').classList.contains('hidden')&&!drawUIOpen();}
 function openPause(){
@@ -4435,7 +4447,7 @@ function frame(now){
   let dt=Math.min(.033,(now-last)/1000);last=now;T+=dt;shake=Math.max(0,shake-dt*40);
   const paused=!$('modal').classList.contains('hidden');
   if(!paused&&(scene==='floor'||scene==='drive'||scene==='draw2'||scene==='bike3'||scene==='climb'||scene==='village'||scene==='battle'||scene==='zoo'||scene==='bey'||scene==='beycam'||scene==='river'||scene==='fish'||scene==='dive'||scene==='air'||scene==='fly'||scene==='salv')&&!(dr.open&&dr.paused)){save.st.time=(save.st.time||0)+dt;if((save.st.time%10)<dt)persist();}
-  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.setTransform(DPR,0,0,DPR,0,0);towerBtnSync();
   if(scene==='home')drawHome(dt);
   else if(scene==='drive'){if(!paused)updDrive(dt);ctx.save();if(shake>0)ctx.translate(rand(-shake,shake),rand(-shake,shake));drawDrive();ctx.restore();}
   else if(scene==='draw2'){if(!paused&&!dr.open)updDraw2(dt);drawDraw2();if(dr.open)updDrawUI(dt);}
