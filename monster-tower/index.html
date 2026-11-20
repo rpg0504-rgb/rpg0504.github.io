@@ -229,6 +229,69 @@
   #towerBtn small{font-size:10px;font-weight:900;margin-top:2px}#towerBtn:active{transform:translateY(3px);box-shadow:0 1px 0 #3a2f1c}
   #towerBtn.hidden{display:none}
   #towerBtn.mm{top:calc(10px + env(safe-area-inset-top));right:calc(min(150px,30vw) + 30px + env(safe-area-inset-right))}#towerBtn.mm2{top:calc(10px + env(safe-area-inset-top));right:calc(min(130px,26vw) + 30px + env(safe-area-inset-right))}#towerBtn.dv{top:calc(114px + env(safe-area-inset-top))}
+  /* ===== 7 樓 視覺升級 ===== */
+  #cv4.g7{filter:saturate(1.28) contrast(1.07)}
+  #vig7{position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse 85% 75% at 50% 46%,rgba(0,0,0,0) 55%,rgba(4,10,28,.42) 100%),linear-gradient(180deg,rgba(255,214,150,.08),rgba(0,0,0,0) 40%,rgba(10,20,40,.12))}
+  #spd7{position:fixed;inset:-10%;z-index:3;pointer-events:none;opacity:0;transition:opacity .3s;background:repeating-conic-gradient(from 0deg at 50% 52%,rgba(255,255,255,0) 0deg 5deg,rgba(255,255,255,.55) 5deg 5.35deg);-webkit-mask-image:radial-gradient(circle at 50% 52%,transparent 34%,#000 78%);mask-image:radial-gradient(circle at 50% 52%,transparent 34%,#000 78%);animation:spd7 .25s linear infinite}
+  @keyframes spd7{from{transform:rotate(0)}to{transform:rotate(1.4deg)}}
+  #flare7{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0;mix-blend-mode:screen}
+  #flare7 i{position:absolute;border-radius:50%;transform:translate(-50%,-50%)}
+  #flare7 i:nth-child(1){width:220px;height:220px;background:radial-gradient(circle,rgba(255,250,225,.75),rgba(255,220,150,.15) 45%,transparent 70%)}
+  #flare7 i:nth-child(2){width:46px;height:46px;background:radial-gradient(circle,rgba(140,220,255,.35),transparent 70%)}
+  #flare7 i:nth-child(3){width:90px;height:90px;border:2px solid rgba(255,200,140,.25);background:radial-gradient(circle,transparent 55%,rgba(255,170,120,.18) 70%,transparent 75%)}
+  #flare7 i:nth-child(4){width:28px;height:28px;background:radial-gradient(circle,rgba(180,255,200,.4),transparent 70%)}
+  #flare7 i:nth-child(5){width:130px;height:130px;background:radial-gradient(circle,rgba(120,160,255,.16),transparent 70%)}
+  #fade7{position:fixed;inset:0;z-index:30;pointer-events:none;background:#04070f;opacity:0}
+  #air7Logo{position:absolute;left:50%;top:calc(10px + env(safe-area-inset-top));transform:translateX(-50%);text-align:center;pointer-events:none!important;filter:drop-shadow(0 4px 14px rgba(0,0,0,.45))}
+  #air7Logo b{display:block;font:900 clamp(18px,3.2vw,30px)/1.05 system-ui,"PingFang TC","Noto Sans TC",sans-serif;letter-spacing:2px;background:linear-gradient(180deg,#ffffff,#d8ecff 55%,#8fc4ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  #air7Logo small{display:inline-block;margin-top:4px;font:800 10px/1 system-ui,sans-serif;letter-spacing:3px;color:#ffe08a;background:rgba(8,16,36,.55);padding:4px 10px;border-radius:20px;border:1px solid rgba(255,224,138,.4)}
+  #air7 #a7Hud{background:linear-gradient(135deg,rgba(10,20,44,.82),rgba(22,46,92,.6));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(160,210,255,.28);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.15);padding:10px 14px;font-size:12.5px;line-height:1.75}
+  #air7 #a7Btns .pill{position:relative;overflow:hidden;color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:16px;font-weight:900;letter-spacing:.5px;text-shadow:0 1px 2px rgba(0,0,0,.35);box-shadow:0 8px 20px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.45),inset 0 -3px 0 rgba(0,0,0,.18);padding:13px 14px;font-size:15px}
+  #air7 #a7Btns .pill::after{content:'';position:absolute;left:-40%;top:0;width:30%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);animation:shine7 4.5s ease-in-out infinite}
+  @keyframes shine7{0%,70%{left:-40%}100%{left:130%}}
+  #air7 #a7Sim{background:linear-gradient(160deg,#4fa8ff,#1d5fd8)}#air7 #a7Race{background:linear-gradient(160deg,#ff7a59,#d6283a)}
+  #air7 #a7Hangar{background:linear-gradient(160deg,#ffd257,#e08a00)!important;color:#3a2400!important;text-shadow:none}#air7 #a7Pax{background:linear-gradient(160deg,#4fe0c8,#0f8f9e)!important}
+  #air7 #a7Door{background:linear-gradient(160deg,#7be36a,#22963a);grid-column:span 2}
+  #air7 .btn.pz,#fly7 .btn.pz{background:rgba(10,20,44,.6);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.3);color:#fff;box-shadow:0 6px 16px rgba(0,0,0,.3)}
+  #fly7Top .hp{background:linear-gradient(135deg,rgba(8,16,36,.82),rgba(18,38,76,.62))!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#fff!important;border:1px solid rgba(160,210,255,.3)!important;border-radius:14px!important;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+  #fly7Top .bar{background:rgba(255,255,255,.14)!important;height:7px!important}#fly7Top .bar i{box-shadow:0 0 10px currentColor}
+  #fly7Hint{background:linear-gradient(135deg,rgba(8,16,36,.86),rgba(16,34,70,.72))!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);color:#eaf4ff!important;border:1px solid rgba(160,210,255,.3)!important;border-left:4px solid #49c6ff!important;border-radius:12px!important;box-shadow:0 10px 26px rgba(0,0,0,.35)}
+  #fly7Hint small{color:#a9c6e6!important}#fly7Hint .big7{color:#ffd257!important;text-shadow:0 0 12px rgba(255,210,87,.5)}#fly7Hint b{color:#fff}
+  #fly7Msg{font-family:system-ui,"PingFang TC",sans-serif;letter-spacing:2px;color:#fff;text-shadow:0 0 18px rgba(80,180,255,.9),0 3px 0 #0b2a5a,0 6px 18px rgba(0,0,0,.5)}
+  #fly7Panel{background:linear-gradient(180deg,rgba(26,32,44,.92),rgba(12,15,22,.95))!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:16px!important;box-shadow:0 -6px 24px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08)}
+  #fly7Inst{color:#8fd8ff!important;letter-spacing:.5px}#fly7Inst b{color:#6dffb0!important;text-shadow:0 0 8px rgba(109,255,176,.45)}
+  .b7{background:linear-gradient(180deg,#3a4458,#222836)!important;border:1px solid #4e5a72!important;box-shadow:0 3px 0 #0b0e14,inset 0 1px 0 rgba(255,255,255,.12)!important;border-radius:11px!important}
+  .b7.on{background:linear-gradient(180deg,#2f8a52,#1d5a36)!important;border-color:#6dffb0!important;box-shadow:0 3px 0 #0b0e14,0 0 12px rgba(109,255,176,.35),inset 0 1px 0 rgba(255,255,255,.2)!important}
+  .b7.next7{border-color:#ffd257!important;animation:pulse7b .75s infinite alternate!important}
+  @keyframes pulse7b{from{box-shadow:0 3px 0 #0b0e14,0 0 0 2px #ffd257,0 0 8px rgba(255,210,87,.6)}to{box-shadow:0 3px 0 #0b0e14,0 0 0 3px #ffd257,0 0 24px rgba(255,210,87,.95)}}
+  #fly7Frame{border-color:#0c1118!important;box-shadow:inset 0 0 0 2px #2a3442,inset 0 0 50px rgba(0,0,0,.55)!important}
+  #ring7{position:absolute;display:none;pointer-events:none!important;transform:translate(-50%,-50%);z-index:4}
+  #ring7.on{display:block}
+  #ring7 .rt{width:62px;height:62px;border-radius:50%;border:3px solid rgba(255,216,96,.95);box-shadow:0 0 16px rgba(255,216,96,.7),inset 0 0 12px rgba(255,216,96,.4);display:flex;align-items:center;justify-content:center;animation:ringp7 1s ease-in-out infinite}
+  #ring7 b{font:900 18px/1 system-ui,sans-serif;color:#fff;text-shadow:0 0 8px #ffb000}#ring7 small{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:4px;white-space:nowrap;font:800 11px/1 system-ui,sans-serif;color:#ffe9a8;background:rgba(8,16,36,.7);padding:3px 7px;border-radius:10px}
+  #ring7.out .rt{width:46px;height:46px;border-radius:12px;transform:rotate(var(--rot)) ;border-color:#ffd860;background:rgba(8,16,36,.55)}
+  #ring7.out .rt::after{content:'';position:absolute;right:-12px;border:9px solid transparent;border-left:12px solid #ffd860}
+  #ring7.out b{transform:rotate(calc(-1 * var(--rot)))}
+  @keyframes ringp7{50%{transform:scale(1.08)}}
+  #ring7.out .rt{animation:none}
+  #trk7{position:absolute;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top));width:min(56vw,400px);height:22px;pointer-events:none!important}
+  #trk7 .ln{position:absolute;left:0;right:0;top:9px;height:4px;border-radius:2px;background:linear-gradient(90deg,rgba(255,255,255,.15),rgba(255,255,255,.45))}
+  #trk7 .d{position:absolute;top:4px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:var(--c,#fff);border:2px solid #fff;box-shadow:0 0 8px var(--c,#fff);transition:left .25s linear}
+  #trk7 .d.me{--c:#49c6ff;width:18px;height:18px;margin-left:-9px;top:2px;z-index:2}
+  #trk7 .d em{position:absolute;top:17px;left:50%;transform:translateX(-50%);font:800 9px/1 system-ui,sans-serif;color:#fff;white-space:nowrap;font-style:normal;text-shadow:0 1px 3px #000}
+  #trk7 .fl{position:absolute;right:-18px;top:0;font-size:14px}
+  #fly7.race7 #fly7Hint{top:calc(96px + env(safe-area-inset-top))}
+  .card.m7{background:linear-gradient(160deg,#0f1a33,#16284d 60%,#0f1a33);color:#e9f2ff;border:1px solid rgba(160,210,255,.35);box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.12);border-radius:22px}
+  .card.m7 h2{background:linear-gradient(180deg,#fff,#b9dcff);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:1px}
+  .card.m7 p,.card.m7 h3{color:#d8e6f8}.card.m7 b{color:#ffd257}
+  .card.m7 .tips{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:#d8e6f8;border-radius:14px}
+  .card.m7 .pill{border:1px solid rgba(255,255,255,.3);box-shadow:0 6px 16px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.35)}
+  .card.m7 .pc7{background:linear-gradient(170deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:1px solid rgba(160,210,255,.25);border-radius:16px;color:#e9f2ff}
+  .card.m7 .pc7.use{border-color:#6dffb0;box-shadow:0 0 0 1px #6dffb0,0 0 18px rgba(109,255,176,.25);background:linear-gradient(170deg,rgba(109,255,176,.14),rgba(255,255,255,.03))}
+  .card.m7 .pc7 small{color:#a9c6e6}.card.m7 .st7,.card.m7 .pc7 .st7 b{color:#e9f2ff}.card.m7 .bar7{background:rgba(255,255,255,.12)}
+  .card.m7 .pc7 .top{flex-direction:column;align-items:flex-start}
+  .th7{width:100%;aspect-ratio:9/5;object-fit:contain;border-radius:12px;background:radial-gradient(ellipse at 50% 70%,rgba(120,180,255,.28),rgba(255,255,255,0) 70%),linear-gradient(180deg,#1d3a6a,#0f1e3a);border:1px solid rgba(255,255,255,.1)}
+  .card.m7 .pc7.lock .th7{filter:saturate(.75) brightness(.9)}
   /* 攀岩 */
   #cvClimb{position:fixed;inset:0;width:100%;height:100%;display:none;z-index:2;touch-action:none}
   #ctlClimb{z-index:6}
@@ -325,7 +388,9 @@
 </div>
 
 <!-- 7 樓：機場 -->
+<div id="vig7" class="hidden"></div><div id="spd7" class="hidden"></div><div id="flare7" class="hidden"><i></i><i></i><i></i><i></i><i></i></div><div id="fade7"></div>
 <div id="air7" class="layer hidden">
+  <div id="air7Logo"><b>SKYTOWER 國際機場</b><small>7F · PILOT ACADEMY</small></div>
   <div id="a7Hud" class="v4hud"></div>
   <button class="btn pz" id="a7Pause" style="right:calc(66px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">⏸</button>
   <button class="btn pz" id="a7Rec" style="right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">📜</button>
@@ -336,6 +401,8 @@
   <div id="fly7Flash"></div>
   <div id="fly7Top" class="hpRow" style="justify-content:center"></div>
   <div id="fly7Hint"></div>
+  <div id="trk7" class="hidden"></div>
+  <div id="ring7"><div class="rt"><b>1</b></div><small></small></div>
   <div id="fly7Msg" class="bigMsg"></div>
   <button class="btn pz" id="fly7Pause" style="right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">⏸</button>
   <div id="fly7Panel"><div id="fly7Inst"></div><div id="fly7Btns"></div></div>
@@ -3741,7 +3808,7 @@ const DEST7=[
   {k:'snow',n:'雪山小鎮',e:'🏔️',dist:1.35,rate:3,sky:[0x6a8fb8,0xe9f0f6],obs:{storm:3,geese:3,turb:2}},
   {k:'desert',n:'沙漠綠洲',e:'🏜️',dist:1.6,rate:3.5,sky:[0x3f8ad0,0xf2dcb0],obs:{turb:4,ufo:2.5,monster:2}},
   {k:'city',n:'大都市',e:'🌆',dist:1.9,rate:4,sky:[0x2a3270,0xf2a060],obs:{drone:4,heli:3,blimp:2.5,plane:2}}];
-const SKY7=[0x3a7fd0,0xc8e0f2];
+const SKY7=[0x1f63c8,0xa8d2f2];
 const STEP7={
   to:[{b:'bat',t:'打開電池 BATTERY',d:'飛機要先有電，儀表才會亮。'},
       {b:'fuel',t:'打開燃油泵 FUEL PUMP',d:'把燃油送到引擎。'},
@@ -4326,6 +4393,162 @@ function drawSalv(){
   const sh=shake>0?rand(-shake,shake)*.02:0;G4.cam.position.set(2.2+sh,3.6,1.6);G4.cam.lookAt(0,0,-7);
   G4.R.render(G6.sc,G4.cam);
 }
+
+/* =========================================================
+   7 樓 視覺升級包：天空反射、影子、電影色調、凝結尾、火焰煙霧、
+   發光圈圈、機場細節、指示箭頭、名次追蹤、玻璃質感介面、機庫 3D 照片
+   ========================================================= */
+const VX7={env:{},th:{},hist:[[],[]],lastRing:-1,sparks:[]};
+const vtex7=(k,w,h,fn)=>VX7[k]||(VX7[k]=canvasTex7(w,h,fn));
+const glowTex7=()=>vtex7('glowT',128,128,(g)=>{const r=g.createRadialGradient(64,64,0,64,64,64);r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.22,'rgba(255,255,255,.65)');r.addColorStop(.55,'rgba(255,255,255,.18)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,128,128);});
+const smokeTex7=()=>vtex7('smokeT',128,128,(g)=>{for(let i=0;i<26;i++){const x=64+rand(-24,24),y=64+rand(-24,24),r=rand(12,34),gr=g.createRadialGradient(x,y,0,x,y,r);gr.addColorStop(0,'rgba(255,255,255,.32)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.beginPath();g.arc(x,y,r,0,7);g.fill();}});
+const grassTex7=()=>{if(VX7.grass)return VX7.grass;const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d'),im=g.createImageData(256,256);
+  for(let i=0;i<256*256;i++){const n=212+Math.random()*43-(Math.random()<.04?60:0);im.data[i*4]=n;im.data[i*4+1]=n;im.data[i*4+2]=n;im.data[i*4+3]=255;}g.putImageData(im,0,0);
+  g.globalAlpha=.25;for(let i=0;i<500;i++){g.strokeStyle=Math.random()<.5?'#9a9a9a':'#ffffff';g.beginPath();const x=Math.random()*256,y=Math.random()*256;g.moveTo(x,y);g.lineTo(x+rand(-2,2),y-rand(3,8));g.stroke();}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=4;return VX7.grass=t;};
+function envFor7(top,hor,R){R=R||G4.R;const key=top+'_'+hor+'_'+(R===G4.R?'m':'t');if(VX7.env[key])return VX7.env[key];
+  const c=document.createElement('canvas');c.width=512;c.height=256;const g=c.getContext('2d'),hx=v=>'#'+v.toString(16).padStart(6,'0');
+  const gr=g.createLinearGradient(0,0,0,256);gr.addColorStop(0,hx(top));gr.addColorStop(.47,hx(hor));gr.addColorStop(.5,'#9aa88a');gr.addColorStop(.62,'#55663f');gr.addColorStop(1,'#2a3320');g.fillStyle=gr;g.fillRect(0,0,512,256);
+  const s=g.createRadialGradient(330,86,0,330,86,70);s.addColorStop(0,'rgba(255,252,235,1)');s.addColorStop(.12,'rgba(255,245,210,.9)');s.addColorStop(1,'rgba(255,230,180,0)');g.fillStyle=s;g.fillRect(0,0,512,256);
+  const t=new THREE.CanvasTexture(c);t.mapping=THREE.EquirectangularReflectionMapping;const pm=new THREE.PMREMGenerator(R);const rt=pm.fromEquirectangular(t);pm.dispose();t.dispose();return VX7.env[key]=rt.texture;}
+function shadowOn7(o){o.traverse(m=>{if(m.isMesh)m.castShadow=true;});}
+/* --- 地形細節貼圖 --- */
+{const _t7=terrain7;terrain7=function(len,zc,pal,hf){const m=_t7(len,zc,pal,hf);const t=grassTex7().clone();t.needsUpdate=true;t.repeat.set(1700/22,len/22);m.material.map=t;m.material.needsUpdate=true;m.receiveShadow=true;return m;};}
+/* --- 天空換顏色時，反射也一起換 --- */
+{const _s7=setSky7;setSky7=function(top,hor){_s7(top,hor);if(G7&&G7.sc){G7.sc.environment=envFor7(top,hor);G7.skyT=[top,hor];}};}
+/* --- 第一次建好機場時加強畫面 --- */
+{const _b7=build7;build7=function(){const first=!G7;_b7();if(first&&G7)enhance7();};}
+function enhance7(){
+  const R=G4.R,sc=G7.sc;R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+  sc.traverse(o=>{if(o.isDirectionalLight)G7.sun=o;if(o.isHemisphereLight)G7.hemi=o;});
+  const sun=G7.sun;sun.castShadow=true;sun.color.setHex(0xfff0d0);sun.intensity=1.25;sun.shadow.mapSize.set(1024,1024);
+  Object.assign(sun.shadow.camera,{left:-36,right:36,top:36,bottom:-36,near:1,far:300});sun.shadow.camera.updateProjectionMatrix();sun.shadow.bias=-.0005;if('normalBias' in sun.shadow)sun.shadow.normalBias=.03;sc.add(sun.target);
+  if(G7.hemi){G7.hemi.intensity=.6;G7.hemi.color.setHex(0xd2e6ff);G7.hemi.groundColor.setHex(0x5a5234);}
+  [G7.rw,G7.lrw].forEach(g=>g.traverse(o=>{if(o.isMesh)o.receiveShadow=true;}));
+  sc.traverse(o=>{if(o.isMesh&&o.material&&o.material.color){const h=o.material.color.getHex();
+    if(h===0x2f6f8f){o.material.roughness=.03;o.material.metalness=.9;o.material.color.setHex(0x3f86a8);}
+    if(h===0x5d86a8){o.material.roughness=.05;o.material.metalness=.95;}
+    if(h===0x5a5d62||h===0x3a3d42||h===0x45484e)o.receiveShadow=true;}});
+  G7.park.forEach(shadowOn7);G7.ai.forEach(shadowOn7);
+  airportDeco7();makeTrails7();
+  sc.environment=envFor7(SKY7[0],SKY7[1]);sc.fog.near=240;sc.fog.far=1000;
+}
+function airportDeco7(){
+  const sc=G7.sc,g=new THREE.Group();sc.add(g);G7.deco=g;
+  const flat=(w,h,c,x,y,z)=>{const p=mk(new THREE.PlaneGeometry(w,h),M3(c,{roughness:.95}),x,y,z,g);p.rotation.x=-Math.PI/2;p.receiveShadow=true;return p;};
+  // 滑行道與黃色中線
+  flat(11,540,0x4a4d52,17,.07,-250);for(let z=5;z>-505;z-=8)flat(.25,4,0xf2c300,17,.09,z);
+  [-40,-200,-380].forEach(z=>{flat(10,14,0x4a4d52,11,.071,z);});
+  // 空橋
+  [[-62,0],[-92,.4]].forEach(([z,h])=>{const b=mk(new THREE.BoxGeometry(9,2.2,2.2),M3(0xd8dde2,{metalness:.4,roughness:.35}),-24,3.4+h,z+.5,g);b.castShadow=true;mk(new THREE.BoxGeometry(9.1,.6,2.3),M3(0x5d86a8,{metalness:.9,roughness:.08}),-24,3.6+h,z+.5,g);mk(new THREE.CylinderGeometry(.3,.3,3.2,8),M3(0x777777),-21,1.6,z+.5,g);});
+  // 風向袋
+  mk(new THREE.CylinderGeometry(.08,.1,6,6),M3(0xdddddd,{metalness:.6}),12,3,-24,g);const ws=new THREE.Group();ws.position.set(12,5.8,-24);g.add(ws);
+  for(let i=0;i<5;i++){const s=mk(new THREE.CylinderGeometry(.5-i*.07,.43-i*.07,.6,12,1,true),M3(i%2?0xffffff:0xff5a1f,{side:THREE.DoubleSide}),0,0,-.3-i*.6,ws);s.rotation.x=Math.PI/2;}
+  G7.sock=ws;
+  // 加油車、行李車、樓梯車
+  const veh=(x,z,ry,kind)=>{const v=new THREE.Group();v.position.set(x,0,z);v.rotation.y=ry;g.add(v);
+    mk(new THREE.BoxGeometry(1.6,1.3,1.4),M3(kind==='fuel'?0xf2c300:0xffffff,{roughness:.4}),0,.95,-1.5,v);mk(new THREE.BoxGeometry(1.5,.5,.05),M3(0x1f3a5a,{metalness:.6,roughness:.1}),0,1.25,-2.2,v);
+    if(kind==='fuel'){const t=mk(new THREE.CylinderGeometry(.75,.75,3,14),M3(0xe8eaec,{metalness:.7,roughness:.25}),0,1.1,.6,v);t.rotation.x=Math.PI/2;}
+    else{const s=mk(new THREE.BoxGeometry(1.2,.2,3.2),M3(0xcfd4d8,{metalness:.5}),0,1.6,.8,v);s.rotation.x=-.5;}
+    [-.8,.8].forEach(xx=>[-1.6,1.2].forEach(zz=>{const w=mk(new THREE.CylinderGeometry(.32,.32,.25,10),M3(0x1a1a1a),xx,.32,zz,v);w.rotation.z=Math.PI/2;}));v.traverse(o=>{if(o.isMesh)o.castShadow=true;});};
+  veh(-8,-55,.3,'fuel');veh(-9,-98,-.2,'stairs');
+  for(let i=0;i<4;i++){const c=mk(new THREE.BoxGeometry(1,.7,1.4),M3(0x6a7684),-4+i*1.5,.55,-72,g);c.castShadow=true;}
+  // 照明燈塔
+  [[-30,-10],[-30,-110],[6,-130]].forEach(([x,z])=>{mk(new THREE.CylinderGeometry(.15,.22,14,8),M3(0x9aa2aa,{metalness:.6}),x,7,z,g);mk(new THREE.BoxGeometry(2.2,.8,.6),M3(0xffffff,{emissive:0xfff2c0,emissiveIntensity:.8}),x,14,z,g);});
+  // 雷達
+  const rd=new THREE.Group();rd.position.set(-25,22.4,8);g.add(rd);mk(new THREE.BoxGeometry(2.6,.6,.2),M3(0xffffff,{metalness:.4}),0,.6,0,rd);G7.radar=rd;
+  // 第二座機庫
+  const hg=mk(new THREE.CylinderGeometry(7,7,18,20,1,false,0,Math.PI),M3(0x9aa4b0,{metalness:.6,roughness:.35}),30,0,-100,g);hg.rotation.set(Math.PI/2,0,Math.PI/2);
+  // 降落跑道的 PAPI 燈
+  [0,1,2,3].forEach(i=>mk(new THREE.BoxGeometry(.7,.45,.5),new THREE.MeshBasicMaterial({color:i<2?0xff3020:0xffffff}),-10.5-i*1.2,.35,-30,G7.lrw));
+}
+/* --- 凝結尾（從翼尖拉出來的白色尾巴） --- */
+function makeTrails7(){
+  const N=56,mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,fog:false,uniforms:{},vertexShader:'attribute float a;varying float va;void main(){va=a;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',fragmentShader:'varying float va;void main(){gl_FragColor=vec4(1.0,1.0,1.0,va);}'});
+  G7.trails=[0,1].map(()=>{const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(N*2*3),3));geo.setAttribute('a',new THREE.BufferAttribute(new Float32Array(N*2),1));
+    const idx=[];for(let i=0;i<N-1;i++){const a=i*2;idx.push(a,a+1,a+2,a+1,a+3,a+2);}geo.setIndex(idx);const m=new THREE.Mesh(geo,mat);m.frustumCulled=false;m.visible=false;G7.sc.add(m);return m;});
+  G7.trailN=N;}
+function updTrails7(cam){
+  const on=scene==='fly'&&G7.pl.visible&&FL.mode!=='sim'&&(FL.ph==='cruise'||FL.ph==='climb'||FL.ph==='appr');
+  if(!on){VX7.hist=[[],[]];G7.trails.forEach(t=>t.visible=false);return;}
+  const m=G7.pl.children[0];if(!m)return;if(VX7.trK!==G7.plK){VX7.trK=G7.plK;m.updateMatrixWorld(true);const b=new THREE.Box3().setFromObject(m);VX7.span=(b.max.x-b.min.x)/2*.94/(m.scale.x||1);VX7.hist=[[],[]];}
+  G7.pl.updateMatrixWorld(true);const N=G7.trailN,tc=cam.position;
+  [-1,1].forEach((s,i)=>{const p=new THREE.Vector3(s*VX7.span,-.02,.35).applyMatrix4(m.matrixWorld),h=VX7.hist[i];h.unshift({p,t:T});if(h.length>N)h.pop();
+    const geo=G7.trails[i].geometry,pa=geo.attributes.position,aa=geo.attributes.a;
+    for(let k=0;k<N;k++){const q=h[Math.min(k,h.length-1)],q2=h[Math.min(k+1,h.length-1)],age=Math.min(1,k/(N-1)),w=.05+age*.55;
+      const dir=new THREE.Vector3().subVectors(q.p,q2.p);if(dir.lengthSq()<1e-6)dir.set(0,0,1);const toC=new THREE.Vector3().subVectors(tc,q.p),off=new THREE.Vector3().crossVectors(dir,toC).normalize().multiplyScalar(w);
+      pa.setXYZ(k*2,q.p.x+off.x,q.p.y+off.y,q.p.z+off.z);pa.setXYZ(k*2+1,q.p.x-off.x,q.p.y-off.y,q.p.z-off.z);const al=k<h.length?(1-age)*(1-age)*.55*Math.min(1,k/3):0;aa.setX(k*2,al);aa.setX(k*2+1,al);}
+    pa.needsUpdate=true;aa.needsUpdate=true;G7.trails[i].visible=true;});
+}
+/* --- 爆炸、煙霧改成柔和的發光粒子 --- */
+fx7=function(x,y,z,col,s,life,vy){const fire=col===0xff9f1c||col===0xffd23f||col===0xe8483a,white=col===0xffffff;
+  const m=new THREE.Sprite(new THREE.SpriteMaterial({map:fire?glowTex7():smokeTex7(),color:fire?col:(white?0xf2f7ff:0x403c3a),transparent:true,depthWrite:false,opacity:.9,blending:fire?THREE.AdditiveBlending:THREE.NormalBlending}));
+  m.position.set(x+rand(-1,1),y+rand(-1,1),z+rand(-1,1));m.scale.setScalar(s*(fire?3.2:2.6));G7.sc.add(m);
+  FL.fx.push({m,life,max:life,vx:rand(-3,3),vy:vy!==undefined?vy:rand(-1,4),vz:rand(-3,3),g:rand(1.5,3)});};
+function burst7(pos,col){for(let i=0;i<18;i++){const m=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex7(),color:col,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));m.position.copy(pos);m.scale.setScalar(rand(.6,1.4));G7.sc.add(m);
+  const a=Math.random()*Math.PI*2;VX7.sparks.push({m,v:new THREE.Vector3(Math.cos(a)*rand(4,9),Math.sin(a)*rand(4,9),rand(-2,2)),t:0,life:rand(.5,.9)});}}
+/* --- 發光的圈圈 --- */
+function decorRings7(){G7.ringM.forEach((m,i)=>{const c=i===11?0xff5a40:0xffd860;m.material.emissiveIntensity=1.6;m.castShadow=true;
+  const h=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex7(),color:c,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.5}));h.scale.set(12,12,1);m.add(h);
+  const rim=new THREE.Mesh(new THREE.TorusGeometry(3.05,.07,6,40),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.85,blending:THREE.AdditiveBlending}));m.add(rim);
+  for(let k=0;k<4;k++){const ch=new THREE.Mesh(new THREE.ConeGeometry(.28,.6,3),new THREE.MeshBasicMaterial({color:c}));ch.position.set(Math.cos(k*Math.PI/2)*3.5,Math.sin(k*Math.PI/2)*3.5,0);ch.rotation.z=k*Math.PI/2+Math.PI/2;m.add(ch);}});}
+{const _sf=startFlight;startFlight=function(mode,job){_sf(mode,job);if(!G7)return;decorRings7();VX7.lastRing=0;VX7.hist=[[],[]];fade7();
+  const s=new THREE.Vector3();G7.pl.traverse(o=>{if(o.isMesh)o.castShadow=true;});};}
+{const _sp=syncPlane7;syncPlane7=function(){const k=G7.plK,m=_sp();if(G7.plK!==k||!VX7.shK){VX7.shK=1;shadowOn7(G7.pl);}return m;};}
+function fade7(){const f=$('fade7');f.style.transition='none';f.style.opacity=1;requestAnimationFrame(()=>requestAnimationFrame(()=>{f.style.transition='opacity .7s ease-out';f.style.opacity=0;}));}
+/* --- 每一格畫面：太陽影子跟著飛機、色調、凝結尾、指示箭頭、名次條、鏡頭光暈 --- */
+{const _r7=render7;render7=function(cam){
+  const R=G4.R,sun=G7.sun,v=new THREE.Vector3();
+  // 大廳：背景有飛機起飛
+  if(scene==='air'||(scene==='result'&&curFloor===7)){const a=G7.ai[1],t=(T%26);a.visible=true;const z=-30-Math.max(0,t-2)*Math.max(0,t-2)*1.6,y=GY7+(z<-260?(-260-z)*.12:0);a.position.set(0,y+a.userData.yo,z);a.rotation.set(z<-260?-.12:0,0,0);a.userData.gear.visible=y<GY7+3;a.children.forEach(c=>{if(c.isSprite)c.visible=false;});
+    if(G7.sock)G7.sock.rotation.y=Math.sin(T*.7)*.25+.6;}
+  else G7.ai[1].children.forEach(c=>{if(c.isSprite)c.visible=true;});
+  if(G7.radar)G7.radar.rotation.y=T*1.5;if(G7.sock)G7.sock.children.forEach((s,i)=>s.rotation.z=Math.sin(T*3+i)*.06);
+  // 影子跟著主角飛機
+  if(G7.pl.visible)G7.pl.getWorldPosition(v);else{cam.getWorldDirection(v);v.multiplyScalar(22).add(cam.position);v.y=Math.max(0,v.y-6);}
+  sun.target.position.copy(v);sun.position.copy(v).add(new THREE.Vector3(.45,.75,.48).normalize().multiplyScalar(140));sun.target.updateMatrixWorld();
+  // 火花
+  for(const s of VX7.sparks){s.t+=1/60;s.m.position.addScaledVector(s.v,1/60);s.m.material.opacity=Math.max(0,1-s.t/s.life);if(s.t>s.life)G7.sc.remove(s.m);}VX7.sparks=VX7.sparks.filter(s=>s.t<=s.life);
+  if(scene==='fly'){
+    if(FL.mode==='race'&&FL.ringI>VX7.lastRing){const r=FL.rings[FL.ringI-1];if(r)burst7(new THREE.Vector3(r.x,r.y,r.z),FL.slow>0?0xff6060:0xffe070);VX7.lastRing=FL.ringI;}
+    const want=60+(FL.boost>0?9:0)+(FL.ph==='cruise'&&FL.mode!=='sim'?Math.max(0,FL.v-25)*.4:0);if(Math.abs(cam.fov-want)>.05){cam.fov+=(want-cam.fov)*.12;cam.updateProjectionMatrix();}
+    updTrails7(cam);hud7x(cam);}
+  else{if(cam.fov!==60){cam.fov=60;cam.updateProjectionMatrix();}if(G7.trails)G7.trails.forEach(t=>t.visible=false);}
+  flare7(cam);
+  const tm=R.toneMapping,te=R.toneMappingExposure;R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=VX7.exp||1.05;
+  _r7(cam);R.toneMapping=tm;R.toneMappingExposure=te;};}
+function flare7(cam){const f=$('flare7');const sp=G7.sunS.position.clone().project(cam);
+  if(sp.z>1||Math.abs(sp.x)>1.25||Math.abs(sp.y)>1.25){f.style.opacity=0;return;}
+  const W=innerWidth,H=innerHeight,sx=(sp.x+1)/2*W,sy=(1-sp.y)/2*H,cx=W/2,cy=H/2,d=Math.hypot(sx-cx,sy-cy)/Math.hypot(cx,cy);
+  f.style.opacity=Math.max(0,.9-d*.6);[...f.children].forEach((e,i)=>{const k=[0,.35,.62,.9,1.25][i];e.style.left=(sx+(cx-sx)*k*2)+'px';e.style.top=(sy+(cy-sy)*k*2)+'px';});}
+function hud7x(cam){
+  $('fly7').classList.toggle('race7',FL.mode==='race');
+  // 下一個圈圈的方向
+  const ra=$('ring7');if(FL.mode==='race'&&FL.ph==='cruise'&&FL.ringI<FL.rings.length&&FL.z-FL.rings[FL.ringI].z>18){const r=FL.rings[FL.ringI],p=new THREE.Vector3(r.x,r.y,r.z),dist=Math.max(0,Math.round(FL.z-r.z)),q=p.clone().project(cam);
+    const W=innerWidth,H=innerHeight,m=46;let x=(q.x+1)/2*W,y=(1-q.y)/2*H,inside=q.z<1&&x>m&&x<W-m&&y>70&&y<H-70;
+    if(!inside){if(q.z>1){x=W-x;y=H-y;}const cx=W/2,cy=H/2,dx=x-cx,dy=y-cy,k=Math.min((W/2-m)/Math.abs(dx||1e-3),(H/2-70)/Math.abs(dy||1e-3));x=cx+dx*k;y=cy+dy*k;ra.style.setProperty('--rot',Math.atan2(dy,dx)+'rad');}
+    ra.className=inside?'on in':'on out';ra.style.left=x+'px';ra.style.top=y+'px';ra.querySelector('b').textContent=`${FL.ringI+1}`;ra.querySelector('small').textContent=`${dist} m`;}
+  else ra.className='';
+  // 名次追蹤條
+  const tk=$('trk7');if(FL.mode==='race'){tk.classList.remove('hidden');const z0=-250,z1=FL.rings[11].z,pr=z=>clamp((z0-z)/(z0-z1),0,1);
+    if(!tk.dataset.on){tk.dataset.on=1;tk.innerHTML='<div class="ln"></div>'+FL.ai.map((a,i)=>`<i class="d ai" style="--c:#${a.c.toString(16).padStart(6,'0')}"><em>${a.n}</em></i>`).join('')+'<i class="d me"><em>我</em></i><span class="fl">🏁</span>';}
+    const ds=tk.querySelectorAll('.d');FL.ai.forEach((a,i)=>ds[i].style.left=(pr(a.fin!=null?z1:a.z)*100)+'%');ds[ds.length-1].style.left=(pr(FL.z)*100)+'%';}
+  else{tk.classList.add('hidden');tk.dataset.on='';}
+  $('spd7').style.opacity=FL.ph==='cruise'&&FL.mode!=='sim'?(FL.boost>0?.75:Math.max(0,(FL.v-26)/12)*.5):0;
+}
+{const _sl=setLayers;setLayers=function(){_sl();const on7=scene==='air'||scene==='fly'||(scene==='result'&&curFloor===7);$('cv4').classList.toggle('g7',on7);
+  $('vig7').classList.toggle('hidden',!on7);$('flare7').classList.toggle('hidden',!on7);$('spd7').classList.toggle('hidden',scene!=='fly');if(scene!=='fly'){$('ring7').className='';$('trk7').classList.add('hidden');$('trk7').dataset.on='';}};}
+/* --- 機庫：每一台飛機都有 3D 照片 --- */
+function planeThumb7(k){if(VX7.th[k])return VX7.th[k];
+  if(!VX7.tr){const r=new THREE.WebGLRenderer({alpha:true,antialias:true,preserveDrawingBuffer:true});r.setSize(360,200,false);r.setPixelRatio(1);r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.25;
+    const s=new THREE.Scene();s.add(new THREE.HemisphereLight(0xe8f2ff,0x40485a,.75));const d=new THREE.DirectionalLight(0xfff4e0,1.3);d.position.set(5,8,6);s.add(d);s.environment=envFor7(0x3a7fd0,0xdfeefb,r);
+    VX7.tr=r;VX7.ts=s;VX7.tc=new THREE.PerspectiveCamera(28,360/200,.1,200);}
+  const P=plane7(k),m=makePlane7(P.col,k);m.rotation.y=-2.45;m.rotation.z=.04;VX7.ts.add(m);const b=new THREE.Box3().setFromObject(m),c=b.getCenter(new THREE.Vector3()),sz=b.getSize(new THREE.Vector3()).length();
+  m.position.sub(c);VX7.tc.position.set(sz*.18,sz*.32,sz*1.25);VX7.tc.lookAt(0,-sz*.03,0);VX7.tr.render(VX7.ts,VX7.tc);const url=VX7.tr.domElement.toDataURL('image/png');VX7.ts.remove(m);return VX7.th[k]=url;}
+{const _oh=openHangar7;openHangar7=function(){_oh();try{document.querySelectorAll('.hangar7 .pc7').forEach((c,i)=>{const P=PLANES7[i];if(!P)return;const big=c.querySelector('.big');if(big)big.outerHTML=`<img class="th7" alt="${P.n}" src="${planeThumb7(P.k)}">`;
+  const pr=c.querySelector('[data-buy7]');if(pr)c.classList.add('lock');});}catch(e){}};}
+/* --- 7 樓的對話框換成深色高級風格 --- */
+{const _sm=showModal;showModal=function(h){_sm(h);if(curFloor===7&&['air','fly','salv','result'].includes(scene))$('modalCard').classList.add('m7');};}
 
 /* ---------- 紀錄 ---------- */
 function stat(k,n){save.st=save.st||{};save.st[k]=(save.st[k]||0)+(n||1);}
