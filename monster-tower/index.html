@@ -79,6 +79,10 @@
   .tips b{color:#c4483a}
 
   .pz{position:absolute;width:44px;height:44px;border-radius:50%;font-size:18px}
+  #tilt7{width:52px!important;height:52px!important;flex-direction:column;line-height:1}
+  #tilt7 .ph{display:inline-block;font-size:20px;transition:transform .08s linear}
+  #tilt7 small{font-size:9px;font-weight:800;margin-top:1px;opacity:.85}
+  #tilt7.on{background:rgba(60,190,110,.75)!important;border-color:#bff7c3!important;box-shadow:0 0 0 3px rgba(120,255,160,.35),0 6px 16px rgba(0,0,0,.3)!important}
   #bPause{left:calc(192px + env(safe-area-inset-left));top:calc(10px + env(safe-area-inset-top))}
   #bRec{left:calc(242px + env(safe-area-inset-left));top:calc(10px + env(safe-area-inset-top))}
   .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;margin-top:8px}
@@ -405,6 +409,7 @@
   <div id="ring7"><div class="rt"><b>1</b></div><small></small></div>
   <div id="fly7Msg" class="bigMsg"></div>
   <button class="btn pz" id="fly7Pause" style="right:calc(14px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))">⏸</button>
+  <button class="btn pz" id="tilt7" style="right:calc(66px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top))" aria-label="晃動手機控制左右"><span class="ph">📱</span><small>晃動</small></button>
   <div id="fly7Panel"><div id="fly7Inst"></div><div id="fly7Btns"></div></div>
 </div>
 <div id="salv7" class="layer hidden">
@@ -4549,6 +4554,161 @@ function planeThumb7(k){if(VX7.th[k])return VX7.th[k];
   const pr=c.querySelector('[data-buy7]');if(pr)c.classList.add('lock');});}catch(e){}};}
 /* --- 7 樓的對話框換成深色高級風格 --- */
 {const _sm=showModal;showModal=function(h){_sm(h);if(curFloor===7&&['air','fly','salv','result'].includes(scene))$('modalCard').classList.add('m7');};}
+
+/* =========================================================
+   7 樓 視覺升級包 2：大氣透視、物理天空、雲影、水面波光、烤漆反光、柏油與草地質感
+   📱 晃動手機控制飛機左右
+   ========================================================= */
+/* --- 大氣透視霧：只有 fog.far < 0 的場景（7 樓）會用，其他樓層不變 --- */
+THREE.ShaderChunk.fog_pars_vertex='#ifdef USE_FOG\n\tvarying float fogDepth;\n\tvarying vec3 vFogW;\n#endif';
+THREE.ShaderChunk.fog_vertex='#ifdef USE_FOG\n\tfogDepth = - mvPosition.z;\n\t{ mat3 fm = mat3( viewMatrix ); vec3 fv = mvPosition.xyz; vFogW = vec3( dot( fm[0], fv ), dot( fm[1], fv ), dot( fm[2], fv ) ); }\n#endif';
+THREE.ShaderChunk.fog_pars_fragment=`#ifdef USE_FOG
+	uniform vec3 fogColor;
+	varying float fogDepth;
+	varying vec3 vFogW;
+	#ifdef FOG_EXP2
+		uniform float fogDensity;
+	#else
+		uniform float fogNear;
+		uniform float fogFar;
+	#endif
+	float fogH7( vec2 p ) { return fract( sin( dot( p, vec2( 127.1, 311.7 ) ) ) * 43758.5453 ); }
+	float fogN7( vec2 p ) { vec2 i = floor( p ), f = fract( p ); f = f * f * ( 3.0 - 2.0 * f );
+		return mix( mix( fogH7( i ), fogH7( i + vec2( 1.0, 0.0 ) ), f.x ), mix( fogH7( i + vec2( 0.0, 1.0 ) ), fogH7( i + vec2( 1.0 ) ), f.x ), f.y ); }
+#endif`;
+THREE.ShaderChunk.fog_fragment=`#ifdef USE_FOG
+	#ifdef FOG_EXP2
+		float fogFactor = 1.0 - exp( - fogDensity * fogDensity * fogDepth * fogDepth );
+		gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+	#else
+	if ( fogFar < 0.0 ) {
+		vec3 fW = vFogW + cameraPosition;
+		float fDist = length( vFogW );
+		vec3 fDir = vFogW / max( fDist, 0.001 );
+		float cs = fogN7( fW.xz * 0.0055 ) * 0.62 + fogN7( fW.xz * 0.019 + 7.3 ) * 0.38;
+		float shade = smoothstep( 0.58, 0.78, cs ) * ( 1.0 - smoothstep( 30.0, 46.0, fW.y ) );
+		gl_FragColor.rgb *= 1.0 - shade * 0.22;
+		float hf = exp( - max( fW.y, 0.0 ) * 0.0065 );
+		float fogFactor = 1.0 - exp( - pow( max( fDist - 120.0, 0.0 ) * fogNear * mix( 0.55, 1.0, hf ), 1.35 ) );
+		float sunA = pow( max( dot( fDir, vec3( 0.4637, 0.4328, -0.8141 ) ), 0.0 ), 6.0 );
+		vec3 fc = mix( fogColor, vec3( 1.0, 0.9, 0.7 ), sunA * 0.5 );
+		gl_FragColor.rgb = mix( gl_FragColor.rgb, fc, clamp( fogFactor, 0.0, 1.0 ) );
+	} else {
+		float fogFactor = smoothstep( fogNear, fogFar, fogDepth );
+		gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );
+	}
+	#endif
+#endif`;
+const VX7B={tex:{}};
+function noiseCanvas7(n,fn){const c=document.createElement('canvas');c.width=c.height=n;const g=c.getContext('2d');fn(g,n);return c;}
+/* 可以無縫重複的雜訊高度圖 → 法線貼圖 */
+function normalTex7(key,n,blobs,rMin,rMax,strength){if(VX7B.tex[key])return VX7B.tex[key];
+  const hc=noiseCanvas7(n,(g,N)=>{g.fillStyle='#808080';g.fillRect(0,0,N,N);
+    for(let i=0;i<blobs;i++){const x=Math.random()*N,y=Math.random()*N,r=rand(rMin,rMax),up=Math.random()<.5;
+      for(const ox of [-N,0,N])for(const oy of [-N,0,N]){const gr=g.createRadialGradient(x+ox,y+oy,0,x+ox,y+oy,r);gr.addColorStop(0,up?'rgba(255,255,255,.22)':'rgba(0,0,0,.22)');gr.addColorStop(1,'rgba(128,128,128,0)');g.fillStyle=gr;g.fillRect(x+ox-r,y+oy-r,r*2,r*2);}}});
+  const src=hc.getContext('2d').getImageData(0,0,n,n).data,out=document.createElement('canvas');out.width=out.height=n;const og=out.getContext('2d'),im=og.createImageData(n,n);
+  const H=(x,y)=>src[(((y+n)%n)*n+((x+n)%n))*4]/255;
+  for(let y=0;y<n;y++)for(let x=0;x<n;x++){const dx=(H(x+1,y)-H(x-1,y))*strength,dy=(H(x,y+1)-H(x,y-1))*strength,l=Math.hypot(dx,dy,1),i=(y*n+x)*4;
+    im.data[i]=(-dx/l*.5+.5)*255;im.data[i+1]=(-dy/l*.5+.5)*255;im.data[i+2]=(1/l*.5+.5)*255;im.data[i+3]=255;}
+  og.putImageData(im,0,0);const t=new THREE.CanvasTexture(out);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=4;return VX7B.tex[key]=t;}
+function asphaltTex7(){if(VX7B.tex.asp)return VX7B.tex.asp;
+  const c=noiseCanvas7(256,(g,N)=>{const im=g.createImageData(N,N);for(let i=0;i<N*N;i++){const v=170+Math.random()*70-(Math.random()<.03?70:0);im.data[i*4]=im.data[i*4+1]=v;im.data[i*4+2]=v+4;im.data[i*4+3]=255;}g.putImageData(im,0,0);
+    g.globalAlpha=.18;for(let i=0;i<40;i++){g.fillStyle=Math.random()<.5?'#000':'#fff';g.beginPath();g.ellipse(Math.random()*N,Math.random()*N,rand(6,30),rand(3,12),rand(0,3),0,7);g.fill();}});
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=4;return VX7B.tex.asp=t;}
+function cirrusTex7(){return canvasTex7(512,256,(g,w,h)=>{for(let i=0;i<90;i++){const x=rand(0,w),y=rand(20,h-20),l=rand(80,220),gr=g.createLinearGradient(x-l/2,0,x+l/2,0);
+  gr.addColorStop(0,'rgba(255,255,255,0)');gr.addColorStop(.5,`rgba(255,255,255,${rand(.08,.22)})`);gr.addColorStop(1,'rgba(255,255,255,0)');g.strokeStyle=gr;g.lineWidth=rand(2,9);g.beginPath();g.moveTo(x-l/2,y);g.quadraticCurveTo(x,y-rand(-12,12),x+l/2,y+rand(-6,6));g.stroke();}});}
+/* --- 物理感的天空：地平線霧白、太陽周圍的光暈 --- */
+function skyShader7(){return new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,fog:false,
+  uniforms:{top:{value:new THREE.Color(SKY7[0])},hor:{value:new THREE.Color(SKY7[1])},sun:{value:new THREE.Vector3(.4637,.4328,-.8141)}},
+  vertexShader:'varying vec3 vD;void main(){vD=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+  fragmentShader:`uniform vec3 top;uniform vec3 hor;uniform vec3 sun;varying vec3 vD;
+    void main(){vec3 d=normalize(vD);float y=d.y;
+      vec3 c=mix(hor,top,pow(max(y,0.0),0.48));
+      c=mix(c,hor*1.06+vec3(.05),exp(-abs(y)*14.0)*.55);
+      float s=max(dot(d,sun),0.0);
+      c+=vec3(1.0,.86,.62)*pow(s,7.0)*.32+vec3(1.0,.95,.82)*pow(s,90.0)*.7+vec3(1.0)*smoothstep(.9993,.9998,s)*1.4;
+      if(y<0.0)c=mix(hor*.9,c,exp(y*28.0));
+      gl_FragColor=vec4(c,1.0);
+      #include <tonemapping_fragment>
+      #include <encodings_fragment>
+    }`});}
+{const _s7=setSky7;setSky7=function(top,hor){_s7(top,hor);if(G7&&G7.dome&&G7.dome.material.uniforms){G7.dome.material.uniforms.top.value.setHex(top);G7.dome.material.uniforms.hor.value.setHex(hor);}};}
+/* --- 烤漆、金屬、玻璃：換成有清漆反光的材質 --- */
+function paint7(root){root.traverse(o=>{if(!o.isMesh||!o.material||o.material.isMeshPhysicalMaterial||!o.material.isMeshStandardMaterial)return;const m=o.material;
+  const glass=m.roughness<=.15&&m.metalness>=.55,metal=m.metalness>=.6;
+  const p=new THREE.MeshPhysicalMaterial({color:m.color,roughness:glass?.04:metal?Math.max(.18,m.roughness*.8):Math.max(.16,m.roughness*.6),metalness:m.metalness,map:m.map,emissive:m.emissive,emissiveIntensity:m.emissiveIntensity,
+    transparent:m.transparent,opacity:m.opacity,side:m.side,flatShading:m.flatShading,clearcoat:metal?.35:1,clearcoatRoughness:glass?.02:.08,envMapIntensity:glass?1.6:1.15});
+  o.material=p;});}
+/* --- 水面：會動的波紋與太陽反光 --- */
+function water7(m){if(m.userData.w7)return;m.userData.w7=1;const t=normalTex7('water',256,220,6,26,6).clone();t.needsUpdate=true;t.repeat.set(3,3);
+  m.normalMap=t;m.normalScale=new THREE.Vector2(.55,.55);m.roughness=.06;m.metalness=.85;m.envMapIntensity=1.5;m.needsUpdate=true;VX7B.waters=(VX7B.waters||[]).concat([{m,t}]);}
+function waterScan7(root){root.traverse(o=>{if(!o.isMesh||!o.material||!o.material.isMeshStandardMaterial)return;const m=o.material,h=m.color.getHex();
+  if([0x3f86a8,0x1f6fa0,0x2a8ab0,0x2f6f8f].includes(h)){const g=o.geometry.parameters||{};water7(m);
+    if(g.width&&g.height){m.normalMap.repeat.set(Math.max(1,g.width/14),Math.max(1,g.height/14));}}});}
+function enhance7b(){
+  const sc=G7.sc;
+  // 天空
+  G7.dome.material=skyShader7();setSky7(G7.skyT?G7.skyT[0]:SKY7[0],G7.skyT?G7.skyT[1]:SKY7[1]);
+  // 大氣透視霧：fog.near 當作濃度、fog.far 設成負的表示啟用
+  sc.fog.near=.00091;sc.fog.far=-1;
+  // 高空卷雲
+  const ci=new THREE.Mesh(new THREE.PlaneGeometry(2600,2600),new THREE.MeshBasicMaterial({map:cirrusTex7(),transparent:true,depthWrite:false,fog:false,opacity:.75}));
+  ci.material.map.wrapS=ci.material.map.wrapT=THREE.RepeatWrapping;ci.material.map.repeat.set(3,3);ci.rotation.x=Math.PI/2;ci.position.y=420;ci.renderOrder=-.5;sc.add(ci);G7.cirrus=ci;
+  // 雲的下半部比較暗，看起來有體積
+  G7.clouds.forEach(c=>{const um=new THREE.SpriteMaterial({map:G7.ctex,color:0xc6cfdb,transparent:true,depthWrite:false,opacity:.42});
+    for(let j=0;j<4;j++){const s=new THREE.Sprite(um);const sz=rand(30,50);s.scale.set(sz,sz*.5,1);s.position.set(rand(-18,18),rand(-5,-3),rand(-12,12));s.userData.under=1;c.add(s);}
+    c.children.forEach(s=>{if(!s.userData.under)s.position.y+=1.5;});});
+  // 草地凹凸、柏油顆粒
+  G7.chunks.forEach(c=>{c.material.normalMap=normalTex7('grass',256,500,2,7,5);c.material.normalScale=new THREE.Vector2(.9,.9);c.material.needsUpdate=true;});
+  const asp=asphaltTex7();sc.traverse(o=>{if(!o.isMesh||!o.material||!o.material.isMeshStandardMaterial||o.material.map)return;const h=o.material.color.getHex();
+    if([0x3a3d42,0x45484e,0x4a4d52,0x5a5d62].includes(h)){const g=o.geometry.parameters||{},t=asp.clone();t.needsUpdate=true;t.repeat.set(Math.max(1,(g.width||10)/6),Math.max(1,(g.height||10)/6));o.material.map=t;o.material.roughnessMap=t;o.material.roughness=.92;o.material.color.offsetHSL(0,0,.06);o.material.needsUpdate=true;}});
+  waterScan7(sc);
+  // 航廈、塔台、停著的飛機、比賽對手也用烤漆反光
+  G7.park.forEach(paint7);G7.ai.forEach(paint7);if(G7.deco)G7.deco.traverse(o=>{if(o.isMesh&&o.material&&o.material.metalness>=.55&&o.material.roughness<=.15)o.material.envMapIntensity=1.6;});
+  // 陽光更暖、陰影更柔
+  if(G7.sun){G7.sun.intensity=1.35;G7.sun.color.setHex(0xffeccc);G7.sun.shadow.radius=3;}if(G7.hemi)G7.hemi.intensity=.55;
+  VX7.exp=1.08;
+}
+{const _b7=build7;build7=function(){const first=!G7;_b7();if(first&&G7)enhance7b();};}
+{const _sp=syncPlane7;syncPlane7=function(){const m=_sp();if(m&&!m.userData.p7){m.userData.p7=1;paint7(m);}return m;};}
+{const _t7=theme7;theme7=function(dk,z0,z1){_t7(dk,z0,z1);if(!G7)return;waterScan7(G7.themeG);
+  G7.clouds.forEach(c=>c.children.forEach(s=>{if(s.userData.under){s.material.color.copy(c.children[0].material.color).multiplyScalar(.8);}}));};}
+{const _o7=obs7Mesh;obs7Mesh=function(k){const r=_o7(k);if(k==='plane'||k==='heli'||k==='ufo'||k==='blimp')paint7(r.g);return r;};}
+{const _r7=render7;render7=function(cam){
+  if(VX7B.waters)VX7B.waters.forEach(w=>{w.t.offset.x=T*.018;w.t.offset.y=-T*.035;});
+  if(G7.cirrus){G7.cirrus.position.x=cam.position.x;G7.cirrus.position.z=cam.position.z;G7.cirrus.material.map.offset.set(cam.position.x/2600*3+T*.002,-cam.position.z/2600*3);}
+  _r7(cam);};}
+
+/* --- 📱 晃動手機控制左右 --- */
+const TILT={on:!!save.tilt,has:false,raw:0,zero:0,v:0,lastEv:0,listening:false};
+function tiltAngle7(e){if(e.beta==null||e.gamma==null)return null;const b=e.beta*Math.PI/180,g=e.gamma*Math.PI/180;
+  const ux=-Math.sin(g)*Math.cos(b),uy=Math.sin(b);
+  let ang=screen.orientation&&typeof screen.orientation.angle==='number'?screen.orientation.angle:(window.orientation||0);ang=((ang%360)+360)%360;
+  const up=ang===90?[1,0]:ang===270?[-1,0]:ang===180?[0,-1]:[0,1],rt=[up[1],-up[0]];
+  if(Math.hypot(ux,uy)<.25)return null;
+  return Math.atan2(ux*rt[0]+uy*rt[1],ux*up[0]+uy*up[1]);}
+function onTilt7(e){const a=tiltAngle7(e);if(a==null)return;TILT.raw=a;TILT.lastEv=performance.now();if(!TILT.has){TILT.has=true;TILT.zero=a;}}
+function listenTilt7(){if(TILT.listening)return;TILT.listening=true;addEventListener('deviceorientation',onTilt7);}
+function tiltZero7(){TILT.zero=TILT.raw;TILT.v=0;}
+function tiltX7(){if(!TILT.on||!TILT.has)return 0;let d=-(TILT.raw-TILT.zero);d=Math.atan2(Math.sin(d),Math.cos(d))*180/Math.PI;
+  const dz=3,mx=26,t=Math.abs(d)<dz?0:clamp((Math.abs(d)-dz)/(mx-dz),0,1)*Math.sign(d);TILT.v+=(t-TILT.v)*.35;return TILT.v;}
+function tiltUI7(){const b=$('tilt7');if(!b)return;b.classList.toggle('on',TILT.on);b.querySelector('small').textContent=TILT.on?'晃動 開':'晃動';}
+async function toggleTilt7(){
+  if(TILT.on){TILT.on=false;save.tilt=false;persist();tiltUI7();toast('📱 晃動控制關掉了，改用左下搖桿控制左右',1800);return;}
+  if(!window.DeviceOrientationEvent){toast('這台手機不支援晃動控制，請用左下搖桿',2200);return;}
+  try{if(typeof DeviceOrientationEvent.requestPermission==='function'){const r=await DeviceOrientationEvent.requestPermission();if(r!=='granted'){toast('沒有拿到晃動感應的權限。<br>可以到瀏覽器設定裡允許「動作與方向」再試一次',3000);return;}}}
+  catch(e){toast('要在網站上（https）才能用晃動控制，請用左下搖桿',2600);return;}
+  listenTilt7();TILT.on=true;save.tilt=true;persist();tiltUI7();
+  setTimeout(()=>{if(!TILT.on)return;if(!TILT.has||performance.now()-TILT.lastEv>1500){TILT.on=false;save.tilt=false;persist();tiltUI7();toast('收不到手機的晃動感應，先用左下搖桿控制',2400);return;}
+    tiltZero7();toast('📱 晃動控制開了！<br>手機像方向盤一樣<b>往左轉、往右轉</b>，飛機就會跟著轉。<br>現在拿手機的角度是「正中間」',3200);},400);
+}
+$('tilt7').addEventListener('pointerdown',e=>{e.preventDefault();toggleTilt7();});
+if(TILT.on){if(window.DeviceOrientationEvent&&typeof DeviceOrientationEvent.requestPermission!=='function')listenTilt7();else{TILT.on=false;save.tilt=false;}}
+{const _j7=joy7;joy7=function(){const r=_j7();if(scene==='fly'&&TILT.on){const t=tiltX7();r[0]=clamp(r[0]+t,-1,1);
+  const ph=$('tilt7').querySelector('.ph');ph.style.transform=`rotate(${(t*35).toFixed(1)}deg)`;}return r;};}
+{const _sf=startFlight;startFlight=function(mode,job){_sf(mode,job);tiltUI7();if(TILT.on&&TILT.has)tiltZero7();
+  if(!save.tiltTip&&!TILT.on){save.tiltTip=1;persist();setTimeout(()=>{if(scene==='fly')toast('💡 按右上角的 📱 可以改成<b>左右晃動手機</b>來控制飛機方向',3200);},3400);}};}
+{const _r7=resume7;resume7=function(){_r7();if(TILT.on&&TILT.has)tiltZero7();};}
 
 /* ---------- 紀錄 ---------- */
 function stat(k,n){save.st=save.st||{};save.st[k]=(save.st[k]||0)+(n||1);}
